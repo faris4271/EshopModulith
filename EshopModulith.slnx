@@ -1,0 +1,33 @@
+<Solution>
+  <Folder Name="/Src/" />
+  <Folder Name="/Src/Api/">
+    <Project Path="Src/Api/Api/Api.csproj" Id="dac9a9bc-b409-4c8d-9534-091a2718c123" />
+  </Folder>
+  <Folder Name="/Src/BuildingBlocks/">
+    <Project Path="Src/BuildingBlocks/Shared.Contract/Shared.Contract.csproj" />
+    <Project Path="Src/BuildingBlocks/Shared.Eventing.Contract/Shared.Eventing.Contract.csproj" Id="86f41d0e-cdfe-437d-91e6-96846f1a8d41" />
+    <Project Path="Src/BuildingBlocks/Shared.Eventing/Shared.Eventing.csproj" Id="3a648412-a98e-4d6d-abb4-35ce3d5c2002" />
+    <Project Path="Src/BuildingBlocks/Shared.Jobs/Shared.Jobs.csproj" Id="08371ad5-dc9a-4ea6-9d0b-739aaf521272" />
+    <Project Path="Src/BuildingBlocks/Shared.Mailing/Shared.Mailing.csproj" Id="66461987-0452-4793-86c9-8acb1428ef97" />
+    <Project Path="Src/BuildingBlocks/Shared.Message/Shared.Message.csproj" />
+    <Project Path="Src/BuildingBlocks/Shared/Shared.csproj" />
+  </Folder>
+  <Folder Name="/Src/Modules/" />
+  <Folder Name="/Src/Modules/Catalog/">
+    <Project Path="Src/Modules/Catalog/Catalog/Catalog.csproj" />
+  </Folder>
+  <Folder Name="/Src/Modules/Core/">
+    <Project Path="Src/Modules/Core/EShop.Module.Core.Contract/EShop.Module.Core.Contract.csproj" Id="a70742e5-57e3-49ed-9ccb-e8b0e3cfb2f7" />
+    <Project Path="Src/Modules/Core/Eshop.Module.Core/Eshop.Module.Core.csproj" Id="6d2c26c4-6e0d-4cba-b003-06bd41654e37" />
+  </Folder>
+  <Folder Name="/Src/Modules/Identity/">
+    <Project Path="Src/Modules/Identity/IdentityModule/IdentityModule.csproj" Id="ec300d1e-5e81-459d-bb31-478c727f673b" />
+    <Project Path="Src/Modules/Identity/Module.Identity.Contract/Module.Identity.Contract.csproj" Id="493927a5-8fcf-4f37-aa41-53f039a40747" />
+  </Folder>
+  <Folder Name="/Src/Modules/Inventory/">
+    <Project Path="Src/Modules/Inventory/Module.Inventory/Module.Inventory.csproj" Id="7b0f7d92-8eb1-496f-97b5-500de5d7939c" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+</Solution>

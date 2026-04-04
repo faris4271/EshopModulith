@@ -1,0 +1,42 @@
+services:
+  api:
+    image: ${DOCKER_REGISTRY-}api
+    build:
+      context: .
+      dockerfile: Src/Api/Api/Dockerfile
+    depends_on:
+      Eshop_db:
+        condition: service_healthy
+
+       
+      
+
+  Eshop_db:
+   image: postgres:latest
+   container_name: Eshop_db
+   environment:
+      - POSTGRES_DB=Eshop
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+   ports:
+   - "5432:5432"
+   volumes:
+   - ./.containers/database:/var/lib/postgresql
+   healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d eshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  messagebus:
+    image: rabbitmq:management
+    container_name: messagebus
+    hostname: ecommerce-mq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
