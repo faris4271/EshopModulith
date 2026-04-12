@@ -58,11 +58,11 @@
 
         public IList<ProductMediaDto> ProductDocuments { get; set; } = new List<ProductMediaDto>();
 
-        public IList<long> DeletedMediaIds { get; set; } = new List<long>();
+        public IList<Guid> DeletedMediaIds { get; set; } = new List<Guid>();
 
-        public long? BrandId { get; set; }
+        public Guid? BrandId { get; set; }
 
-        public long? TaxClassId { get; set; }
+        public Guid? TaxClassId { get; set; }
 
         public List<ProductLinkDto> RelatedProducts { get; set; } = new List<ProductLinkDto>();
 

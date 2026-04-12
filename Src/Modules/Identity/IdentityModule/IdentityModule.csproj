@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Jobs\Shared.Jobs.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Mailing\Shared.Mailing.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />

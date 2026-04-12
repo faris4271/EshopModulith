@@ -84,6 +84,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             await SaveProductMedias(request.ProductForm, product);
 
             await MapProductVariationDtoToProduct(request.ProductForm, product);
+            
 
             MapProductLinkDtoToProduct(request.ProductForm, product);
 
@@ -141,6 +142,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                 productLink.LinkedProduct.NormalizedName = variant.NormalizedName;
                 productLink.LinkedProduct.IsVisibleIndividually = false;
 
+                await MapProductVariantImageFromDto(variant, product);
 
                 foreach (var combination in variant.OptionCombinations)
                 {
@@ -155,6 +157,10 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
                     productLink.LinkedProduct.AddOptionCombination(option);
                 }
+
+
+
+        
 
                 var history = CreatePriceHistory(productLink.LinkedProduct);
 

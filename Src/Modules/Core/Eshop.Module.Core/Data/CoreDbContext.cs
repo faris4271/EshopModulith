@@ -5,8 +5,8 @@ namespace Eshop.Module.Core.Data
 {
     public class CoreDbContext : DbContext
     {
-        DbSet<Entity> entities;
-        DbSet<Media> media;
+       public DbSet<Entity> entities { get; set; }
+       public DbSet<Media> media { get; set; }
         public CoreDbContext(DbContextOptions options) : base(options)
         {
         }

@@ -4,6 +4,7 @@
     <Project Path="Src/Api/Api/Api.csproj" Id="dac9a9bc-b409-4c8d-9534-091a2718c123" />
   </Folder>
   <Folder Name="/Src/BuildingBlocks/">
+    <Project Path="Src/BuildingBlocks/Shared.Caching/Shared.Caching.csproj" Id="15ba5eef-2f6f-4729-8f00-19496c1aee07" />
     <Project Path="Src/BuildingBlocks/Shared.Contract/Shared.Contract.csproj" />
     <Project Path="Src/BuildingBlocks/Shared.Eventing.Contract/Shared.Eventing.Contract.csproj" Id="86f41d0e-cdfe-437d-91e6-96846f1a8d41" />
     <Project Path="Src/BuildingBlocks/Shared.Eventing/Shared.Eventing.csproj" Id="3a648412-a98e-4d6d-abb4-35ce3d5c2002" />

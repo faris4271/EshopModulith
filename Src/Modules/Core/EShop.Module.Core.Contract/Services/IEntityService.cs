@@ -6,7 +6,7 @@ namespace EShop.Module.Core.Contract.Services
     {
         Task<string> ToSafeSlug(string slug, Guid entityId, string entityTypeId);
 
-        Task<EntityDto> Get(Guid entityId, string entityTypeId);
+        Task<EntityDto> Get(Guid entityId);
 
         void Add(string name, string slug, Guid entityId, string entityTypeId);
 

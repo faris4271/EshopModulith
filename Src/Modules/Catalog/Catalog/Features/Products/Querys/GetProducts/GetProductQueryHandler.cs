@@ -19,7 +19,7 @@ namespace Catalog.Features.Products.Querys.GetProducts
         {
             var query = await _repository.GetAllAsQuerable();
 
-            var prducts = await query.ToPaginatedListAsync(request.PageNumber, request.PageSize);
+            var prducts = await query.ToPaginatedListAsync(request.PageNumber, request.PageSize, cancellationToken);
 
 
             return prducts;

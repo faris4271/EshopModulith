@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Linq.Expressions;
 
 namespace Shared.Abstraction
 {
@@ -22,7 +23,7 @@ namespace Shared.Abstraction
 
 
 
-        public void Delete(int id)
+        public void Delete<TId>(TId id)
         {
             var entity = _context.Set<T>().Find(id);
             if (entity == null)
@@ -60,19 +61,32 @@ namespace Shared.Abstraction
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id, params System.Linq.Expressions.Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdAsync<TId>(
+           TId id,
+           bool trackChanges = false,
+           params Expression<Func<T, object>>[] includes)
+           where TId : notnull
         {
-            var query = _context.Set<T>().AsQueryable().AsNoTracking();
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
-            var entity = await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
-            return entity;
+            IQueryable<T> query = _context.Set<T>();
 
+            // التحكم في التتبع حسب الحاجة (Update vs Read)
+            if (!trackChanges)
+            {
+                query = query.AsNoTracking();
+            }
+
+            // إضافة الـ Includes ديناميكياً
+            if (includes.Any())
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            // استخدام FirstOrDefaultAsync مع البحث عن المعرف
+            // ملاحظة: افترضنا هنا أن اسم الخاصية هو "Id" كما في كودك الأصلي
+            return await query.FirstOrDefaultAsync(e => EF.Property<TId>(e, "Id")!.Equals(id));
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync<TId>(TId id)
         {
             var entity = _context.Set<T>().FindAsync(id);
             return await entity;

@@ -1,5 +1,6 @@
 using Carter;
 using Catalog;
+using Eshop.Module.Core;
 using Microsoft.OpenApi;
 using Shared.Extensions;
 using Shared.Message.Extensions;
@@ -16,7 +17,7 @@ builder.Services
     .AddMediatRWithAssemblies(catalogAssembly);
 
 
-builder.Services.AddCatalog(builder.Configuration);
+builder.Services.AddCatalog(builder.Configuration).AddCore(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

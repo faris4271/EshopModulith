@@ -10,12 +10,12 @@ namespace Eshop.Module.Core.Services
 {
     internal class EntityService : IEntityService
     {
-        private readonly IGenericeRepository<Entity, CoreDbContext> _entityRepository;
+        private readonly CoreDbContext _context;
         private readonly IMediator _mediator;
 
-        public EntityService(IGenericeRepository<Entity, CoreDbContext> entityRepository, IMediator mediator)
+        public EntityService(CoreDbContext context, IMediator mediator)
         {
-            _entityRepository = entityRepository;
+            _context = context;
             _mediator = mediator;
         }
 
@@ -24,8 +24,8 @@ namespace Eshop.Module.Core.Services
             var i = 2;
             while (true)
             {
-                var query = await _entityRepository.GetAllAsQuerable();
-                var entity = query.FirstOrDefault(x => x.Slug == slug);
+                var entity =  _context.entities.AsQueryable()
+               .FirstOrDefault(x => x.Slug == slug);
 
                 if (entity != null && !(entity.EntityId == entityId && entity.EntityTypeId == entityTypeId))
                 {
@@ -41,10 +41,10 @@ namespace Eshop.Module.Core.Services
             return slug;
         }
 
-        public async Task<EntityDto> Get(Guid entityId, string entityTypeId)
+        public async Task<EntityDto> Get(Guid entityId)
         {
-            var query = await _entityRepository.GetAllAsQuerable();
-            var entity = query.FirstOrDefault(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
+            var query = _context.entities.AsQueryable();
+            var entity = query.FirstOrDefault(x => x.EntityId == entityId);
             var result = entity.Adapt<EntityDto>();
             return result;
         }
@@ -59,12 +59,12 @@ namespace Eshop.Module.Core.Services
                 EntityTypeId = entityTypeId
             };
 
-            _entityRepository.Add(entity);
+            _context.entities.Add(entity);
         }
 
         public async Task Update(string newName, string newSlug, Guid entityId, string entityTypeId)
         {
-            var query = await _entityRepository.GetAllAsQuerable();
+            var query = _context.entities.AsQueryable();
             var entity = query.First(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
             entity.Name = newName;
             entity.Slug = newSlug;
@@ -73,9 +73,9 @@ namespace Eshop.Module.Core.Services
 
         public async Task Remove(Guid entityId, string entityTypeId)
         {
-            var query = await _entityRepository.GetAllAsQuerable();
+            var query = _context.entities.AsQueryable();
             var entity = query.FirstOrDefault(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
-            _entityRepository.Delete(entity);
+            _context.entities.Remove(entity);
             //if (entity != null)
             //{
             //    await _mediator.Publish(new EntityDeleting { EntityId = entity.Id });

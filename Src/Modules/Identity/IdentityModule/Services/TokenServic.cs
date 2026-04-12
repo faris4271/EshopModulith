@@ -20,10 +20,12 @@ namespace IdentityModule.Services
         private readonly IdentityMetrics _metrics;
 
         private readonly ILogger<TokenServic> _logger;
-        public TokenServic(IOptions<JwtOptions> options)
+        public TokenServic(IOptions<JwtOptions> options,
+            IdentityMetrics metrics, ILogger<TokenServic> logger)
         {
             _jwtOptions = options.Value;
-
+            _metrics = metrics;
+            _logger = logger;
         }
         public Task<TokenResponse> IssueAsync(string subject, IEnumerable<Claim> claims, string? tenant = null, CancellationToken ct = default)
         {

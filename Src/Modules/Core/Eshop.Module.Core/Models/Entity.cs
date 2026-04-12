@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Eshop.Module.Core.Models
 {
-    internal class Entity : Aggregate<Guid>
+    public class Entity : Aggregate<Guid>
     {
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(450)]

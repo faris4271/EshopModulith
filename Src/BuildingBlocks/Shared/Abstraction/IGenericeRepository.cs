@@ -8,12 +8,15 @@ namespace Shared.Abstraction
     {
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<IReadOnlyList<T>> GetAllAsync(params Expression<Func<T, object>>[] Includes);
-        Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes);
+        Task<T> GetByIdAsync<TId>(TId id,
+           bool trackChanges = false,
+           params Expression<Func<T, object>>[] includes);
+        
         Task<IQueryable<T>> GetAllAsQuerable();
-        Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync<TId>(TId id);
         void Add(T entity);
         void Update(T entity);
-        void Delete(int id);
+        void Delete<TId>(TId id);
         void Delete(T entity);
         Task<int> SaveChangesAsync();
         IDbContextTransaction BeginTransaction();
