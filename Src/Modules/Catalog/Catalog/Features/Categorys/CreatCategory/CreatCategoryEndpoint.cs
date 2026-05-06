@@ -12,7 +12,7 @@ namespace Catalog.Features.Categorys.CreatCategory
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/category", async ([FromForm] CategoryDto dto, [FromServices] ISender sender) =>
+            app.MapPost("api/categories", async ([FromForm] CategoryDto dto, [FromServices] ISender sender) =>
             {
                 var command = new CreatCategoryCommand(dto);
                 var result = await sender.Send(command);

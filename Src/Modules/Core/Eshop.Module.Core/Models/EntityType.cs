@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Eshop.Module.Core.Models
 {
-    public class EntityType : EntityBase<string>
+    public class EntityType : EntityBase<string>,IAuditableEntity, IHasDomainEvents
     {
         public EntityType()
         {
@@ -29,5 +29,13 @@ namespace Eshop.Module.Core.Models
 
         [StringLength(450)]
         public string RoutingAction { get; set; }
+
+        public DateTimeOffset CreatedOn {  get; set; }
+
+        public string? CreatedById { get; set; }
+
+        public DateTimeOffset? LatestUpdatedOn { get; set; }
+
+        public string? LatestUpdatedById { get; set; }
     }
 }

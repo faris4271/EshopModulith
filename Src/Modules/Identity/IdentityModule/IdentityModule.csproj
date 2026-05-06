@@ -7,18 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Feature\" />
-    <Folder Include="Events\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.1" />
+    <PackageReference Include="NuGet.CommandLine" Version="7.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Caching\Shared.Caching.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Eventing\Shared.Eventing.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Jobs\Shared.Jobs.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Mailing\Shared.Mailing.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Storage\Shared.Storage.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Web\Shared.Web.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />
     <ProjectReference Include="..\Module.Identity.Contract\Module.Identity.Contract.csproj" />
   </ItemGroup>

@@ -4,18 +4,20 @@ using EShop.Module.Core.Contract.Dtos;
 using EShop.Module.Core.Contract.Services;
 using Mapster;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Shared.Abstraction;
+
 
 namespace Eshop.Module.Core.Services
 {
     internal class EntityService : IEntityService
     {
-        private readonly CoreDbContext _context;
+        private readonly IGenericeRepository<Entity, CoreDbContext> _repository;
         private readonly IMediator _mediator;
 
-        public EntityService(CoreDbContext context, IMediator mediator)
+        public EntityService(IGenericeRepository<Entity, CoreDbContext> repository, IMediator mediator)
         {
-            _context = context;
+            _repository = repository;
             _mediator = mediator;
         }
 
@@ -24,8 +26,9 @@ namespace Eshop.Module.Core.Services
             var i = 2;
             while (true)
             {
-                var entity =  _context.entities.AsQueryable()
-               .FirstOrDefault(x => x.Slug == slug);
+                var query =await _repository.GetAllAsQuerable();
+                var entity = query.FirstOrDefault(x => x.Slug == slug);
+
 
                 if (entity != null && !(entity.EntityId == entityId && entity.EntityTypeId == entityTypeId))
                 {
@@ -43,50 +46,49 @@ namespace Eshop.Module.Core.Services
 
         public async Task<EntityDto> Get(Guid entityId)
         {
-            var query = _context.entities.AsQueryable();
+            var query = await _repository.GetAllAsQuerable();
             var entity = query.FirstOrDefault(x => x.EntityId == entityId);
             var result = entity.Adapt<EntityDto>();
             return result;
         }
 
-        public void Add(string name, string slug, Guid entityId, string entityTypeId)
+        public async Task Add(string name, string slug, Guid entityId, string entityTypeId)
         {
-            var entity = new Entity
-            {
-                Name = name,
-                Slug = slug,
-                EntityId = entityId,
-                EntityTypeId = entityTypeId
-            };
-
-            _context.entities.Add(entity);
+            var entity = Entity.Creat(name, slug, entityId, entityTypeId);
+            await _repository.AddAsync(entity);            // if available
+            var saved = await _repository.SaveChangesAsync();
+            if (saved == 0) throw new InvalidOperationException("No rows were saved.");
         }
 
         public async Task Update(string newName, string newSlug, Guid entityId, string entityTypeId)
         {
-            var query = _context.entities.AsQueryable();
-            var entity = query.First(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
-            entity.Name = newName;
-            entity.Slug = newSlug;
+            var query =await _repository.GetAllAsQuerable() ;
+            var entity = query.FirstOrDefault(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
+
+            if(entity is null)
+                throw new InvalidOperationException("can not find entity");
+
+            entity.Update(newName, newSlug, entityId, entityTypeId);
+
+              _repository.Update(entity);
+
+            await _repository.SaveChangesAsync();
 
         }
 
         public async Task Remove(Guid entityId, string entityTypeId)
         {
-            var query = _context.entities.AsQueryable();
+            var query =await _repository.GetAllAsQuerable();
             var entity = query.FirstOrDefault(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
-            _context.entities.Remove(entity);
+            _repository.Delete(entity);
             //if (entity != null)
             //{
             //    await _mediator.Publish(new EntityDeleting { EntityId = entity.Id });
             //    _entityRepository.Remove(entity);
             //}
+            await _repository.SaveChangesAsync();
         }
 
-
-
-
-
-
+        
     }
 }

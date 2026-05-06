@@ -13,9 +13,9 @@ namespace Catalog.Features.Products.Querys.GetProducts
         public record GetProductRequest(int PageNumber, int PageSize);
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/get-product", async ([FromBody] GetProductRequest query, [FromServices] ISender send) =>
+            app.MapGet("/get-product", async (int PageNumber,int PageSize,[FromServices] ISender send) =>
             {
-                var request = query.Adapt<GetProductQuery>();
+                var request = new GetProductQuery { PageNumber = PageNumber, PageSize = PageSize };
 
                 var respons = await send.Send(request);
 

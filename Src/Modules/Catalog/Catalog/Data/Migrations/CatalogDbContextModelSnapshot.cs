@@ -18,23 +18,47 @@ namespace Catalog.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("catalog")
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Catalog.Brands.Moddels.Brand", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brand", "catalog");
+                });
 
             modelBuilder.Entity("Catalog.Category.Models.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -51,13 +75,6 @@ namespace Catalog.Data.Migrations
 
                     b.Property<bool>("IsPublished")
                         .HasColumnType("boolean");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("MetaDescription")
                         .IsRequired()
@@ -85,9 +102,6 @@ namespace Catalog.Data.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)");
 
-                    b.Property<Guid>("ThumbnailImageId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
@@ -95,49 +109,27 @@ namespace Catalog.Data.Migrations
                     b.ToTable("Categories", "catalog");
                 });
 
-            modelBuilder.Entity("Catalog.Products.Models.Brand", b =>
+            modelBuilder.Entity("Catalog.Category.Models.CategoryMedia", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)");
+                    b.Property<Guid>("MediaId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand", "catalog");
+                    b.HasIndex("CategoryId")
+                        .IsUnique();
+
+                    b.ToTable("CategoryMedia", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Products.Models.Product", b =>
@@ -146,18 +138,8 @@ namespace Catalog.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long?>("BrandId")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("BrandId1")
+                    b.Property<Guid?>("BrandId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("CreatedById")
                         .IsRequired()
@@ -199,18 +181,14 @@ namespace Catalog.Data.Migrations
                     b.Property<bool>("IsVisibleIndividually")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("LatestUpdatedById")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("LatestUpdatedById")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("LatestUpdatedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("MainImageId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("MetaDescription")
                         .IsRequired()
@@ -283,16 +261,12 @@ namespace Catalog.Data.Migrations
                     b.Property<long?>("TaxClassId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ThumbnailImage")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<long?>("VendorId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BrandId1");
+                    b.HasIndex("BrandId");
 
                     b.ToTable("Products", "catalog");
                 });
@@ -303,25 +277,8 @@ namespace Catalog.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("GroupId")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("GroupId1")
+                    b.Property<Guid>("GroupId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -329,7 +286,7 @@ namespace Catalog.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GroupId1");
+                    b.HasIndex("GroupId");
 
                     b.ToTable("ProductAttribute", "catalog");
                 });
@@ -339,20 +296,6 @@ namespace Catalog.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -367,20 +310,6 @@ namespace Catalog.Data.Migrations
 
                     b.Property<Guid>("AttributeId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -407,25 +336,11 @@ namespace Catalog.Data.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsFeaturedProduct")
                         .HasColumnType("boolean");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -444,20 +359,6 @@ namespace Catalog.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("LinkType")
                         .HasColumnType("integer");
@@ -483,22 +384,8 @@ namespace Catalog.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("MediaId")
                         .HasColumnType("uuid");
@@ -519,20 +406,6 @@ namespace Catalog.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -548,20 +421,6 @@ namespace Catalog.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("OptionId")
                         .HasColumnType("uuid");
@@ -592,24 +451,10 @@ namespace Catalog.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("DisplayType")
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("OptionId")
                         .HasColumnType("uuid");
@@ -640,25 +485,11 @@ namespace Catalog.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("CreatedById")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<decimal?>("OldPrice")
                         .HasColumnType("numeric");
@@ -691,20 +522,6 @@ namespace Catalog.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -719,20 +536,6 @@ namespace Catalog.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LasteModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LasteModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("ProductAttributeId")
                         .HasColumnType("uuid");
@@ -758,13 +561,22 @@ namespace Catalog.Data.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Catalog.Products.Models.Product", b =>
+            modelBuilder.Entity("Catalog.Category.Models.CategoryMedia", b =>
                 {
-                    b.HasOne("Catalog.Products.Models.Brand", "Brand")
-                        .WithMany()
-                        .HasForeignKey("BrandId1")
+                    b.HasOne("Catalog.Category.Models.Category", "Category")
+                        .WithOne("ThumbnailImage")
+                        .HasForeignKey("Catalog.Category.Models.CategoryMedia", "CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Catalog.Products.Models.Product", b =>
+                {
+                    b.HasOne("Catalog.Brands.Moddels.Brand", "Brand")
+                        .WithMany("Products")
+                        .HasForeignKey("BrandId");
 
                     b.OwnsOne("Shared.DDD.Description", "ShortDescription", b1 =>
                         {
@@ -793,7 +605,7 @@ namespace Catalog.Data.Migrations
                 {
                     b.HasOne("Catalog.Products.Models.ProductAttributeGroup", "Group")
                         .WithMany("Attributes")
-                        .HasForeignKey("GroupId1")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -959,11 +771,19 @@ namespace Catalog.Data.Migrations
                     b.Navigation("ProductTemplate");
                 });
 
+            modelBuilder.Entity("Catalog.Brands.Moddels.Brand", b =>
+                {
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("Catalog.Category.Models.Category", b =>
                 {
                     b.Navigation("Children");
 
                     b.Navigation("Products");
+
+                    b.Navigation("ThumbnailImage")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Catalog.Products.Models.Product", b =>

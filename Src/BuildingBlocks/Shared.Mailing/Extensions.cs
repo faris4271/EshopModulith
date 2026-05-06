@@ -6,7 +6,7 @@ namespace Shared.Mailing;
 
 public static class Extensions
 {
-    public static IServiceCollection AddHeroMailing(this IServiceCollection services)
+    public static IServiceCollection AddMailing(this IServiceCollection services)
     {
         services.AddOptions<MailOptions>()
             .BindConfiguration(nameof(MailOptions))

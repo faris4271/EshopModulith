@@ -11,12 +11,12 @@ namespace Catalog.Features.Categorys.GetCategories
 {
     internal class GetCategoriesEndpoint : ICarterModule
     {
-        public record GetCategoriesRequest(int PageNumber, int PageSize);
+        
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/categorys", async ([FromBody] GetCategoriesRequest request, [FromServices] ISender send) =>
+            app.MapGet("api/categories", async ([FromServices] ISender send) =>
             {
-                var query = request.Adapt<GetCategoriesQuery>();
+                var query = new GetCategoriesQuery();
                 var result = await send.Send(query);
                 return result.Match(Results.Ok, Results.BadRequest);
             }).WithTags("Category")

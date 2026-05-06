@@ -20,13 +20,12 @@ namespace Shared.Data.interceptores
         }
         private async Task DispacheDomainEvent(DbContext? context)
         {
-            var aggregate = context.ChangeTracker.Entries<IAggregate>()
-                 .Where(a => a.Entity.Events.Any()).Select(a => a.Entity);
+            var aggregate = context.ChangeTracker.Entries<IHasDomainEvents>()
+                 .Where(a => a.Entity.DomainEvents.Any()).Select(a => a.Entity);
 
-            var domainEvent = aggregate.SelectMany(a => a.Events).ToList();
+            var domainEvent = aggregate.SelectMany(a => a.DomainEvents).ToList();
 
-            aggregate.ToList().ForEach(x => x.ClearDomainEvent());
-
+            aggregate.ToList().ForEach(x => x.ClearDomainEvents());
             foreach (var domain in domainEvent)
             {
                 await mediator.Publish(domain);

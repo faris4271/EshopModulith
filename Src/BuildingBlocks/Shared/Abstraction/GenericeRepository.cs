@@ -21,7 +21,14 @@ namespace Shared.Abstraction
         }
 
 
+        public async Task AddAsync(T entity,CancellationToken cancellationToken=default)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+          await  _context.Set<T>().AddAsync(entity,cancellationToken);
 
+
+        }
 
         public void Delete<TId>(TId id)
         {
@@ -68,21 +75,15 @@ namespace Shared.Abstraction
            where TId : notnull
         {
             IQueryable<T> query = _context.Set<T>();
-
-            // التحكم في التتبع حسب الحاجة (Update vs Read)
             if (!trackChanges)
             {
                 query = query.AsNoTracking();
             }
 
-            // إضافة الـ Includes ديناميكياً
             if (includes.Any())
             {
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
             }
-
-            // استخدام FirstOrDefaultAsync مع البحث عن المعرف
-            // ملاحظة: افترضنا هنا أن اسم الخاصية هو "Id" كما في كودك الأصلي
             return await query.FirstOrDefaultAsync(e => EF.Property<TId>(e, "Id")!.Equals(id));
         }
 
@@ -115,5 +116,48 @@ namespace Shared.Abstraction
         {
             _context.Remove(entity);
         }
+
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+          await  _context.Set<T>().AddRangeAsync(entities);
+        }
+
+        public async Task<IQueryable<T>> Query()
+        {
+          return  _context.Set<T>();
+
+        }
+
+        public void DeleteRange<TId>(IEnumerable<TId> ids)
+        {
+            foreach (var id in ids)
+            {
+                var entity = _context.Set<T>().Find(id);
+                if (entity != null)
+                {
+                    _context.Set<T>().Remove(entity);
+                }
+            }
+        }
+
+        public void DeleteRange(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                _context.Set<T>().Remove(entity);
+            }
+        }
+
+        public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Set<T>().ToListAsync(cancellationToken);
+        }
+
+        public async Task<T> GetByIdAsync<TId>(TId id, CancellationToken cancellationToken)
+        {
+            return await _context.Set<T>().FirstOrDefaultAsync(e => EF.Property<TId>(e, "Id")!.Equals(id), cancellationToken);
+        }
+
+   
     }
 }

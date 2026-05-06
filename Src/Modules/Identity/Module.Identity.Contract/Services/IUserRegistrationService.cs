@@ -23,7 +23,7 @@ namespace Module.Identity.Contract.Services
         /// <summary>
         /// Confirms a user's email address.
         /// </summary>
-        Task<string> ConfirmEmailAsync(string userId, string code, string tenant, CancellationToken cancellationToken);
+        Task<string> ConfirmEmailAsync(string userId, string code,  CancellationToken cancellationToken);
 
         /// <summary>
         /// Confirms a user's phone number.

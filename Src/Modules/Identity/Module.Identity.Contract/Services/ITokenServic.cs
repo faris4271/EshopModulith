@@ -8,6 +8,6 @@ namespace Module.Identity.Contract.Services
 {
     public interface ITokenServic
     {
-    Task<TokenResponse> IssueAsync(string subject,IEnumerable<Claim> claims,string? tenant = null,CancellationToken ct = default);
+    Task<TokenResponse> IssueAsync(string subject,IEnumerable<Claim> claims,CancellationToken ct = default);
     }
 }

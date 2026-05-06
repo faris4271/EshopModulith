@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Shared.Services;
+
 
 namespace Shared
 {
@@ -7,7 +7,7 @@ namespace Shared
     {
         public static IServiceCollection AddShared(this IServiceCollection services)
         {
-            services.AddScoped<IFileService, LocalFileService>();
+       
 
             return services;
         }

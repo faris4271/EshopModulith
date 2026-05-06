@@ -1,11 +1,13 @@
-﻿using Catalog.Products.Events;
+﻿using Catalog.Brands.Moddels;
+using Catalog.Products.Events;
 using Shared.DDD;
 using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Products.Models
 {
-    public class Product : Content
+    public class Product : Content,IAuditableEntity
     {
+
 
         public Description ShortDescription { get; set; }
 
@@ -44,13 +46,13 @@ namespace Catalog.Products.Models
         public string Gtin { get; set; }
 
         [StringLength(450)]
-        public string NormalizedName { get; set; }
+        public string NormalizedName { get; set; } 
 
         public int DisplayOrder { get; set; }
 
         public long? VendorId { get; set; }
 
-        public string ThumbnailImage { get; set; }
+        public Guid MainImageId { get; set; }
 
         public IList<ProductMedia> Medias { get; set; } = new List<ProductMedia>();
 
@@ -70,12 +72,18 @@ namespace Catalog.Products.Models
 
         public double? RatingAverage { get; set; }
 
-        public long? BrandId { get; set; }
+        public Guid? BrandId { get; set; }
 
         public Brand Brand { get; set; }
 
         public long? TaxClassId { get; set; }
 
+        public string CreatedById { get; set; }
+        public DateTimeOffset CreatedOn { get; set; }
+
+        public DateTimeOffset LatestUpdatedOn { get; set; }
+
+        public Guid LatestUpdatedById { get; set; }
 
 
         public void AddCategory(ProductCategory category)
@@ -84,9 +92,9 @@ namespace Catalog.Products.Models
             Categories.Add(category);
         }
 
-        public void AddOrUpdateFileName(string fileName)
+        public void AddOrUpdateFileName(Guid id)
         {
-            ThumbnailImage = fileName;
+            MainImageId = id;
         }
         public void AddMedia(ProductMedia media)
         {
@@ -113,6 +121,10 @@ namespace Catalog.Products.Models
         }
 
         public IList<ProductOptionCombination> OptionCombinations { get; set; } = new List<ProductOptionCombination>();
+
+        DateTimeOffset? IAuditableEntity.LatestUpdatedOn => LatestUpdatedOn;
+
+        string? IAuditableEntity.LatestUpdatedById => throw new NotImplementedException();
 
         public void AddOptionCombination(ProductOptionCombination combination)
         {
@@ -213,6 +225,7 @@ namespace Catalog.Products.Models
                 Id = Guid.NewGuid(),
                 Name = new Name(name),
                 Slug = slug,
+                NormalizedName = name.ToUpperInvariant(),
                 ShortDescription = new Description(shortDescription),
                 Description = new Description(description),
                 Specification = specification,
@@ -234,7 +247,7 @@ namespace Catalog.Products.Models
                 MetaKeywords = metaKeyword
 
             };
-            product.AddDomainEvent(new CreatProductEvent(product));
+            product.AddDomainEvent(CreatProductEvent.Creat(product));
 
             return product;
         }
@@ -295,7 +308,7 @@ namespace Catalog.Products.Models
 
             if (priceChanged)
             {
-                AddDomainEvent(new ProductPriceChangeEvent(this));
+                AddDomainEvent(ProductPriceChangeEvent.Create(this));
             }
         }
     }

@@ -9,7 +9,7 @@ public record Error
         "General.Null",
         "Null value was provided",
         ErrorType.Failure);
-
+  
     public Error(string code, string description, ErrorType type)
     {
         Code = code;
@@ -25,6 +25,8 @@ public record Error
 
     public static Error Failure(string code, string description) =>
         new(code, description, ErrorType.Failure);
+    public static Error Unauthorized(string code, string description) =>
+      new(code, description, ErrorType.Unauthorized);
 
     public static Error NotFound(string code, string description) =>
         new(code, description, ErrorType.NotFound);

@@ -1,8 +1,10 @@
 ﻿using Catalog.Data;
-using Catalog.Products.Dtos;
 using Catalog.Products.Models;
+using CatalogContract.Dtos;
 using EShop.Module.Core.Contract.Feature.Medias;
+using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Services;
 using Newtonsoft.Json;
@@ -22,10 +24,9 @@ namespace Catalog.Features.Products.Commands.UpdateProduct
         {
             var query = await _repository.GetAllAsQuerable();
 
-            var product = query.Include(x => x.ThumbnailImage)
-                .Include(x => x.ProductLinks).
+            var product = query.Include(x => x.ProductLinks).
                 ThenInclude(x => x.LinkedProduct).
-                ThenInclude(p => p.ThumbnailImage)
+                ThenInclude(p => p.Medias)
                .Include(x => x.OptionValues).
                 ThenInclude(o => o.Option)
                 .Include(x => x.AttributeValues).ThenInclude(a => a.Attribute).ThenInclude(g => g.Group)
@@ -59,17 +60,19 @@ namespace Catalog.Features.Products.Commands.UpdateProduct
                productreq.MetaKeywords);
 
             //delet not complet
+            var thumbNailFileCollection = new FormFileCollection();
 
-            var mediaId = await sender.Send(new CreatMediaCommand(request.ProductForm.ThumbnailImage));
+            thumbNailFileCollection.Add(request.ProductForm.ThumbnailImage);
+            var mediaId = await sender.Send(new CreatMediaCommand(thumbNailFileCollection));
 
             if (mediaId.IsSuccess)
                 return Result.Failure<Guid>(new Error("500", "error while save media", ErrorType.Problem));
-            product.AddMedia(new ProductMedia
-            {
-                MediaId = mediaId.Value.id,
-                ProductId = product.Id,
+            //product.AddMedia(new ProductMedia
+            //{
+            //    MediaId = mediaId.Value.id,
+            //    ProductId = product.Id,
 
-            });
+            //});
 
             AddOrDeleteProductOption(request.ProductForm, product);
             AddOrDeleteProductAttribute(request.ProductForm, product);

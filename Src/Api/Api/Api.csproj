@@ -16,6 +16,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+    <PackageReference Include="NuGet.CommandLine" Version="7.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" Version="2.12.47" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.4" />
@@ -23,8 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\Shared.Jobs\Shared.Jobs.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Shared.Mailing\Shared.Mailing.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
     <ProjectReference Include="..\..\Modules\Catalog\Catalog\Catalog.csproj" />
     <ProjectReference Include="..\..\Modules\Core\Eshop.Module.Core\Eshop.Module.Core.csproj" />
+    <ProjectReference Include="..\..\Modules\Identity\IdentityModule\IdentityModule.csproj" />
   </ItemGroup>
 
 </Project>

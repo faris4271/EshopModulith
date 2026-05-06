@@ -1,8 +1,10 @@
 ﻿using Catalog.Data;
-using Catalog.Products.Dtos;
 using Catalog.Products.Models;
+using CatalogContract.Dtos;
 using EShop.Module.Core.Contract.Feature.Medias;
+using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Shared.Abstraction;
 using Shared.Contract.CQRS;
@@ -81,15 +83,20 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                 product.AddCategory(productCategory);
             }
 
-            await SaveProductMedias(request.ProductForm, product);
+           if(request.ProductForm.ThumbnailImage != null)
+            {
+                await SaveProductMedias(request.ProductForm, product);
+            }
 
             await MapProductVariationDtoToProduct(request.ProductForm, product);
-            
+
 
             MapProductLinkDtoToProduct(request.ProductForm, product);
 
-
+            product.CreatedById = "Faris";
             _productRepository.Add(product);
+            var result = await _productRepository.SaveChangesAsync();
+            Console.WriteLine($"Rows affected: {result}");
 
             return Result.Create(product.Id);
         }
@@ -160,7 +167,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
 
 
-        
+
 
                 var history = CreatePriceHistory(productLink.LinkedProduct);
 
@@ -171,7 +178,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             }
 
 
-
+           await _productRepository.SaveChangesAsync();
 
         }
         private static ProductPriceHistory CreatePriceHistory(Product product)
@@ -199,49 +206,50 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
 
 
-                product.AddOrUpdateFileName(thumbnailImage.Value.FileName);
+                product.AddOrUpdateFileName(thumbnailImage.Value.FirstOrDefault().id);
 
             }
 
-            foreach (var file in productVariation.NewImages)
+
+            var filesName = await _sender.Send(new CreatMediaCommand(productVariation.NewImages));
+
+            if (!filesName.IsSuccess)
+                throw new Exception(filesName.Error.ToString());
+
+            var productMedia = new ProductMedia
             {
-                var fileName = await _sender.Send(new CreatMediaCommand(file));
-
-                if (!fileName.IsSuccess)
-                    throw new Exception(fileName.Error.ToString());
-
-                var productMedia = new ProductMedia
-                {
-                    MediaId = fileName.Value.id,
-
-                };
-                product.AddMedia(productMedia);
-            }
+                MediaId = filesName.Value.FirstOrDefault().id,
+            };
+            product.AddMedia(productMedia);
         }
+    
         private async Task SaveProductMedias(ProductForm model, Product product)
         {
-
-            var mediaDto = await _sender.Send(new CreatMediaCommand(model.ThumbnailImage));
+            var mediaFileCollection= new FormFileCollection();
+            mediaFileCollection.Add(model.ThumbnailImage);
+            var mediaDto = await _sender.Send(new CreatMediaCommand(mediaFileCollection));
 
             if (!mediaDto.IsSuccess)
                 throw new ArgumentNullException(nameof(mediaDto));
 
-            if (product.ThumbnailImage != null)
+            if (product.MainImageId == Guid.Empty)
             {
-                product.ThumbnailImage = mediaDto.Value.FileName;
+                product.AddOrUpdateFileName(mediaDto.Value.FirstOrDefault().id);
             }
 
+            var productImagesCollection = new FormFileCollection();
+            
+            productImagesCollection.AddRange(model.ProductImages);
 
-            foreach (var file in model.ProductImages)
-            {
-                var mediaDt = await _sender.Send(new CreatMediaCommand(file));
+            var mediaDt = await _sender.Send(new CreatMediaCommand(productImagesCollection));
 
                 if (!mediaDt.IsSuccess)
                     throw new ArgumentNullException(nameof(mediaDt));
-
+            foreach (var file in mediaDt.Value)
+            {
                 product.AddMedia(new ProductMedia
                 {
-                    MediaId = mediaDt.Value.id
+                    MediaId = file.id
                 });
 
             }

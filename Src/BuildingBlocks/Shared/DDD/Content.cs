@@ -6,11 +6,7 @@ namespace Shared.DDD
     {
         private bool isDeleted;
 
-        protected Content()
-        {
-            CreatedOn = DateTimeOffset.Now;
-            LatestUpdatedOn = DateTimeOffset.Now;
-        }
+     
 
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(450)]
@@ -49,14 +45,7 @@ namespace Shared.DDD
             }
         }
 
-        public string CreatedById { get; set; }
 
-
-        public DateTimeOffset CreatedOn { get; set; }
-
-        public DateTimeOffset LatestUpdatedOn { get; set; }
-
-        public long LatestUpdatedById { get; set; }
 
 
     }

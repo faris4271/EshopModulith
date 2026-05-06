@@ -7,7 +7,7 @@ namespace Catalog.Products.Models
 
         public Name Name { get; set; }
 
-        public long GroupId { get; set; }
+        public Guid GroupId { get; set; }
 
         public ProductAttributeGroup Group { get; set; }
 

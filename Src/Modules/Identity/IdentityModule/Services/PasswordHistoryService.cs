@@ -37,7 +37,7 @@ namespace IdentityModule.Services
                 return;
             }
 
-            var oldPasswordHistory=await _identityDb.passwordHistory.
+            var oldPasswordHistory=await _identityDb.PasswordHistories.
                 Where(x=>x.UserId==userId).
                 OrderByDescending(x=>x.CreatedAt).
                 ToListAsync(cancellationToken);
@@ -47,7 +47,7 @@ namespace IdentityModule.Services
                 var passwordHistoryToRemove=oldPasswordHistory.Skip(count).ToList();
                 if (passwordHistoryToRemove.Any())
                 {
-                    _identityDb.passwordHistory.RemoveRange(passwordHistoryToRemove);
+                    _identityDb.PasswordHistories.RemoveRange(passwordHistoryToRemove);
                     await _identityDb.SaveChangesAsync(cancellationToken);
                 }
             }
@@ -106,7 +106,7 @@ namespace IdentityModule.Services
 
             var passwordHistory = PasswordHistory.Create(userId, user.PasswordHash);
 
-            await _identityDb.passwordHistory.AddAsync(passwordHistory, cancellationToken);
+            await _identityDb.PasswordHistories.AddAsync(passwordHistory, cancellationToken);
 
             await _identityDb.SaveChangesAsync(cancellationToken);
 

@@ -14,7 +14,7 @@ namespace Catalog.Data.Configurations
             builder.Property(d => d.Description)
                 .HasConversion(d => d.description, v => new Shared.DDD.Description(v));
 
-
+            builder.HasOne(x => x.Brand).WithMany(x=>x.Products).HasForeignKey(x => x.BrandId);
 
         }
     }

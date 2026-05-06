@@ -127,7 +127,7 @@ namespace IdentityModule.Services
                 throw new CustomException("password not valid");
         }
 
-        public async Task<string> ConfirmEmailAsync(string userId, string code, string tenant, CancellationToken cancellationToken)
+        public async Task<string> ConfirmEmailAsync(string userId, string code, CancellationToken cancellationToken)
         {
             var user = _userManager.Users.Where(x => x.Id == userId && !x.EmailConfirmed).FirstOrDefault();
 

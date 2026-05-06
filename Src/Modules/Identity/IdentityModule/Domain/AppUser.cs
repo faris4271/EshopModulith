@@ -1,10 +1,11 @@
 ﻿using IdentityModule.Domain.Events;
 using Microsoft.AspNetCore.Identity;
 using Shared.DDD;
+using System.ComponentModel.DataAnnotations;
 
 namespace IdentityModule.Domain
 {
-    public class AppUser : IdentityUser, IAggregate
+    public class AppUser : IdentityUser, IHasDomainEvents
     {
         private readonly List<IDomainEvent> _domainEvent;
         public string? FirstName { get; set; }
@@ -27,7 +28,12 @@ namespace IdentityModule.Domain
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string CreatedBy { get; set; }
         public string LasteModifiedBy { get; set; }
+
+        [StringLength(450)]
+        public string Culture { get; set; }
         public DateTime LasteModified { get; set; } = DateTime.UtcNow;
+
+        public IReadOnlyCollection<IDomainEvent> DomainEvents => throw new NotImplementedException();
 
         public IDomainEvent[] ClearDomainEvent()
         {
@@ -94,6 +100,9 @@ namespace IdentityModule.Domain
                 tenantId: tenantId));
         }
 
-
+        public void ClearDomainEvents()
+        {
+            _domainEvent.Clear();
+        }
     }
 }

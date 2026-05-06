@@ -54,16 +54,16 @@ namespace Catalog.Category.Models
         public IList<Category> Children { get; private set; } = new List<Category>();
         public IList<ProductCategory> Products { get; private set; } = new List<ProductCategory>();
 
-        public Guid ThumbnailImageId { get; private set; }
+        public CategoryMedia ThumbnailImage { get; private set; }
 
         public void AddSafeSluge(string sluge)
         {
             Slug = sluge;
         }
 
-        public void AddMediaId(Guid guid)
+        public void AddMediaId(CategoryMedia categoryMedia)
         {
-            ThumbnailImageId = guid;
+            ThumbnailImage = categoryMedia;
         }
 
         public void Update(string name, string metaTitle, string sluge,
@@ -71,7 +71,7 @@ namespace Catalog.Category.Models
             string description, int displayOrder, bool isPublished,
              Guid? parentId)
         {
-            Id = Guid.NewGuid();
+            
             Name = new Name(name);
             Slug = sluge;
             MetaTitle = metaTitle;

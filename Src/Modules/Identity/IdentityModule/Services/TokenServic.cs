@@ -27,7 +27,7 @@ namespace IdentityModule.Services
             _metrics = metrics;
             _logger = logger;
         }
-        public Task<TokenResponse> IssueAsync(string subject, IEnumerable<Claim> claims, string? tenant = null, CancellationToken ct = default)
+        public Task<TokenResponse> IssueAsync(string subject, IEnumerable<Claim> claims,  CancellationToken ct = default)
         {
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SigningKey));
 

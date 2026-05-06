@@ -6,6 +6,7 @@
         Problem,
         NotFound,
         Conflict,
-        Failure
+        Failure,
+        Unauthorized
     }
 }

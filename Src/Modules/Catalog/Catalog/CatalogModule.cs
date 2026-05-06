@@ -1,4 +1,6 @@
 ﻿using Catalog.Data;
+using Catalog.Services;
+using CatalogContract.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -7,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Abstraction;
 using Shared.Data;
 using Shared.Data.interceptores;
-using Shared.Services;
+using Shared.Message.Extensions;
 using System.Reflection;
 
 namespace Catalog
@@ -21,15 +23,13 @@ namespace Catalog
                 cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
             });
 
-            service.AddScoped<ISaveChangesInterceptor, AuditableSaveChangeInterceptor>();
             service.AddScoped<ISaveChangesInterceptor, DispachDomainEventInterceptor>();
             service.AddScoped(typeof(IGenericeRepository<,>), typeof(GenericeRepository<,>));
 
-            service.AddScoped<IFileService, LocalFileService>();
 
+            service.AddMassTransitWithAssemblies<CatalogDbContext>(configuration,typeof(CatalogDbContext).Assembly);
 
-
-
+            service.AddScoped<IProductPricingService, ProductPricingService>();
             service.AddDbContext<CatalogDbContext>((sp, option) =>
             {
                 option.AddInterceptors(sp.GetService<ISaveChangesInterceptor>());

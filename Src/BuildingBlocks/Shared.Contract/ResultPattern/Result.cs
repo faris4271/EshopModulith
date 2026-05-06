@@ -47,7 +47,7 @@
         }
 
         public TValue Value =>
-            IsSuccess ? _value : throw new InvalidOperationException("لا يمكن الوصول للقيمة عند الفشل");
+            IsSuccess ? _value : throw new InvalidOperationException("can not find this value");
 
         public static implicit operator Result<TValue>(TValue? value) => Create(value);
     }

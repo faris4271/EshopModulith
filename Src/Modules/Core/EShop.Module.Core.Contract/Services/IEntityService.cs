@@ -8,7 +8,7 @@ namespace EShop.Module.Core.Contract.Services
 
         Task<EntityDto> Get(Guid entityId);
 
-        void Add(string name, string slug, Guid entityId, string entityTypeId);
+        Task Add(string name, string slug, Guid entityId, string entityTypeId);
 
         Task Update(string newName, string newSlug, Guid entityId, string entityTypeId);
 

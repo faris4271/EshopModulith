@@ -3,6 +3,21 @@ using Shared.DDD;
 
 namespace Catalog.Products.Events
 {
-    public record CreatProductEvent(Product Product) : IDomainEvent;
+    public record CreatProductEvent(
+        Guid EventId, DateTimeOffset OccurredOnUtc,
+        Product Product 
 
+        ) : DomainEvent(EventId,OccurredOnUtc)
+    {
+       public static CreatProductEvent Creat(Product product)
+        {
+            return new CreatProductEvent(
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow,
+                product
+
+                );
+
+        }
+    }
 }

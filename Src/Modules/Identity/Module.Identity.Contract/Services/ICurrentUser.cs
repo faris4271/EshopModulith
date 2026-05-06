@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using Module.Identity.Contract.Dtos;
+using System.Security.Claims;
 
 namespace Module.Identity.Contract.Services
 {
@@ -23,6 +24,8 @@ namespace Module.Identity.Contract.Services
         /// </summary>
         /// <returns>The tenant identifier, or null if not in a multi-tenant context.</returns>
         string? GetTenant();
+
+        Task<UserDto> GetCurrentUser();
 
         /// <summary>
         /// Determines whether the current user is authenticated.

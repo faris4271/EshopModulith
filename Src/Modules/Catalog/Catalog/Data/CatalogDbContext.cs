@@ -10,13 +10,10 @@ namespace Catalog.Data
         public DbSet<Category.Models.Category> Categories { get; set; }
 
 
-        public CatalogDbContext(DbContextOptions options) : base(options)
+        public CatalogDbContext(DbContextOptions<CatalogDbContext> options) : base(options)
         {
         }
-        public CatalogDbContext()
-        {
-
-        }
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
