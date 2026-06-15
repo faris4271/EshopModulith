@@ -12,12 +12,12 @@ namespace Catalog.Features.Categorys.DeleteCategory
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("/category/{id}", async (Guid id, [FromServices] ISender sender) =>
+            app.MapDelete("api/category/{id}", async (Guid id, [FromServices] ISender sender) =>
             {
                 var command = new DeleteCategoryCommand(id);
                 var result = await sender.Send(command);
                 return result.Match(Results.Ok, Results.BadRequest);
-            }).WithTags("Category");
+            }).WithTags("Category").AllowAnonymous();
         }
     }
 }

@@ -1,6 +1,7 @@
 using FluentValidation;
 using Module.Identity.Contract.Feature.Users.ChangePassword;
 using Module.Identity.Contract.Services;
+using Shared.Contract.Context;
 
 namespace IdentityModule.Feature.Users.ChangePassword;
 

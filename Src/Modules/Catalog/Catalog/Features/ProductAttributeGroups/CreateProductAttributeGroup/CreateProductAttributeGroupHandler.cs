@@ -1,15 +1,13 @@
 using Catalog.Data;
 using Catalog.Products.Models;
-using MediatR;
 using Shared.Abstraction;
-using Shared.Contract;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 using Shared.DDD;
 
 namespace Catalog.Features.ProductAttributeGroups.CreateProductAttributeGroup;
 
-public sealed class CreateProductAttributeGroupHandler(IGenericeRepository<ProductAttributeGroup,CatalogDbContext> repo)
+public sealed class CreateProductAttributeGroupHandler(IGenericeRepository<ProductAttributeGroup, CatalogDbContext> repo)
     : ICommandHandler<CreateProductAttributeGroupCommand>
 {
     public async Task<Result> Handle(CreateProductAttributeGroupCommand cmd, CancellationToken ct)
@@ -20,6 +18,7 @@ public sealed class CreateProductAttributeGroupHandler(IGenericeRepository<Produ
         };
 
         await repo.AddAsync(group, ct);
+        await repo.SaveChangesAsync();
         return Result.Success();
     }
 }

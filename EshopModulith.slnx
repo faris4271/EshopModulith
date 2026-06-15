@@ -17,6 +17,7 @@
   </Folder>
   <Folder Name="/Src/Modules/" />
   <Folder Name="/Src/Modules/Basket/">
+    <Project Path="Src/Modules/Basket/Eshop.Module.Basket.Contract/Eshop.Module.Basket.Contract.csproj" Id="ee465eb8-7c17-4776-ac77-f52c3abc50e6" />
     <Project Path="Src/Modules/Basket/Eshop.Module.Basket/Eshop.Module.Basket.csproj" Id="c935e359-56b3-426d-a96c-fab65f53c270" />
   </Folder>
   <Folder Name="/Src/Modules/Catalog/">

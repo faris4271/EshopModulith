@@ -1,9 +1,7 @@
 ﻿using IdentityModule.Domain;
-using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Shared.Persistence;
+using Shared.Eventing;
 
 namespace IdentityModule.Data
 {
@@ -14,14 +12,9 @@ namespace IdentityModule.Data
         }
 
 
-
-
-        private readonly DatabaseOptions _settings;
-        private readonly IHostEnvironment _environment;
-        public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-
-
         public DbSet<PasswordHistory> PasswordHistories => Set<PasswordHistory>();
+
+        public DbSet<OutboxMessage> outboxMessages => Set<OutboxMessage>();
 
         public DbSet<UserSession> UserSessions => Set<UserSession>();
 
@@ -34,11 +27,27 @@ namespace IdentityModule.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+
             base.OnModelCreating(modelBuilder);
+            // وحد الاسم هنا (مثلاً اجعله كله lowercase)
+            const string schema = "identity";
+            modelBuilder.HasDefaultSchema(schema);
+
+            // تأكد من تمرير نفس الاسم للـ OutboxConfiguration
+            modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration(schema));
+
+            // تأكد من الـ Identity Entities أنها تتبع نفس الـ Schema
+            modelBuilder.Entity<AppUser>().ToTable("AspNetUsers", schema);
+            modelBuilder.Entity<Role>().ToTable("AspNetRoles", schema);
+
+            // إزالة الـ Unique عن UserName كما طلبت سابقاً
+            modelBuilder.Entity<AppUser>(entity =>
+            {
+                entity.HasIndex(u => u.NormalizedUserName).IsUnique(false);
+            });
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
-            modelBuilder.HasDefaultSchema("Identity");
+
         }
 
 

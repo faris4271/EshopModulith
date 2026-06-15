@@ -1,11 +1,11 @@
-﻿using Hangfire.Dashboard;
-using IdentityModule.Data;
+﻿using IdentityModule.Data;
 using IdentityModule.Domain;
 using MassTransit.Initializers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
+using Shared.Contract.Context;
 using UAParser;
 
 namespace IdentityModule.Services
@@ -17,6 +17,15 @@ namespace IdentityModule.Services
 
         private readonly ILogger<SessionService> _logger;
         private readonly Parser _uaParser;
+
+        public SessionService(IdentityDbContext db,
+            ICurrentUser currentUser, ILogger<SessionService> logger, Parser uaParser)
+        {
+            _db = db;
+            _currentUser = currentUser;
+            _logger = logger;
+            _uaParser = uaParser;
+        }
 
         public Task CleanupExpiredSessionsAsync(CancellationToken cancellationToken = default)
         {
@@ -68,7 +77,7 @@ namespace IdentityModule.Services
         public async Task<Guid?> GetSessionIdByRefreshTokenAsync(string refreshTokenHash, CancellationToken cancellationToken = default)
         {
             var session = await _db.UserSessions.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.RefreshTokenHash == refreshTokenHash&& !x.IsRevoked);
+                .FirstOrDefaultAsync(x => x.RefreshTokenHash == refreshTokenHash && !x.IsRevoked);
 
 
             return session.Id;
@@ -83,7 +92,7 @@ namespace IdentityModule.Services
                 throw new UnauthorizedAccessException("Cannot view sessions for another user");
             }
 
-            var userSession =  _db.UserSessions.AsNoTracking().Where(
+            var userSession = _db.UserSessions.AsNoTracking().Where(
                 x => x.UserId == userId &&
                 !x.IsRevoked && x.ExpiresAt > DateTime.UtcNow).OrderByDescending(s => s.LastActivityAt);
 
@@ -92,11 +101,11 @@ namespace IdentityModule.Services
 
         public async Task<List<UserSessionDto>> GetUserSessionsForAdminAsync(string userId, CancellationToken cancellationToken = default)
         {
-            var userSession =await _db.UserSessions.AsNoTracking().
-                Where(x => x.UserId == userId && !x.IsRevoked && 
-                DateTime.UtcNow > x.LastActivityAt).OrderByDescending(x=>x.LastActivityAt).ToListAsync();
+            var userSession = await _db.UserSessions.AsNoTracking().
+                Where(x => x.UserId == userId && !x.IsRevoked &&
+                DateTime.UtcNow > x.LastActivityAt).OrderByDescending(x => x.LastActivityAt).ToListAsync();
 
-            return  userSession.Select(x=> MapToDto(x, false)).ToList();
+            return userSession.Select(x => MapToDto(x, false)).ToList();
         }
 
         public async Task<int> RevokeAllSessionsAsync(string userId, string revokedBy, Guid? exceptSessionId = null, string? reason = null, CancellationToken cancellationToken = default)
@@ -118,7 +127,7 @@ namespace IdentityModule.Services
 
             var sessions = await query.ToListAsync(cancellationToken);
 
-          
+
             foreach (var session in sessions)
             {
                 session.Revoke(revokedBy, reason ?? "User requested logout from all devices");
@@ -155,11 +164,11 @@ namespace IdentityModule.Services
             Guid sessionId, string revokedBy,
             string? reason = null, CancellationToken cancellationToken = default)
         {
-            var currentUserId=_currentUser.GetUserId();
+            var currentUserId = _currentUser.GetUserId();
 
-            
-            var session =await _db.UserSessions.
-                FirstOrDefaultAsync(x => x.Id == sessionId && !x.IsRevoked,cancellationToken);
+
+            var session = await _db.UserSessions.
+                FirstOrDefaultAsync(x => x.Id == sessionId && !x.IsRevoked, cancellationToken);
 
             if (!string.Equals(currentUserId.ToString(), session.UserId, StringComparison.OrdinalIgnoreCase))
                 throw new UnauthorizedAccessException("Cannot revoke session for another user");
@@ -167,22 +176,22 @@ namespace IdentityModule.Services
             if (session == null)
                 return false;
 
-            session.Revoke(revokedBy, reason,reason);
+            session.Revoke(revokedBy, reason, reason);
 
-           await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             _logger.LogInformation("Session {SessionId} revoked by {RevokedBy}", sessionId, revokedBy);
             return true;
 
-            
+
         }
 
 
         public async Task<bool> RevokeSessionForAdminAsync(Guid sessionId, string revokedBy, string? reason = null, CancellationToken cancellationToken = default)
         {
-           var session=await _db.UserSessions.
-                FirstOrDefaultAsync(x=>x.Id==sessionId && !x.IsRevoked, cancellationToken);
+            var session = await _db.UserSessions.
+                 FirstOrDefaultAsync(x => x.Id == sessionId && !x.IsRevoked, cancellationToken);
 
-            if(session == null) return false;
+            if (session == null) return false;
 
             session.Revoke(revokedBy, reason);
             await _db.SaveChangesAsync();
@@ -222,7 +231,7 @@ namespace IdentityModule.Services
             var sessionExists = _db.UserSessions
                 .AsNoTracking()
                 .Any(s => s.RefreshTokenHash == refreshTokenHash && !s.IsRevoked && s.ExpiresAt > DateTime.UtcNow);
-            if(!sessionExists)
+            if (!sessionExists)
             {
                 _logger.LogWarning("Invalid session attempt with refresh token hash {RefreshTokenHash}", refreshTokenHash);
                 return false;

@@ -30,6 +30,8 @@
     <ProjectReference Include="..\..\BuildingBlocks\Shared.Jobs\Shared.Jobs.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Shared.Mailing\Shared.Mailing.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Shared.Web\Shared.Web.csproj" />
+    <ProjectReference Include="..\..\Modules\Basket\Eshop.Module.Basket\Eshop.Module.Basket.csproj" />
     <ProjectReference Include="..\..\Modules\Catalog\Catalog\Catalog.csproj" />
     <ProjectReference Include="..\..\Modules\Core\Eshop.Module.Core\Eshop.Module.Core.csproj" />
     <ProjectReference Include="..\..\Modules\Identity\IdentityModule\IdentityModule.csproj" />

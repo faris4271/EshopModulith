@@ -3,12 +3,10 @@ using IdentityModule.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Module.Identity.Contract.Services;
-using Shared.Exeption;
+using Shared.Contract.Exeption;
 using Shared.Jobs.Services;
 using Shared.Mailing;
 using Shared.Mailing.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -39,15 +37,15 @@ namespace IdentityModule.Services
 
             var result = await _userManager.ChangePasswordAsync(user, password, newPassword);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 var error = result.Errors.Select(x => x.Description).ToList();
 
                 throw new CustomException(string.Join("failed to change password", error));
             }
-                await _userManager.UpdateAsync(user);
+            await _userManager.UpdateAsync(user);
 
-              user.RecordPasswordChanged(false);
+            user.RecordPasswordChanged(false);
 
             await _identityDb.SaveChangesAsync();
 
@@ -58,14 +56,14 @@ namespace IdentityModule.Services
             ArgumentNullException.ThrowIfNullOrEmpty(email, nameof(email));
             ArgumentNullException.ThrowIfNullOrEmpty(origin, nameof(origin));
 
-            var user =await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
 
-            if (user == null) 
+            if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            token= WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
             var resetPasswordUri = $"{origin}/reset-password?token={token}&email={email}";
             var mailRequest = new MailRequest(
@@ -73,7 +71,7 @@ namespace IdentityModule.Services
                 "Reset Password",
                 $"Please reset your password using the following link: {resetPasswordUri}");
 
-            _jobService.Enqueue(()=>_emailService.SendAsync(mailRequest,cancellationToken));
+            _jobService.Enqueue(() => _emailService.SendAsync(mailRequest, cancellationToken));
 
 
         }
@@ -86,16 +84,16 @@ namespace IdentityModule.Services
 
             var user = await _userManager.FindByEmailAsync(email);
 
-            if(user == null)
+            if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-             token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+            token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
 
-            var result =await _userManager.ResetPasswordAsync(user, token, password);
+            var result = await _userManager.ResetPasswordAsync(user, token, password);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
-                foreach(var error in result.Errors)
+                foreach (var error in result.Errors)
                 {
                     throw new CustomException(error.Description);
                 }

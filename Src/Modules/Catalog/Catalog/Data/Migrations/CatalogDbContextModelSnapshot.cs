@@ -102,34 +102,14 @@ namespace Catalog.Data.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)");
 
+                    b.Property<Guid>("ThumbnailImageId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
 
                     b.ToTable("Categories", "catalog");
-                });
-
-            modelBuilder.Entity("Catalog.Category.Models.CategoryMedia", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("MediaId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId")
-                        .IsUnique();
-
-                    b.ToTable("CategoryMedia", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Products.Models.Product", b =>
@@ -181,10 +161,10 @@ namespace Catalog.Data.Migrations
                     b.Property<bool>("IsVisibleIndividually")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("LatestUpdatedById")
-                        .HasColumnType("uuid");
+                    b.Property<string>("LatestUpdatedById")
+                        .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LatestUpdatedOn")
+                    b.Property<DateTimeOffset?>("LatestUpdatedOn")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("MainImageId")
@@ -258,8 +238,8 @@ namespace Catalog.Data.Migrations
                     b.Property<bool>("StockTrackingIsEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<long?>("TaxClassId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("TaxClassId")
+                        .HasColumnType("uuid");
 
                     b.Property<long?>("VendorId")
                         .HasColumnType("bigint");
@@ -311,12 +291,13 @@ namespace Catalog.Data.Migrations
                     b.Property<Guid>("AttributeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
@@ -459,7 +440,10 @@ namespace Catalog.Data.Migrations
                     b.Property<Guid>("OptionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("OptionId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("SortIndex")
@@ -473,6 +457,8 @@ namespace Catalog.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OptionId");
+
+                    b.HasIndex("OptionId1");
 
                     b.HasIndex("ProductId");
 
@@ -561,17 +547,6 @@ namespace Catalog.Data.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Catalog.Category.Models.CategoryMedia", b =>
-                {
-                    b.HasOne("Catalog.Category.Models.Category", "Category")
-                        .WithOne("ThumbnailImage")
-                        .HasForeignKey("Catalog.Category.Models.CategoryMedia", "CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
             modelBuilder.Entity("Catalog.Products.Models.Product", b =>
                 {
                     b.HasOne("Catalog.Brands.Moddels.Brand", "Brand")
@@ -645,9 +620,7 @@ namespace Catalog.Data.Migrations
 
                     b.HasOne("Catalog.Products.Models.Product", "Product")
                         .WithMany("AttributeValues")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.Navigation("Attribute");
 
@@ -656,14 +629,14 @@ namespace Catalog.Data.Migrations
 
             modelBuilder.Entity("Catalog.Products.Models.ProductCategory", b =>
                 {
-                    b.HasOne("Catalog.Products.Models.Product", "Product")
-                        .WithMany("Categories")
+                    b.HasOne("Catalog.Category.Models.Category", "Category")
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Category.Models.Category", "Category")
-                        .WithMany("Products")
+                    b.HasOne("Catalog.Products.Models.Product", "Product")
+                        .WithMany("Categories")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -724,21 +697,27 @@ namespace Catalog.Data.Migrations
 
             modelBuilder.Entity("Catalog.Products.Models.ProductOptionValue", b =>
                 {
+                    b.HasOne("Catalog.Products.Models.ProductOption", "ProductOption")
+                        .WithMany("Values")
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Catalog.Products.Models.ProductOption", "Option")
                         .WithMany()
-                        .HasForeignKey("OptionId")
+                        .HasForeignKey("OptionId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Catalog.Products.Models.Product", "Product")
                         .WithMany("OptionValues")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.Navigation("Option");
 
                     b.Navigation("Product");
+
+                    b.Navigation("ProductOption");
                 });
 
             modelBuilder.Entity("Catalog.Products.Models.ProductPriceHistory", b =>
@@ -781,9 +760,6 @@ namespace Catalog.Data.Migrations
                     b.Navigation("Children");
 
                     b.Navigation("Products");
-
-                    b.Navigation("ThumbnailImage")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Catalog.Products.Models.Product", b =>
@@ -813,6 +789,11 @@ namespace Catalog.Data.Migrations
             modelBuilder.Entity("Catalog.Products.Models.ProductAttributeGroup", b =>
                 {
                     b.Navigation("Attributes");
+                });
+
+            modelBuilder.Entity("Catalog.Products.Models.ProductOption", b =>
+                {
+                    b.Navigation("Values");
                 });
 
             modelBuilder.Entity("Catalog.Products.Models.ProductTemplate", b =>

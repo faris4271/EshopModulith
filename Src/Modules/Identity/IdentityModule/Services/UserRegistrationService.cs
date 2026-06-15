@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Events;
 using Module.Identity.Contract.Services;
 using Shared.Abstraction;
-using Shared.Constants;
-using Shared.Exeption;
+using Shared.Contract.Exeption;
+using Shared.Identity;
 using Shared.Mailing;
 using Shared.Mailing.Services;
 using System.Collections.ObjectModel;
@@ -98,8 +98,8 @@ namespace IdentityModule.Services
                 throw new CustomException("email is already exist");
             var findUserByName = await _userManager.FindByNameAsync(userName);
 
-            if (findUserByName is not null)
-                throw new CustomException("userName is already exist");
+            //if (findUserByName is not null)
+            //    throw new CustomException("userName is already exist");
 
             var user = new AppUser
             {
@@ -114,8 +114,11 @@ namespace IdentityModule.Services
 
             if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(error => error.Description).ToList();
-                throw new CustomException("error while registering a new user", errors);
+                foreach (var err in result.Errors)
+                {
+
+                    throw new CustomException(err.Description.ToString());
+                }
             }
             return user;
 

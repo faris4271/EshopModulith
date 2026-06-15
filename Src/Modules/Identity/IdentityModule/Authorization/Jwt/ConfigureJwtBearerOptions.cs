@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SendGrid.Helpers.Errors.Model;
-using Shared.DDD;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 
@@ -22,10 +19,10 @@ namespace IdentityModule.Authorization.Jwt
         {
             ArgumentNullException.ThrowIfNull(options, nameof(options));
 
-            if (name!=JwtBearerDefaults.AuthenticationScheme)
+            if (name != JwtBearerDefaults.AuthenticationScheme)
                 return;
 
-            byte[] key=Encoding.UTF8.GetBytes(_options.SigningKey);
+            byte[] key = Encoding.UTF8.GetBytes(_options.SigningKey);
 
             options.SaveToken = false;
             options.RequireHttpsMetadata = false;
@@ -62,6 +59,10 @@ namespace IdentityModule.Authorization.Jwt
                 OnForbidden = _ => throw new ForbiddenException(),
                 OnMessageReceived = context =>
                 {
+                    if (context.Request.Cookies.TryGetValue("accessToken", out var cookieToken))
+                    {
+                        context.Token = cookieToken;
+                    }
                     var accessToken = context.Request.Query["access_token"];
                     if (!string.IsNullOrEmpty(accessToken) &&
                         context.HttpContext.Request.Path.StartsWithSegments("/notifications", StringComparison.OrdinalIgnoreCase))

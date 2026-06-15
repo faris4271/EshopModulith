@@ -1,14 +1,11 @@
 ﻿using Shared.DDD;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Eshop.Module.Basket.Models
 {
-    public class CartRule: EntityBase<Guid>
+    public class CartRule : EntityBase<Guid>
     {
-        public CartRule(string name, string description, bool isActive, 
+        public CartRule(string name, string description, bool isActive,
             DateTimeOffset? startOn, DateTimeOffset? endOn,
             bool isCouponRequired, string ruleToApply, decimal discountAmount,
             decimal? maxDiscountAmount, int? discountStep,
@@ -30,28 +27,28 @@ namespace Eshop.Module.Basket.Models
 
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(450)]
-        public string Name { get;private set; }
+        public string Name { get; private set; }
 
-        public string Description { get;private set; }
+        public string Description { get; private set; }
 
-        public bool IsActive { get;private set; }
+        public bool IsActive { get; private set; }
 
-        public DateTimeOffset? StartOn { get;private set; }
-        public DateTimeOffset? EndOn { get;private set; }
+        public DateTimeOffset? StartOn { get; private set; }
+        public DateTimeOffset? EndOn { get; private set; }
 
-        public bool IsCouponRequired { get;private set; }
+        public bool IsCouponRequired { get; private set; }
 
         [StringLength(450)]
-        public string RuleToApply { get;private set; }
+        public string RuleToApply { get; private set; }
 
-        public decimal DiscountAmount { get;private set; }
+        public decimal DiscountAmount { get; private set; }
 
-        public decimal? MaxDiscountAmount { get;private set; } = 0;
-        public int? DiscountStep { get;private set; }
+        public decimal? MaxDiscountAmount { get; private set; } = 0;
+        public int? DiscountStep { get; private set; }
 
-        public int? UsageLimitPerCoupon { get;private set; }
+        public int? UsageLimitPerCoupon { get; private set; }
 
-        public int? UsageLimitPerCustomer { get;private set; }
+        public int? UsageLimitPerCustomer { get; private set; }
         public IList<Coupon> Coupons { get; set; } = new List<Coupon>();
 
         public IList<CartRuleCustomerGroup> CustomerGroups { get; set; } = new List<CartRuleCustomerGroup>();
@@ -60,11 +57,11 @@ namespace Eshop.Module.Basket.Models
 
         public IList<CartRuleCategory> Categories { get; set; } = new List<CartRuleCategory>();
 
-        public  void AddCoupon( string couponCode)
+        public void AddCoupon(string couponCode)
         {
-            var coupon = new Coupon(couponCode, this);
+            var coupon = new Coupon(couponCode, this.Id);
             Coupons.Add(coupon);
-        }     
+        }
 
         public void AddProductRule(Guid productId)
         {

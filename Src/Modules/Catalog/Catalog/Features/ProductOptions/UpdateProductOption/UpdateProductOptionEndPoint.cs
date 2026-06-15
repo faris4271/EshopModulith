@@ -2,11 +2,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Shared.Contract.ResultPattern;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Catalog.Features.ProductOptions.UpdateProductOption
 {
@@ -14,11 +11,13 @@ namespace Catalog.Features.ProductOptions.UpdateProductOption
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("api/product-options", async (ISender sender, UpdateProductOptionCommand command, CancellationToken cancellationToken) =>
+            app.MapPut("api/product-options/{Id}", async ([FromServices] ISender sender, Guid Id, [FromBody] UpdateProductOptionCommand command, CancellationToken cancellationToken) =>
             {
+                if (Id != command.ProductOption.Id)
+                    return Results.BadRequest();
                 var result = await sender.Send(command, cancellationToken);
                 return result.Match(Results.NoContent, Results.BadRequest);
-            }).WithTags("ProductOptions");
+            }).WithTags("ProductOptions").AllowAnonymous();
         }
     }
 }

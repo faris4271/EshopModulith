@@ -5,9 +5,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Catalog.Features.Brands.AddBrand
 {
@@ -15,13 +12,13 @@ namespace Catalog.Features.Brands.AddBrand
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("Api/Brand", async ([FromServices]ISender sender, CreatBrandDto dto) =>
+            app.MapPost("Api/brands", async ([FromServices] ISender sender, CreatBrandDto dto) =>
             {
-                var result=await sender.Send(new CreatBrandCommand(dto));
+                var result = await sender.Send(new CreatBrandCommand(dto));
 
                 result.Match(Results.Created, Results.BadRequest);
 
-            });
+            }).WithTags("Brand").AllowAnonymous();
         }
     }
 }

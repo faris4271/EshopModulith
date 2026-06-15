@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Shared.Contract.Context;
 using Shared.Contract.Identity;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace Shared.Web.Auth
 {
-    internal class CurrentUserMiddleware(ICurrentUserInitializer currentUserInitializer) : IMiddleware
+    public class CurrentUserMiddleware(ICurrentUserInitializer currentUserInitializer) : IMiddleware
     {
         private readonly ICurrentUserInitializer _currentUserInitializer = currentUserInitializer;
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -18,13 +15,13 @@ namespace Shared.Web.Auth
 
             _currentUserInitializer.SetCurrentUser(context.User);
 
-            var activity=Activity.Current;
+            var activity = Activity.Current;
 
-            if (activity is not null&&context.User.Identity?.IsAuthenticated == true)
+            if (activity is not null && context.User.Identity?.IsAuthenticated == true)
             {
 
                 var userId = context.User.GetUserId();
-                
+
                 var correlationId = context.Request.HttpContext.TraceIdentifier;
 
                 if (!string.IsNullOrEmpty(userId))

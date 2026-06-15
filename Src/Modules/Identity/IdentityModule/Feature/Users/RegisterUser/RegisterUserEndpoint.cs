@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Module.Identity.Contract.Feature.Users.RegisterUser;
 using Shared.Contract.ResultPattern;
-using System.Net;
 
 namespace IdentityModule.Feature.Users.RegisterUser;
 
@@ -21,12 +20,12 @@ public class RegisterUserEndpointL : ICarterModule
             var origin = $"{context.Request.Scheme}://{context.Request.Host.Value}{context.Request.PathBase.Value}";
             command.Origin = origin;
 
-            var result=await sender.Send(command, cancellationToken);
+            var result = await sender.Send(command, cancellationToken);
 
-           return result.Match(Results.Ok, Results.BadRequest);
+            return result.Match(Results.Ok, Results.BadRequest);
         })
        .WithName("RegisterUser")
-       .WithSummary("Register user")
+       .WithSummary("Register user").AllowAnonymous()
        //.RequirePermission(IdentityPermissionConstants.Users.Create)
        .WithDescription("Create a new user account.");
     }

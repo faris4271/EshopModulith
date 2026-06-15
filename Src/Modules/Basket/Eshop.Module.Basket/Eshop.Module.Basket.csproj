@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />
     <ProjectReference Include="..\..\Catalog\CatalogContract\CatalogContract.csproj" />
     <ProjectReference Include="..\..\Identity\Module.Identity.Contract\Module.Identity.Contract.csproj" />
+    <ProjectReference Include="..\Eshop.Module.Basket.Contract\Eshop.Module.Basket.Contract.csproj" />
   </ItemGroup>
 
 </Project>

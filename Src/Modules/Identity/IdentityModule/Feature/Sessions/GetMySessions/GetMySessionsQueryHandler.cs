@@ -1,6 +1,7 @@
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Feature.Sessions.GetMySessions;
 using Module.Identity.Contract.Services;
+using Shared.Contract.Context;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 
@@ -20,7 +21,7 @@ public sealed class GetMySessionsQueryHandler : IQueryHandler<GetMySessionsQuery
     public async Task<Result<List<UserSessionDto>>> Handle(GetMySessionsQuery request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId().ToString();
-        var result= await _sessionService.GetUserSessionsAsync(userId, cancellationToken);
+        var result = await _sessionService.GetUserSessionsAsync(userId, cancellationToken);
 
         return Result.Success(result);
     }

@@ -1,7 +1,6 @@
 ﻿using Catalog.Data;
 using Catalog.Products.Models;
 using CatalogContract.Dtos;
-using EShop.Module.Core.Contract.Feature.Medias;
 using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -65,11 +64,8 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
             foreach (var attribute in productreq.Attributes)
             {
-                var att = new ProductAttributeValue
-                {
-                    AttributeId = attribute.Id,
-                    Value = attribute.Value,
-                };
+                var att = new ProductAttributeValue(attribute.Id, attribute.Value);
+
                 product.AddAttributeValue(att);
             }
 
@@ -79,11 +75,12 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                 var productCategory = new Catalog.Products.Models.ProductCategory
                 {
                     CategoryId = categoryId,
+                    ProductId = product.Id,
                 };
                 product.AddCategory(productCategory);
             }
 
-           if(request.ProductForm.ThumbnailImage != null)
+            if (request.ProductForm.ThumbnailImage != null)
             {
                 await SaveProductMedias(request.ProductForm, product);
             }
@@ -178,7 +175,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             }
 
 
-           await _productRepository.SaveChangesAsync();
+            await _productRepository.SaveChangesAsync();
 
         }
         private static ProductPriceHistory CreatePriceHistory(Product product)
@@ -222,10 +219,10 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             };
             product.AddMedia(productMedia);
         }
-    
+
         private async Task SaveProductMedias(ProductForm model, Product product)
         {
-            var mediaFileCollection= new FormFileCollection();
+            var mediaFileCollection = new FormFileCollection();
             mediaFileCollection.Add(model.ThumbnailImage);
             var mediaDto = await _sender.Send(new CreatMediaCommand(mediaFileCollection));
 
@@ -238,13 +235,13 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             }
 
             var productImagesCollection = new FormFileCollection();
-            
+
             productImagesCollection.AddRange(model.ProductImages);
 
             var mediaDt = await _sender.Send(new CreatMediaCommand(productImagesCollection));
 
-                if (!mediaDt.IsSuccess)
-                    throw new ArgumentNullException(nameof(mediaDt));
+            if (!mediaDt.IsSuccess)
+                throw new ArgumentNullException(nameof(mediaDt));
             foreach (var file in mediaDt.Value)
             {
                 product.AddMedia(new ProductMedia

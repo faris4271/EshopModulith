@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace IdentityModule.Authorization.Jwt
 {
-    public class JwtOptions: IValidatableObject
+    public class JwtOptions : IValidatableObject
     {
         public string Issuer { get; init; } = string.Empty;
         public string Audience { get; init; } = string.Empty;
         public string SigningKey { get; init; } = string.Empty;
-        public int AccessTokenMinutes { get; init; } = 30;
+        public int AccessTokenMinutes { get; init; } = 1;
         public int RefreshTokenDays { get; init; } = 7;
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

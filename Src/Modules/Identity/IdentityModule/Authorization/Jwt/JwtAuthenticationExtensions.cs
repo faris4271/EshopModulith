@@ -1,22 +1,18 @@
-﻿using MassTransit;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityModule.Authorization.Jwt
 {
     public static class JwtAuthenticationExtensions
     {
-        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureJwtAuth(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions<JwtOptions>()
-           .BindConfiguration(nameof(JwtOptions))
-           .ValidateDataAnnotations()
-           .ValidateOnStart();
+        .BindConfiguration(nameof(JwtOptions))
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 
             services.AddSingleton<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
             services
@@ -27,8 +23,11 @@ namespace IdentityModule.Authorization.Jwt
                 })
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, null!);
 
-          
-         
+            services.AddAuthorizationBuilder().AddRequiredPermissionPolicy();
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = options.GetPolicy(RequiredPermissionDefaults.PolicyName);
+            });
             return services;
         }
     }

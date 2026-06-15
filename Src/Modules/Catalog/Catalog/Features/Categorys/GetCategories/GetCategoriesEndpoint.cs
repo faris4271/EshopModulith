@@ -1,5 +1,4 @@
 using Carter;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -11,16 +10,16 @@ namespace Catalog.Features.Categorys.GetCategories
 {
     internal class GetCategoriesEndpoint : ICarterModule
     {
-        
+
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("api/categories", async ([FromServices] ISender send) =>
+            app.MapGet("api/category", async ([FromServices] ISender send) =>
             {
                 var query = new GetCategoriesQuery();
                 var result = await send.Send(query);
                 return result.Match(Results.Ok, Results.BadRequest);
             }).WithTags("Category")
-               .WithName("GetCategories");
+               .WithName("GetCategories").AllowAnonymous();
         }
     }
 }

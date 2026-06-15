@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Shared.Contract.ResultPattern;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Catalog.Features.ProductOptions.GetProductOptions
 {
@@ -14,14 +11,14 @@ namespace Catalog.Features.ProductOptions.GetProductOptions
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("api/product-options", async ( ISender sender,CancellationToken cancellationToken) =>
+            app.MapGet("api/product-options", async (ISender sender, CancellationToken cancellationToken) =>
             {
-                var result=await sender.Send(new GetProductOptionsQuery(), cancellationToken);
+                var result = await sender.Send(new GetProductOptionsQuery(), cancellationToken);
 
-               return result.Match(Results.Ok, Results.BadRequest);
+                return result.Match(Results.Ok, Results.BadRequest);
 
-               
-            }).WithTags("ProductOptions"); ;
+
+            }).WithTags("ProductOptions").AllowAnonymous();
         }
     }
 }

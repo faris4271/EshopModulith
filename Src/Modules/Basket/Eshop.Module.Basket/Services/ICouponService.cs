@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿using Eshop.Module.Basket.Contract.Dtos;
 
 namespace Eshop.Module.Basket.Services
 {

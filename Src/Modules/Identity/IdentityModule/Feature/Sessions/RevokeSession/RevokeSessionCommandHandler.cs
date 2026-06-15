@@ -1,5 +1,6 @@
 using Module.Identity.Contract.Feature.Sessions.RevokeSession;
 using Module.Identity.Contract.Services;
+using Shared.Contract.Context;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 
@@ -19,7 +20,7 @@ public sealed class RevokeSessionCommandHandler : ICommandHandler<RevokeSessionC
     public async Task<Result<bool>> Handle(RevokeSessionCommand command, CancellationToken cancellationToken)
     {
         var userId = _currentUser.GetUserId().ToString();
-        var result= await _sessionService.RevokeSessionAsync(
+        var result = await _sessionService.RevokeSessionAsync(
             command.SessionId,
             userId,
             "User requested",

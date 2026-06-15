@@ -1,12 +1,9 @@
-﻿using Eshop.Module.Basket.Dtos;
+﻿using Eshop.Module.Basket.Contract.Dtos;
 using Shared.Contract.CQRS;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Eshop.Module.Basket.Feature.Querys.GetCartRuleById
 {
-    internal record GetCartRuleByIdQuery(Guid Id):IQuery<CartRuleDto>
+    internal record GetCartRuleByIdQuery(Guid Id) : IQuery<CartRuleDto>
     {
     }
 }

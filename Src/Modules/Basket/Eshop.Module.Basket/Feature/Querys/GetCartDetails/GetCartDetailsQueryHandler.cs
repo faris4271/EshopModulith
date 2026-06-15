@@ -1,19 +1,28 @@
-﻿using Eshop.Module.Basket.Dtos;
+﻿using Eshop.Module.Basket.Contract.Dtos;
+using Eshop.Module.Basket.Contract.Services;
+using Module.Identity.Contract.Services;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Eshop.Module.Basket.Feature.Querys.GetCartDetails
 {
-    internal class GetCartDetailsQueryHandler : IQueryHandler<GetCartDetailsQuery, CartItemDto>
+    internal class GetCartDetailsQueryHandler(
+           ICartService _cartService,
+            ICurrentUserService _currentUserService
+        ) : IQueryHandler<GetCartDetailsQuery, CartDto>
     {
-        public Task<Result<CartItemDto>> Handle(GetCartDetailsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<CartDto>> Handle(GetCartDetailsQuery request, CancellationToken cancellationToken)
         {
 
-             
+
+            var cartDetails = await _cartService.GetCartDetails(request.CustomerId);
+
+            if (cartDetails == null)
+                return Result.Failure<CartDto>(new Error("CartNotFound", "Cart not found", ErrorType.NotFound));
+
+            return Result.Success(cartDetails);
+
+
         }
     }
 }
- 

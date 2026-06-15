@@ -2,7 +2,7 @@
 
 using Module.Identity.Contract.Feature.Users.ChangePassword;
 using Module.Identity.Contract.Services;
-using SendGrid.Helpers.Errors.Model;
+using Shared.Contract.Context;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 
@@ -24,9 +24,9 @@ public sealed class ChangePasswordCommandHandler : ICommandHandler<ChangePasswor
         if (!_currentUser.IsAuthenticated())
             return Result.Failure<string>(Error.Unauthorized("401", "you not loged in"));
         var userId = _currentUser.GetUserId();
-       await _userService.ChangePasswordAsync(
-           request.Password, request.NewPassword,
-           request.ConfirmNewPassword, userId.ToString());
+        await _userService.ChangePasswordAsync(
+            request.Password, request.NewPassword,
+            request.ConfirmNewPassword, userId.ToString());
 
         return Result.Success("password changed success");
 

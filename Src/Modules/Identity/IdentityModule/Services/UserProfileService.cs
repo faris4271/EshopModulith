@@ -6,13 +6,10 @@ using Microsoft.Extensions.Options;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
 using SendGrid.Helpers.Errors.Model;
-using Shared.Exeption;
+using Shared.Contract.Exeption;
 using Shared.Storage;
 using Shared.Storage.Services;
 using Shared.Web.Origin;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityModule.Services
 {
@@ -28,24 +25,24 @@ namespace IdentityModule.Services
         private readonly Uri? _originUrl = originOptions.Value.OriginUrl;
         public async Task<bool> ExistsWithEmailAsync(string email, string? exceptId = null)
         {
-            
+
             return await _userManager.FindByEmailAsync(email.Normalize()) is AppUser user && user.Id != exceptId;
         }
 
         public async Task<bool> ExistsWithNameAsync(string name)
         {
-            
+
             return await _userManager.FindByNameAsync(name) is not null;
         }
 
         public async Task<bool> ExistsWithPhoneNumberAsync(string phoneNumber, string? exceptId = null)
         {
-            
+
             return await _userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber) is AppUser user && user.Id != exceptId;
         }
         public async Task<UserDto> GetAsync(string userId, CancellationToken cancellationToken)
         {
-            var user=await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
                 throw new NotFoundException("user not found");
@@ -102,11 +99,11 @@ namespace IdentityModule.Services
 
         public async Task<List<UserDto>> GetListAsync(CancellationToken cancellationToken)
         {
-            var users=await _userManager.Users.AsNoTracking().ToListAsync();
+            var users = await _userManager.Users.AsNoTracking().ToListAsync();
 
             var userDto = new List<UserDto>(users.Count);
 
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 userDto.Add(new UserDto
                 {
@@ -126,39 +123,39 @@ namespace IdentityModule.Services
 
         public async Task UpdateAsync(string userId, string firstName, string lastName, string phoneNumber, FileUploadRequest image, bool deleteCurrentImage)
         {
-            var user=await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
 
-            _=user ?? throw new CustomException("user not found");
+            _ = user ?? throw new CustomException("user not found");
 
             var imageUri = user.ImageUrl ?? null;
 
             if (image.Data != null && deleteCurrentImage)
             {
-                var ImageUrl =await _storageService.UploadAsync<AppUser>(image,FileType.Image);
+                var ImageUrl = await _storageService.UploadAsync<AppUser>(image, FileType.Image);
 
-                user.ImageUrl = new Uri(ImageUrl,UriKind.RelativeOrAbsolute);
+                user.ImageUrl = new Uri(ImageUrl, UriKind.RelativeOrAbsolute);
 
                 if (imageUri != null && deleteCurrentImage)
                 {
-                  await  _storageService.RemoveAsync(imageUri.ToString());
+                    await _storageService.RemoveAsync(imageUri.ToString());
                 }
 
             }
 
             user.FirstName = firstName;
             user.LastName = lastName;
-            
-            var curentPhoneNumber=await _userManager.GetPhoneNumberAsync(user);
+
+            var curentPhoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             if (curentPhoneNumber != phoneNumber)
             {
-              var phoneResult=   await _userManager.SetPhoneNumberAsync(user, phoneNumber);
+                var phoneResult = await _userManager.SetPhoneNumberAsync(user, phoneNumber);
 
                 if (!phoneResult.Succeeded)
                     throw new CustomException(phoneResult.Errors.FirstOrDefault().Description);
             }
 
-            var result=await _userManager.UpdateAsync(user);
+            var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
             {

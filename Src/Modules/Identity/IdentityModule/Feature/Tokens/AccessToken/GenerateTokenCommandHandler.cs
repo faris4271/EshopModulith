@@ -3,13 +3,9 @@ using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Events;
 using Module.Identity.Contract.Feature.Tokens.TokenGeneration;
 using Module.Identity.Contract.Services;
-using Shared.Context;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 using Shared.Message.OutBox;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityModule.Feature.Tokens.AccessToken
 {
@@ -21,16 +17,18 @@ namespace IdentityModule.Feature.Tokens.AccessToken
         private readonly IRequestContextService _requestService;
         private readonly ILogger<GenerateTokenCommandHandler> _logger;
         private readonly IOutBoxStore _outBoxStore;
+
         public GenerateTokenCommandHandler(IIdentityService identityService,
             ITokenServic tokenService, ISessionService sessionService,
-            IRequestContextService requestService, 
-            ILogger<GenerateTokenCommandHandler> logger)
+            IRequestContextService requestService,
+            ILogger<GenerateTokenCommandHandler> logger, IOutBoxStore outBoxStore)
         {
             _identityService = identityService;
             _tokenService = tokenService;
             _sessionService = sessionService;
             _requestService = requestService;
             _logger = logger;
+            _outBoxStore = outBoxStore;
         }
 
         public async Task<Result<TokenResponse>> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
@@ -39,23 +37,23 @@ namespace IdentityModule.Feature.Tokens.AccessToken
             var ua = _requestService.UserAgent ?? "unknown";
             var clientId = _requestService.ClientId;
 
-            var identityValue=await _identityService.ValidateCredentialsAsync(request.Email, request.Password);
+            var identityValue = await _identityService.ValidateCredentialsAsync(request.Email, request.Password);
 
-            var subject=identityValue.Value.Subject;
+            var subject = identityValue.Value.Subject;
 
-            var claims=identityValue.Value.Claims;
+            var claims = identityValue.Value.Claims;
 
-            var token =await _tokenService.IssueAsync(subject, claims, cancellationToken);
+            var token = await _tokenService.IssueAsync(subject, claims, cancellationToken);
 
-           await _identityService.StoreRefreshTokenAsync(subject,token.RefreshToken,token.RefreshTokenExpiresAt,cancellationToken);
+            await _identityService.StoreRefreshTokenAsync(subject, token.RefreshToken, token.RefreshTokenExpiresAt, cancellationToken);
 
             try
             {
-                var refresgTokenHashed= Sha256Short(token.RefreshToken);
+                var refresgTokenHashed = Sha256Short(token.RefreshToken);
 
-               await _sessionService.CreateSessionAsync(
-                   clientId, refresgTokenHashed,
-                   ip,ua,token.RefreshTokenExpiresAt,cancellationToken);
+                await _sessionService.CreateSessionAsync(
+                    subject, refresgTokenHashed,
+                    ip, ua, token.RefreshTokenExpiresAt, cancellationToken);
 
             }
             catch (Exception ex)
@@ -64,7 +62,7 @@ namespace IdentityModule.Feature.Tokens.AccessToken
                 _logger.LogWarning("cannot make session for this user");
             }
 
-            var fingerprint=Sha256Short(token.AccessToken);
+            var fingerprint = Sha256Short(token.AccessToken);
 
 
             var correlationId = Guid.NewGuid().ToString();
@@ -72,7 +70,7 @@ namespace IdentityModule.Feature.Tokens.AccessToken
             var integrationEvent = new TokenGeneratedIntegrationEvent(
                 Id: Guid.NewGuid(),
                 OccurredOnUtc: DateTime.UtcNow,
-               
+
                 CorrelationId: correlationId,
                 Source: "Identity",
                 UserId: subject,
@@ -83,7 +81,8 @@ namespace IdentityModule.Feature.Tokens.AccessToken
                 TokenFingerprint: fingerprint,
                 AccessTokenExpiresAtUtc: token.AccessTokenExpiresAt);
 
-           await _outBoxStore.AddAsync(integrationEvent);
+            await _outBoxStore.AddAsync(integrationEvent);
+
             return Result.Success(token);
 
         }

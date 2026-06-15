@@ -12,12 +12,12 @@ namespace Catalog.Features.Categorys.CreatCategory
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("api/categories", async ([FromForm] CategoryDto dto, [FromServices] ISender sender) =>
+            app.MapPost("api/category", async ([FromForm] CategoryDto dto, [FromServices] ISender sender) =>
             {
                 var command = new CreatCategoryCommand(dto);
                 var result = await sender.Send(command);
                 return result.Match(Results.Created, Results.BadRequest);
-            }).WithTags("Category").DisableAntiforgery();
+            }).WithTags("Category").AllowAnonymous().DisableAntiforgery();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Carter;
-using Catalog.Brands.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -19,7 +18,7 @@ namespace Catalog.Features.Brands.GetBrands
 
                 return brands.Match(Results.Ok, Results.BadRequest);
 
-            }).WithTags("Brand");
+            }).WithTags("Brand").AllowAnonymous();
         }
     }
 }

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace IdentityModule.Domain
 {
-    public class AppUser : IdentityUser, IHasDomainEvents
+    public class AppUser : IdentityUser, IHasDomainEvents, IAuditableEntity
     {
         private readonly List<IDomainEvent> _domainEvent;
         public string? FirstName { get; set; }
@@ -25,15 +25,18 @@ namespace IdentityModule.Domain
 
         public IReadOnlyList<IDomainEvent> Events => _domainEvent.AsReadOnly();
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public string CreatedBy { get; set; }
-        public string LasteModifiedBy { get; set; }
-
         [StringLength(450)]
-        public string Culture { get; set; }
-        public DateTime LasteModified { get; set; } = DateTime.UtcNow;
+        public string? Culture { get; set; } = "en-us";
 
         public IReadOnlyCollection<IDomainEvent> DomainEvents => throw new NotImplementedException();
+
+        public DateTimeOffset CreatedOn { get; set; }
+
+        public string? CreatedById { get; set; }
+
+        public DateTimeOffset? LatestUpdatedOn { get; set; }
+
+        public string? LatestUpdatedById { get; set; }
 
         public IDomainEvent[] ClearDomainEvent()
         {

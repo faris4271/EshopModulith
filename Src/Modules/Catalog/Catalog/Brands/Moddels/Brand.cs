@@ -8,7 +8,7 @@ namespace Catalog.Brands.Moddels
     {
         public Brand(string name, string description, bool isPublished, bool isDeleted)
         {
-            Id= Guid.NewGuid();
+            Id = Guid.NewGuid();
             Name = name;
             Description = description;
             IsPublished = isPublished;
@@ -17,25 +17,33 @@ namespace Catalog.Brands.Moddels
 
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(450)]
-        public string Name { get;private set; }
+        public string Name { get; private set; }
 
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(450)]
-        public string Slug { get;private set; }
+        public string Slug { get; private set; }
 
-        public string Description { get;private set; }
+        public string Description { get; private set; }
 
-        public bool IsPublished { get;private set; }
+        public bool IsPublished { get; private set; }
 
-        public bool IsDeleted { get;private set; }
+        public bool IsDeleted { get; private set; }
 
         public ICollection<Product> Products { get; private set; } = new List<Product>();
 
-        public  void AddSafeSloge(string sloge)
+        public void AddSafeSloge(string sloge)
         {
-            Slug= sloge;
+            Slug = sloge;
         }
 
+        public void Update(string name, string sluge, string description, bool isPublished, bool isDeleted)
+        {
+            Name = name;
+            Slug = sluge;
+            Description = description;
+            IsPublished = isPublished;
+            IsDeleted = isDeleted;
+        }
 
     }
 }

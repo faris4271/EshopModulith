@@ -1,17 +1,15 @@
-﻿using Eshop.Module.Basket.Data;
+﻿using Eshop.Module.Basket.Contract.Dtos;
+using Eshop.Module.Basket.Data;
 using Eshop.Module.Basket.Models;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstraction;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Eshop.Module.Basket.Services
 {
     internal class CouponService(
-        IGenericeRepository<Coupon,BasketDbContext> _couponRepository,
-        IGenericeRepository<CartRuleUsage,BasketDbContext> _cartRuleUsageRepository
+        IGenericeRepository<Coupon, BasketDbContext> _couponRepository,
+        IGenericeRepository<CartRuleUsage, BasketDbContext> _cartRuleUsageRepository
         ) : ICouponService
     {
 
@@ -20,7 +18,7 @@ namespace Eshop.Module.Basket.Services
         {
             var query = await _couponRepository.GetAllAsQuerable();
 
-            var coupon = query.Include(x=>x.CartRule).FirstOrDefault(x => x.Code == couponCode);
+            var coupon = query.Include(x => x.CartRule).FirstOrDefault(x => x.Code == couponCode);
             var validationResult = new CouponValidationResult { Succeeded = false };
             if (coupon == null || !coupon.CartRule.IsActive)
             {
@@ -40,11 +38,11 @@ namespace Eshop.Module.Basket.Services
                 return validationResult;
             }
 
-            var couponQuery=await _cartRuleUsageRepository.Query();
+            var couponQuery = await _cartRuleUsageRepository.Query();
 
-            var usageCount = await couponQuery.Where(x=>x.CouponId==coupon.Id).CountAsync();
+            var usageCount = await couponQuery.Where(x => x.CouponId == coupon.Id).CountAsync();
 
-            if(coupon.CartRule.UsageLimitPerCoupon.HasValue && usageCount >= coupon.CartRule.UsageLimitPerCoupon)
+            if (coupon.CartRule.UsageLimitPerCoupon.HasValue && usageCount >= coupon.CartRule.UsageLimitPerCoupon)
             {
                 validationResult.ErrorMessage = $"The coupon {couponCode} has reached its usage limit.";
                 return validationResult;
@@ -62,7 +60,7 @@ namespace Eshop.Module.Basket.Services
 
         }
 
-        public void AddCouponUsage(Guid customerId, Guid  orderId, CouponValidationResult couponValidationResult)
+        public void AddCouponUsage(Guid customerId, Guid orderId, CouponValidationResult couponValidationResult)
         {
             throw new NotImplementedException();
         }

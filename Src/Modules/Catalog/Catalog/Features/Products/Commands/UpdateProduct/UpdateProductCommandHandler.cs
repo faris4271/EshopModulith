@@ -1,14 +1,13 @@
 ﻿using Catalog.Data;
 using Catalog.Products.Models;
 using CatalogContract.Dtos;
-using EShop.Module.Core.Contract.Feature.Medias;
 using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Module.Identity.Contract.Services;
 using Newtonsoft.Json;
 using Shared.Abstraction;
+using Shared.Contract.Context;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 

@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Module.Identity.Contract.Services;
 using SendGrid.Helpers.Errors.Model;
-using Shared.Constants;
-using Shared.Exeption;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Shared.Contract.Context;
+using Shared.Contract.Exeption;
+using Shared.Identity;
 
 namespace IdentityModule.Services
 {
@@ -17,18 +15,18 @@ namespace IdentityModule.Services
     {
         public async Task DeleteAsync(string userId)
         {
-           ArgumentNullException.ThrowIfNullOrEmpty( userId );
+            ArgumentNullException.ThrowIfNullOrEmpty(userId);
 
-            var user=await _userManager.FindByIdAsync( userId );
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
                 throw new NotFoundException($"can not find userId:{userId}");
 
-            user.IsActive= false;
+            user.IsActive = false;
 
-           var result=  await  _userManager.UpdateAsync( user );
+            var result = await _userManager.UpdateAsync(user);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 throw new CustomException(result.Errors.FirstOrDefault().Description);
             }
@@ -39,14 +37,14 @@ namespace IdentityModule.Services
 
         public async Task ToggleStatusAsync(bool activateUser, string userId, CancellationToken cancellationToken)
         {
-           var context=  await BuildToggleContextAsync(userId,activateUser,cancellationToken);
+            var context = await BuildToggleContextAsync(userId, activateUser, cancellationToken);
 
-         await   ValidateTogglePermissionsAsync(context, cancellationToken);
+            await ValidateTogglePermissionsAsync(context, cancellationToken);
 
-         
+
             ApplyStatusChange(context);
 
-           await  _userManager.UpdateAsync(context.TargetUser);
+            await _userManager.UpdateAsync(context.TargetUser);
 
 
 
@@ -69,16 +67,16 @@ namespace IdentityModule.Services
              bool activateUser,
              CancellationToken cancellationToken)
         {
-            var targetUser=await _userManager.FindByIdAsync( userId );
+            var targetUser = await _userManager.FindByIdAsync(userId);
 
             _ = targetUser ?? throw new NotFoundException("can not find this user");
 
-            var actorId=_currentUser.GetUserId();
+            var actorId = _currentUser.GetUserId();
 
             if (actorId == Guid.Empty)
                 throw new UnauthorizedException();
 
-            var actore =await _userManager.FindByIdAsync(actorId.ToString());
+            var actore = await _userManager.FindByIdAsync(actorId.ToString());
 
             return new ToggleStatusContext
             (
@@ -95,19 +93,19 @@ namespace IdentityModule.Services
         {
             if (!await _userManager.IsInRoleAsync(context.Actor, RoleConstants.Admin))
             {
-               
+
                 throw new CustomException("Only administrators can toggle user status.");
             }
 
             if (!context.ActivateUser && context.ActorId.ToString() == context.TargetUser.Id)
             {
-               
+
                 throw new CustomException("Users cannot deactivate themselves.");
             }
 
             if (await _userManager.IsInRoleAsync(context.TargetUser, RoleConstants.Admin))
             {
-               
+
                 throw new CustomException("Administrators cannot be deactivated.");
             }
 
@@ -129,12 +127,12 @@ namespace IdentityModule.Services
                 throw new CustomException("user must be admin");
             }
         }
- private sealed record ToggleStatusContext(
-Guid ActorId,
-AppUser Actor,
-AppUser TargetUser,
-bool ActivateUser
-);
+        private sealed record ToggleStatusContext(
+       Guid ActorId,
+       AppUser Actor,
+       AppUser TargetUser,
+       bool ActivateUser
+       );
     }
 
 

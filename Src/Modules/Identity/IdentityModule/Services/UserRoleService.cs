@@ -5,10 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
 using SendGrid.Helpers.Errors.Model;
-using Shared.Exeption;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityModule.Services
 {
@@ -33,13 +29,13 @@ namespace IdentityModule.Services
             ArgumentException.ThrowIfNullOrEmpty(userId, nameof(userId));
             ArgumentNullException.ThrowIfNull(userRoles, nameof(userRoles));
 
-            var user=await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
                 throw new NotFoundException("can not find user with the given id");
             }
-          var assignedRoles = await ProcessRoleAssignmentsAsync(user, userRoles);
+            var assignedRoles = await ProcessRoleAssignmentsAsync(user, userRoles);
 
             await RaiseRolesAssignedEventAsync(user, assignedRoles, cancellationToken);
 
@@ -51,13 +47,13 @@ namespace IdentityModule.Services
         {
             ArgumentException.ThrowIfNullOrEmpty(userId, nameof(userId));
 
-            var user=await _userManager.FindByIdAsync(userId)
+            var user = await _userManager.FindByIdAsync(userId)
                 ?? throw new NotFoundException("can not find user with the given id");
 
-            var roles=await _roleManager.Roles.ToListAsync();
-            var enrolledRoles=await _userManager.GetRolesAsync(user);
+            var roles = await _roleManager.Roles.ToListAsync();
+            var enrolledRoles = await _userManager.GetRolesAsync(user);
 
-            var userRoles=new List<UserRoleDto>();
+            var userRoles = new List<UserRoleDto>();
 
             foreach (var role in roles)
             {
@@ -76,13 +72,13 @@ namespace IdentityModule.Services
 
         private async Task<List<string>> ProcessRoleAssignmentsAsync(AppUser user, List<UserRoleDto> userRoles)
         {
-            var AssignRoles=new List<string>();
+            var AssignRoles = new List<string>();
 
             var currentRoles = await _userManager.GetRolesAsync(user);
 
-            foreach(var role in userRoles)
+            foreach (var role in userRoles)
             {
-                if(!await _roleManager.RoleExistsAsync(role.RoleName))
+                if (!await _roleManager.RoleExistsAsync(role.RoleName))
                 {
                     continue;
                 }
@@ -103,8 +99,8 @@ namespace IdentityModule.Services
 
         private async Task RaiseRolesAssignedEventAsync(AppUser user, List<string> assignedRoles, CancellationToken cancellationToken)
         {
-            if(assignedRoles.Count==0)
-             {
+            if (assignedRoles.Count == 0)
+            {
                 return;
             }
 

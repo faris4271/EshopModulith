@@ -1,5 +1,6 @@
 using Module.Identity.Contract.Feature.Sessions.AdminRevokeAllSessions;
 using Module.Identity.Contract.Services;
+using Shared.Contract.Context;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 
@@ -19,7 +20,7 @@ public sealed class AdminRevokeAllSessionsCommandHandler : ICommandHandler<Admin
     public async Task<Result<int>> Handle(AdminRevokeAllSessionsCommand command, CancellationToken cancellationToken)
     {
         var adminId = _currentUser.GetUserId().ToString();
-        var result= await _sessionService.RevokeAllSessionsForAdminAsync(
+        var result = await _sessionService.RevokeAllSessionsForAdminAsync(
             command.UserId.ToString(),
             adminId,
             command.Reason ?? "Revoked by administrator",

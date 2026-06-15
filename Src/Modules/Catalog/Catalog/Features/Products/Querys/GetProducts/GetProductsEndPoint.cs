@@ -1,28 +1,26 @@
 ﻿using Carter;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Shared.Contract.ResultPattern;
+using Shared.Web.SmartTable;
 
 namespace Catalog.Features.Products.Querys.GetProducts
 {
     internal class GetProductsEndPoint : ICarterModule
     {
-        public record GetProductRequest(int PageNumber, int PageSize);
+
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/get-product", async (int PageNumber,int PageSize,[FromServices] ISender send) =>
+            app.MapPost("api/product-grid", async ([FromBody] SmartTableParam smartTableParam, [FromServices] ISender send) =>
             {
-                var request = new GetProductQuery { PageNumber = PageNumber, PageSize = PageSize };
+                var request = new GetProductQuery(smartTableParam);
 
                 var respons = await send.Send(request);
 
-                if (!respons.IsSuccess)
-                    return Results.BadRequest(respons.Error);
-
-                return Results.Ok(respons.Value);
+                return respons.Match(Results.Ok, Results.NotFound);
 
             }).WithTags("Products")
                .WithName("CreateProduct");

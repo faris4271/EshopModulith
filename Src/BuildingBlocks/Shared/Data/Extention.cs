@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Persistence;
 
 
 namespace Shared.Data
@@ -18,7 +19,10 @@ namespace Shared.Data
         {
             using var scope = service.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<TContext>();
+            var seeder = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+
             await context.Database.MigrateAsync();
+            await seeder.SeedAsync();
         }
     }
 }

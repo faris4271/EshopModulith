@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
 using SendGrid.Helpers.Errors.Model;
-using Shared.Constants;
-using Shared.Exeption;
+using Shared.Contract.Context;
+using Shared.Contract.Exeption;
+using Shared.Identity;
 
 namespace IdentityModule.Services;
 
@@ -88,7 +89,7 @@ public class RoleService(RoleManager<Role> roleManager,
             ?? throw new NotFoundException("role not found");
 
         ValidateRoleCanBeModified(role);
-  
+
 
         var currentClaims = await roleManager.GetClaimsAsync(role);
         await RemoveRevokedPermissionsAsync(role, currentClaims, permissions, cancellationToken);
@@ -105,7 +106,7 @@ public class RoleService(RoleManager<Role> roleManager,
         }
     }
 
-        
+
 
     private async Task RemoveRevokedPermissionsAsync(Role role, IList<System.Security.Claims.Claim> currentClaims, List<string> permissions, CancellationToken cancellationToken = default)
     {

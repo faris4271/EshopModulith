@@ -8,7 +8,7 @@ namespace CatalogContract.Services
     {
         CalculatedProductPrice CalculateProductPrice(ProductThumbnail productThumbnail);
 
-        CalculatedProductPrice CalculateProductPrice(ProductDto product);
+        CalculatedProductPrice CalculateProductPrice(CartItemsDto product);
 
         CalculatedProductPrice CalculateProductPrice(decimal price, decimal? oldPrice, decimal? specialPrice, DateTimeOffset? specialPriceStart, DateTimeOffset? specialPriceEnd);
     }

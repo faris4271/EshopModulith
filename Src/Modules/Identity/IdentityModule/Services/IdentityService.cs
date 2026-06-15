@@ -3,32 +3,27 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Module.Identity.Contract.Services;
-using Newtonsoft.Json.Linq;
 using SendGrid.Helpers.Errors.Model;
-using Shared.Abstraction;
-using Shared.Constants;
-using Shared.Exeption;
-using System;
-using System.Collections.Generic;
+using Shared.Contract.Exeption;
+using Shared.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace IdentityModule.Services
 {
     internal class IdentityService(
         UserManager<AppUser> _userManager,
-        ILogger<IdentityService> _logger,IGroupRoleService _groupRoleService )
+        ILogger<IdentityService> _logger, IGroupRoleService _groupRoleService)
         : IIdentityService
     {
         public async Task StoreRefreshTokenAsync(string subject, string refreshToken, DateTime expiresAtUtc, CancellationToken ct = default)
         {
-            var user =await _userManager.FindByIdAsync(subject);
+            var user = await _userManager.FindByIdAsync(subject);
 
             if (user == null)
                 throw new CustomException("User not found");
 
-            var hashedToken=HashToken(refreshToken);
+            var hashedToken = HashToken(refreshToken);
 
             user.RefreshToken = hashedToken;
 
@@ -54,7 +49,7 @@ namespace IdentityModule.Services
             ArgumentNullException.ThrowIfNull(email, nameof(email));
             ArgumentNullException.ThrowIfNull(password, nameof(password));
 
-            var user =await FindAndValidateUserByCredentialsAsync(email, password);
+            var user = await FindAndValidateUserByCredentialsAsync(email, password);
             ValidateUserStatus(user);
             var claims = await BuildUserClaimsAsync(user, ct);
 
@@ -69,6 +64,7 @@ namespace IdentityModule.Services
             {
         new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new(ClaimTypes.NameIdentifier, user.Id),
+        new(JwtRegisteredClaimNames.Sub, user.Id),
         new(ClaimTypes.Email, user.Email!),
         new(ClaimTypes.Name, user.FirstName ?? string.Empty),
         new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
@@ -78,7 +74,7 @@ namespace IdentityModule.Services
            };
 
 
-          await  AddRoleClaimsAsync(basicClaims, user, ct);
+            await AddRoleClaimsAsync(basicClaims, user, ct);
 
             return basicClaims;
         }
@@ -86,38 +82,40 @@ namespace IdentityModule.Services
 
         private async Task AddRoleClaimsAsync(List<Claim> claims, AppUser user, CancellationToken ct)
         {
-             var userroles = await _userManager.GetRolesAsync(user);
+            var userroles = await _userManager.GetRolesAsync(user);
 
-            var groupRole=await _groupRoleService.GetUserGroupRolesAsync(user.Id, ct);
+            var groupRole = await _groupRoleService.GetUserGroupRolesAsync(user.Id, ct);
 
-            var allRoles = userroles.Union(groupRole).Distinct() ;
+            var allRoles = userroles.Union(groupRole).Distinct();
 
             claims.AddRange(allRoles.Select(x => new Claim(ClaimTypes.Role, x)));
         }
 
         private async Task<AppUser> FindAndValidateUserByCredentialsAsync(string email, string password)
         {
-           var user = await _userManager.FindByEmailAsync(email);
-            if (user == null && !await _userManager.CheckPasswordAsync(user,password))
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null && !await _userManager.CheckPasswordAsync(user, password))
                 throw new UnauthorizedException("Invalid email or password");
-            
+
             return user;
         }
 
         public async Task<(string Subject, IEnumerable<Claim> Claims)?> ValidateRefreshTokenAsync(string refreshToken, CancellationToken ct = default)
         {
+
             var user = await FindUserByRefreshTokenAsync(refreshToken, ct);
 
             ValidateRefreshTokenExpiry(user);
             ValidateUserStatus(user);
-            
+
 
             var claims = await BuildUserClaimsAsync(user, ct);
             return (user.Id, claims);
         }
-        private async Task<AppUser> FindUserByRefreshTokenAsync(string refreshToken,  CancellationToken ct)
+        private async Task<AppUser> FindUserByRefreshTokenAsync(string refreshToken, CancellationToken ct)
         {
             var hashedToken = HashToken(refreshToken);
+
 
             _logger.LogDebug(
                 "Validating refresh token ",
@@ -125,8 +123,11 @@ namespace IdentityModule.Services
 
             var user = await _userManager.Users
                 .FirstOrDefaultAsync(u => u.RefreshToken == hashedToken, ct);
-
-
+            if (user is null)
+            {
+                _logger.LogWarning("No user found with matching refresh token hash for tenant {TenantId}");
+                throw new UnauthorizedException("refresh token is invalid or expired");
+            }
             return user;
         }
 
@@ -140,11 +141,11 @@ namespace IdentityModule.Services
                 throw new UnauthorizedException("refresh token is invalid or expired");
             }
         }
-        private  void ValidateUserStatus(AppUser user)
+        private void ValidateUserStatus(AppUser user)
         {
             if (!user.IsActive)
                 throw new InvalidOperationException();
-            if(user.EmailConfirmed)
+            if (user.EmailConfirmed)
                 throw new InvalidOperationException();
 
         }

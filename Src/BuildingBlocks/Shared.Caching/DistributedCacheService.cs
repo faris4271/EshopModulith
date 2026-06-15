@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using Shared.Exeption;
 using System.Text;
 using System.Text.Json;
 namespace Shared.Caching
@@ -14,7 +13,7 @@ namespace Shared.Caching
         private readonly Encoding utf8;
 
         private readonly ILogger<DistributedCacheService> _logger;
-        private readonly JsonSerializerOptions _jsonOptions=new() {PropertyNamingPolicy=JsonNamingPolicy.CamelCase};
+        private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         public DistributedCacheService(CachingOptions cachingOptions,
             IDistributedCache cache, Encoding utf8,
@@ -86,7 +85,7 @@ namespace Shared.Caching
             {
                 var data = utf8.GetBytes(JsonSerializer.Serialize(value, _jsonOptions));
 
-               await _Cache.SetAsync(key, data, BuildEntryOptions(sliding), ct);
+                await _Cache.SetAsync(key, data, BuildEntryOptions(sliding), ct);
                 _logger.LogInformation("Cache item set for key: {Key}", key);
 
 
@@ -107,12 +106,12 @@ namespace Shared.Caching
 
             var prefix = _cachingOptions.KeyPrefix ?? string.Empty;
 
-            if(prefix.Length == 0)
+            if (prefix.Length == 0)
                 return key;
 
-            return key.StartsWith(prefix, StringComparison.Ordinal) ? key :prefix+key;
+            return key.StartsWith(prefix, StringComparison.Ordinal) ? key : prefix + key;
 
-            
+
         }
 
         public T? GetItem<T>(string key)
@@ -122,17 +121,17 @@ namespace Shared.Caching
         {
             var op = new DistributedCacheEntryOptions();
 
-            if(sliding.HasValue)
+            if (sliding.HasValue)
                 op.SetSlidingExpiration(sliding.Value);
 
-            else if(_cachingOptions.DefaultSlidingExpiration.HasValue)
+            else if (_cachingOptions.DefaultSlidingExpiration.HasValue)
                 op.SetSlidingExpiration(_cachingOptions.DefaultSlidingExpiration.Value);
 
-            if(_cachingOptions.DefaultAbsoluteExpiration.HasValue)
+            if (_cachingOptions.DefaultAbsoluteExpiration.HasValue)
                 op.SetAbsoluteExpiration(_cachingOptions.DefaultAbsoluteExpiration.Value);
 
             return op;
-            
+
         }
     }
 }

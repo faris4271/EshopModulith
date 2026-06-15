@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CatalogContract.Dtos
 {
-    public class ProductDto
+    public class CartItemsDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

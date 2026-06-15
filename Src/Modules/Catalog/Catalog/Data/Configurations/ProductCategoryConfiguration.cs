@@ -11,10 +11,10 @@ namespace Catalog.Data.Configurations
             builder.HasKey(x => x.Id);
 
             builder.HasOne(x => x.Category)
-                .WithMany(x => x.Products).HasForeignKey(x => x.ProductId);
+                .WithMany(x => x.Products).HasForeignKey(x => x.CategoryId);
 
             builder.HasOne(x => x.Product)
-                .WithMany(x => x.Categories).HasForeignKey(x => x.CategoryId);
+                .WithMany(x => x.Categories).HasForeignKey(x => x.ProductId);
 
         }
     }

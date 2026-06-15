@@ -1,7 +1,6 @@
 ﻿using Catalog.Category.Dtos;
 using Catalog.Data;
-using EShop.Module.Core.Contract.Feature.Medias;
-using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
+using EShop.Module.Core.Contract.Feature.Medias.UpdateMedia;
 using EShop.Module.Core.Contract.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,30 +28,36 @@ namespace Catalog.Features.Categorys.UpdateCategory
 
             if (categiry == null) return Result.Failure<Guid>(Error.NullValue);
 
-            if(categiry.ParentId.HasValue)
+            if (categiry.ParentId.HasValue)
             {
                 var isCircular = await HaveCircularNesting(categiry.Id, categiry.ParentId);
 
                 if (!isCircular) return Result.Failure<Guid>(Error.NullValue);
             }
 
-            var mediaId = await sender.Send(new CreatMediaCommand(request.categoryDto.ThumbnailImages));
+            if (categiry.ThumbnailImageId != Guid.Empty)
+            {
+                var listIds = new List<Guid>();
+                listIds.Add(categiry.ThumbnailImageId);
 
-            if (!mediaId.IsSuccess)
-                return Result.Failure<Guid>(mediaId.Error);
+                var mediaId = await sender.Send(new UpdateMediaCommand(listIds, request.categoryDto.ThumbnailImages));
 
-         
+                if (!mediaId.IsSuccess)
+                    return Result.Failure<Guid>(mediaId.Error);
+            }
+
+
 
             var safeSlog = await _entityService.ToSafeSlug(request.categoryDto.Slug, categiry.Id, EntityTypeId);
 
             categiry.AddSafeSluge(safeSlog);
 
-            await _entityService.Update( categiry.Name.name,safeSlog,categiry.Id,EntityTypeId);
+            await _entityService.Update(categiry.Name.name, safeSlog, categiry.Id, EntityTypeId);
 
             categiry.Update(request.categoryDto.Name
-                , request.categoryDto.MetaTitle,
-                safeSlog,
-                request.categoryDto.MetaKeywords, request.categoryDto.MetaDescription
+               , request.categoryDto.MetaTitle,
+                 safeSlog,
+                 request.categoryDto.MetaKeywords, request.categoryDto.MetaDescription
                 , request.categoryDto.Description, request.categoryDto.DisplayOrder,
                 request.categoryDto.IsPublished, request.categoryDto.ParentId);
 
@@ -62,14 +67,11 @@ namespace Catalog.Features.Categorys.UpdateCategory
 
             return Result.Success<Guid>(categiry.Id);
 
-
-
         }
 
         private async Task<bool> HaveCircularNesting(Guid childId, Guid? parentId)
         {
-            // لاحظ استخدام "catalog"."Categories" بدلاً من "Categories" فقط
-            // واستخدام RECURSIVE لأن Postgres يتطلبها في الـ CTE
+
             var sql = @"
         WITH RECURSIVE CategoryTree AS (
             SELECT ""Id"", ""ParentId"" FROM ""catalog"".""Categories"" WHERE ""Id"" = {0}

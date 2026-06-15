@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Catalog.Products.Models
 {
-    public class Product : Content,IAuditableEntity
+    public class Product : Content, IAuditableEntity
     {
 
 
@@ -46,7 +46,7 @@ namespace Catalog.Products.Models
         public string Gtin { get; set; }
 
         [StringLength(450)]
-        public string NormalizedName { get; set; } 
+        public string NormalizedName { get; set; }
 
         public int DisplayOrder { get; set; }
 
@@ -76,14 +76,16 @@ namespace Catalog.Products.Models
 
         public Brand Brand { get; set; }
 
-        public long? TaxClassId { get; set; }
+        public Guid? TaxClassId { get; set; }
 
         public string CreatedById { get; set; }
+
         public DateTimeOffset CreatedOn { get; set; }
 
-        public DateTimeOffset LatestUpdatedOn { get; set; }
+        public DateTimeOffset? LatestUpdatedOn { get; set; }
 
-        public Guid LatestUpdatedById { get; set; }
+        public string? LatestUpdatedById { get; set; }
+
 
 
         public void AddCategory(ProductCategory category)
@@ -110,9 +112,9 @@ namespace Catalog.Products.Models
 
         public void AddOptionValue(ProductOptionValue optionValue)
         {
-            optionValue.Product = this;
-            OptionValues.Add(optionValue);
+            this.OptionValues.Add(optionValue);
         }
+
 
         public void AddProductLinks(ProductLink productLink)
         {
@@ -122,9 +124,7 @@ namespace Catalog.Products.Models
 
         public IList<ProductOptionCombination> OptionCombinations { get; set; } = new List<ProductOptionCombination>();
 
-        DateTimeOffset? IAuditableEntity.LatestUpdatedOn => LatestUpdatedOn;
 
-        string? IAuditableEntity.LatestUpdatedById => throw new NotImplementedException();
 
         public void AddOptionCombination(ProductOptionCombination combination)
         {
@@ -167,11 +167,7 @@ namespace Catalog.Products.Models
 
             foreach (var attribute in AttributeValues)
             {
-                product.AddAttributeValue(new ProductAttributeValue
-                {
-                    AttributeId = attribute.AttributeId,
-                    Value = attribute.Value
-                });
+                product.AddAttributeValue(new ProductAttributeValue(attribute.Id, attribute.Value));
             }
 
             foreach (var category in Categories)

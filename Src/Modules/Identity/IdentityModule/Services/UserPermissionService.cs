@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Services;
 using Shared.Caching;
-using Shared.Constants;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Shared.Identity;
 
 namespace IdentityModule.Services
 {
@@ -19,13 +16,13 @@ namespace IdentityModule.Services
     {
         public async Task<List<string>?> GetPermissionsAsync(string userId, CancellationToken cancellationToken)
         {
-            var permissions = await cache.GetOrSetAsync(GetPermissionCacheKey(userId),async () =>
+            var permissions = await cache.GetOrSetAsync(GetPermissionCacheKey(userId), async () =>
             {
                 ArgumentNullException.ThrowIfNull(userId, nameof(userId));
 
                 var user = await _userManager.FindByIdAsync(userId);
 
-                _=user ?? throw new UnauthorizedAccessException($"User with ID '{userId}' not found.");
+                _ = user ?? throw new UnauthorizedAccessException($"User with ID '{userId}' not found.");
 
                 var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -37,7 +34,7 @@ namespace IdentityModule.Services
                     permissions.AddRange(await _db.RoleClaims.
                         Where(x => x.RoleId == role.Id &&
                         x.ClaimType == ClaimConstants.Permission).
-                        Select(x=>x.ClaimValue!).ToListAsync(cancellationToken));
+                        Select(x => x.ClaimValue!).ToListAsync(cancellationToken));
 
                 }
                 return permissions.Distinct().ToList();
@@ -45,7 +42,7 @@ namespace IdentityModule.Services
 
 
 
-            },cancellationToken: cancellationToken);
+            }, cancellationToken: cancellationToken);
 
             return permissions;
 

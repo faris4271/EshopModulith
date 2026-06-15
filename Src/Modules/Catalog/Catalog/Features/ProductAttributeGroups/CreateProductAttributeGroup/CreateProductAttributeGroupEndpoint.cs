@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Shared.Contract;
 
 namespace Catalog.Features.ProductAttributeGroups.CreateProductAttributeGroup;
 
@@ -11,7 +10,7 @@ public sealed class CreateProductAttributeGroupEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/", async (CreateProductAttributeGroupCommand cmd, ISender sender, CancellationToken ct) =>
+        app.MapPost("/product-attribut-groub", async (CreateProductAttributeGroupCommand cmd, ISender sender, CancellationToken ct) =>
             {
                 var result = await sender.Send(cmd, ct);
                 return result.Match(Results.Created, Results.BadRequest);

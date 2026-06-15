@@ -19,7 +19,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             {
                 var form = await request.ReadFormAsync();
 
-            
+
 
                 // Expecting a JSON payload for the product in the "Product" field
                 var productJson = form["Product"].FirstOrDefault();
@@ -29,7 +29,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
                 for (int i = 0; i < productDto.Variations.Count; i++)
                 {
-                    
+
                     var variantFiles = form.Files.GetFiles($"Variations[{i}].NewImages");
                     var varinatnThumbnail = form.Files.GetFile($"Variations[{i}].ThumbnailImage");
                     var formFiles = new FormFileCollection();

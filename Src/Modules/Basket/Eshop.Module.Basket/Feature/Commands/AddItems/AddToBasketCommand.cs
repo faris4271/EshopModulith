@@ -1,10 +1,8 @@
-﻿using Shared.Contract.CQRS;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Eshop.Module.Basket.Contract.Dtos;
+using Shared.Contract.CQRS;
 
 namespace Eshop.Module.Basket.Feature.Commands.AddItems
 {
-    internal record AddToBasketCommand(Guid productId,int quantity) : ICommand<string>;
-    
+    internal record AddToBasketCommand(Guid productId, int quantity) : ICommand<CartDto>;
+
 }

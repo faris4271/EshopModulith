@@ -1,15 +1,12 @@
 ﻿using Catalog.Features.Products.Querys.GetCartRuleProduct;
+using Eshop.Module.Basket.Contract.Dtos;
 using Eshop.Module.Basket.Data;
-using Eshop.Module.Basket.Dtos;
 using Eshop.Module.Basket.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstraction;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Eshop.Module.Basket.Feature.Querys.GetCartRuleById
 {
@@ -49,19 +46,19 @@ namespace Eshop.Module.Basket.Feature.Querys.GetCartRuleById
                 }).ToList()
 
             };
-           
+
             if (cartRule.IsCouponRequired)
             {
                 var coupon = cartRule.Coupons.FirstOrDefault();
                 if (coupon != null)
                 {
-                   cartRuleDto.CouponCode = coupon.Code;
+                    cartRuleDto.CouponCode = coupon.Code;
                 }
             }
 
             return Result.Success(cartRuleDto);
 
-        }    
+        }
     }
 }
 

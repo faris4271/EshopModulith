@@ -23,7 +23,7 @@ namespace Catalog.Services
                 productThumbnail.SpecialPrice, productThumbnail.SpecialPriceStart, productThumbnail.SpecialPriceEnd);
         }
 
-        public CalculatedProductPrice CalculateProductPrice(ProductDto product)
+        public CalculatedProductPrice CalculateProductPrice(CartItemsDto product)
         {
             return CalculateProductPrice(product.Price,
                 product.OldPrice, product.SpecialPrice,

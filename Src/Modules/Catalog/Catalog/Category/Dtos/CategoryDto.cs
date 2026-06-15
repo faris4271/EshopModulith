@@ -12,7 +12,7 @@ namespace Catalog.Category.Dtos
             IsPublished = true;
         }
 
-      
+        public Guid Id { get; set; }
 
         [Required(ErrorMessage = "The {0} field is required.")]
         public string Slug { get; set; }
@@ -30,7 +30,7 @@ namespace Catalog.Category.Dtos
 
         public int DisplayOrder { get; set; }
 
-       
+
         public Guid? ParentId { get; set; }
 
         public bool IncludeInMenu { get; set; }
@@ -39,6 +39,6 @@ namespace Catalog.Category.Dtos
 
         public IFormFileCollection ThumbnailImages { get; set; }
 
-       
+
     }
 }

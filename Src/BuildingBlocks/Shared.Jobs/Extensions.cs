@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Shared.Exeption;
+using Shared.Contract.Exeption;
 using Shared.Jobs.Services;
 using Shared.Persistence;
 

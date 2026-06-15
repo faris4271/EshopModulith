@@ -27,12 +27,16 @@ namespace Catalog
             service.AddScoped(typeof(IGenericeRepository<,>), typeof(GenericeRepository<,>));
 
 
-            service.AddMassTransitWithAssemblies<CatalogDbContext>(configuration,typeof(CatalogDbContext).Assembly);
-
+            service.AddMassTransitWithAssemblies<CatalogDbContext>(configuration, typeof(CatalogDbContext).Assembly);
+            service.AddScoped<DispachDomainEventInterceptor>();
+            service.AddScoped<AuditableEntityInterceptor>();
             service.AddScoped<IProductPricingService, ProductPricingService>();
             service.AddDbContext<CatalogDbContext>((sp, option) =>
             {
-                option.AddInterceptors(sp.GetService<ISaveChangesInterceptor>());
+                var domainEventInterceptor = sp.GetRequiredService<DispachDomainEventInterceptor>();
+                var auditInterceptor = sp.GetRequiredService<AuditableEntityInterceptor>();
+                option.AddInterceptors(domainEventInterceptor).AddInterceptors(auditInterceptor);
+
 
                 option.UseNpgsql(configuration.GetConnectionString("defualt"));
             });

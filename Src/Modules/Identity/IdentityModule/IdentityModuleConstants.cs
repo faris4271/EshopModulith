@@ -1,6 +1,6 @@
 ﻿namespace IdentityModule;
 
-public sealed class IdentityModuleConstants 
+public sealed class IdentityModuleConstants
 {
     public string ModuleId => "Identity";
 
@@ -8,5 +8,5 @@ public sealed class IdentityModuleConstants
 
     public string ApiPrefix => "identity";
     public const string SchemaName = "identity";
-    public const int PasswordLength = 10;
+    public const int PasswordLength = 8;
 }

@@ -1,4 +1,3 @@
-
 using IdentityModule.Data;
 using IdentityModule.Domain;
 using Microsoft.AspNetCore.Identity;
@@ -6,8 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
 using SendGrid.Helpers.Errors.Model;
-using Shared.Constants;
-using Shared.Exeption;
+using Shared.Contract.Context;
+using Shared.Contract.Exeption;
+using Shared.Identity;
 
 namespace IdentityModule.Feature.Roles;
 

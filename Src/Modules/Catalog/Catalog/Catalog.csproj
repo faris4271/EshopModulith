@@ -28,6 +28,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
 		<ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />
+		<ProjectReference Include="..\..\Basket\Eshop.Module.Basket.Contract\Eshop.Module.Basket.Contract.csproj" />
 		<ProjectReference Include="..\..\Core\EShop.Module.Core.Contract\EShop.Module.Core.Contract.csproj" />
 		<ProjectReference Include="..\..\Identity\Module.Identity.Contract\Module.Identity.Contract.csproj" />
 		<ProjectReference Include="..\..\Localization\Eshop.Module.Localization.Contract\Eshop.Module.Localization.Contract.csproj" />

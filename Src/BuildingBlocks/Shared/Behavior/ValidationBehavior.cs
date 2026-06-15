@@ -1,7 +1,9 @@
 ﻿
 using FluentValidation;
 using MediatR;
-using Shared.Exeption;
+using Shared.Contract.Exeption;
+using ValidationException = Shared.Contract.Exeption.ValidationException;
+
 
 
 
@@ -29,7 +31,7 @@ namespace Shared.Behavior
               validationFailure.PropertyName,
               validationFailure.ErrorMessage))
           .ToList();
-            if (validationErrors.Any()) throw new Shared.Exeption.ValidationException(validationErrors);
+            if (validationErrors.Any()) throw new ValidationException(validationErrors);
 
             return next();
 

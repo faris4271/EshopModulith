@@ -1,65 +1,30 @@
-﻿using CatalogContract.Services;
-using Eshop.Module.Basket.Data;
-using Eshop.Module.Basket.Models;
+﻿using Eshop.Module.Basket.Contract.Dtos;
+using Eshop.Module.Basket.Contract.Services;
 using Module.Identity.Contract.Services;
-using Shared.Abstraction;
-using Shared.Context;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Eshop.Module.Basket.Feature.Commands.AddItems
 {
     internal class AddToBasketCommandHandler(
-        IGenericeRepository<CartItem,BasketDbContext> _repository,
-        IProductPricingService _productPricing,
-        ICurrentUserService _currentUser
-        ) 
-        : ICommandHandler<AddToBasketCommand,string>
+       ICartService _cartService,
+       ICurrentUserService _currentUserService
+        )
+        : ICommandHandler<AddToBasketCommand, CartDto>
     {
-        public async Task<Result<string>> Handle(AddToBasketCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CartDto>> Handle(AddToBasketCommand request, CancellationToken cancellationToken)
         {
-            var user = await _currentUser.GetCurrentUser();
+            var currentUserId = _currentUserService.GetUserId();
 
-            
+            var result = await _cartService.AddToCart(currentUserId, request.productId, request.quantity);
 
-            if (request.quantity <= 0)
-            {
-                return Result.Failure<string>(Error.Problem("404", "Quantity must be greater than zero."));
-            }
+            if (!result.Success)
+                return Result.Failure<CartDto>(Error.Failure(result.ErrorCode, result.ErrorMessage.ToString()));
 
-            if(request.productId == Guid.Empty)
-            {
-                return Result.Failure<string>(Error.Problem("404", "ProductId is required."));
-            }
 
-            var query =await _repository.Query();
+            var cartDetails = await _cartService.GetCartDetails(currentUserId);
 
-            var cartItems=query.FirstOrDefault(x => x.CustomerId == user.Id && x.ProductId == request.productId);
-
-            if (cartItems == null)
-            {
-                cartItems = new CartItem
-                {
-                    
-                    CustomerId = user.Id,
-                    ProductId = request.productId,
-                    Quantity = request.quantity,
-                    CreatedOn = DateTimeOffset.UtcNow,
-                    LatestUpdatedOn = DateTimeOffset.UtcNow
-                };
-                await _repository.AddAsync(cartItems);
-            }
-            else
-            {
-                cartItems.Quantity += request.quantity;
-                cartItems.LatestUpdatedOn = DateTimeOffset.UtcNow;
-                 _repository.Update(cartItems);   
-            }
-
-            return Result.Success(cartItems.Id.ToString());
+            return Result.Success(cartDetails);
         }
     }
 }

@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
+using Shared.Contract.Exeption;
 using Shared.Contract.Identity;
-using Shared.Exeption;
 using Shared.GlobalConfig;
 using System.Security.Claims;
 
@@ -65,7 +65,7 @@ internal sealed class CurrentUserService : ICurrentUserService
 
         var userRole = await _userManager.GetRolesAsync(user);
 
-        if(user != null && userRole.Count==1 && userRole[0] == "Guest")
+        if (user != null && userRole.Count == 1 && userRole[0] == "Guest")
         {
             return _currentUser = user.Adapt<UserDto>();
         }
@@ -111,8 +111,11 @@ internal sealed class CurrentUserService : ICurrentUserService
             ? _user!.GetEmail()
             : string.Empty;
 
-    public bool IsAuthenticated() =>
-        _user?.Identity?.IsAuthenticated is true;
+    public bool IsAuthenticated()
+    {
+
+        return (_user?.Identity?.IsAuthenticated ?? _httpContext.User?.Identity?.IsAuthenticated) is true;
+    }
 
     public bool IsInRole(string role) =>
         _user?.IsInRole(role) is true;

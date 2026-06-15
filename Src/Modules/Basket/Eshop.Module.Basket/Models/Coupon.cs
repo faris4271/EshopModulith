@@ -3,13 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Eshop.Module.Basket.Models
 {
-    public class Coupon:EntityBase<Guid>
+    public class Coupon : EntityBase<Guid>
     {
-        public Coupon(string code, CartRule cartRule)
+        public Coupon(string code, Guid cartRuleId)
         {
-          
-            CartRule = cartRule;
-            CartRuleId = cartRule.Id;
+
+            CartRuleId = cartRuleId;
             Code = code;
             CreatedOn = DateTimeOffset.Now;
         }
