@@ -4,6 +4,7 @@ using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
 using EShop.Module.Core.Contract.Services;
 using MediatR;
 using Shared.Abstraction;
+using Shared.Constants;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 using Shared.DDD;
@@ -18,7 +19,7 @@ namespace Catalog.Features.Categorys.CreatCategory
         IGenericeRepository<Category.Models.Category, CatalogDbContext> _repository,
         IEntityService _entityService, ISender _sender) : ICommandHandler<CreatCategoryCommand, Guid>
     {
-        const string EntityTypeId = "Category";
+        const string EntityTypeId = EntityTypeConstants.Category;
         public async Task<Result<Guid>> Handle(CreatCategoryCommand request, CancellationToken cancellationToken)
         {
 

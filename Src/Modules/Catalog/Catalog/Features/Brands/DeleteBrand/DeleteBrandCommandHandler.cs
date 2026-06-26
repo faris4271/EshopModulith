@@ -4,14 +4,11 @@ using EShop.Module.Core.Contract.Services;
 using Shared.Abstraction;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Catalog.Features.Brands.DeleteBrand
 {
     internal class DeleteBrandCommandHandler(
-        IGenericeRepository<Brand,CatalogDbContext> _repository,
+        IGenericeRepository<Brand, CatalogDbContext> _repository,
         IEntityService _entityService
         ) : ICommandHandler<DeleteBrandCommand, Guid>
     {
@@ -27,6 +24,7 @@ namespace Catalog.Features.Brands.DeleteBrand
                     await _entityService.Remove(request.id, EntityTypeId);
 
                     transaction.Commit();
+                    var res = await _repository.SaveChangesAsync();
 
                     return Result.Success(Guid.NewGuid());
                 }

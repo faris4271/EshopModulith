@@ -47,6 +47,11 @@ namespace Catalog.Features.Products.Querys.GetProducts
                     bool isPublished = search.IsPublished;
                     query = query.Where(x => x.IsPublished == isPublished);
                 }
+                if (search.IsFeatured != null)
+                {
+                    bool IsFeatured = search.IsFeatured;
+                    query = query.Where(x => x.IsFeatured == IsFeatured);
+                }
 
                 if (search.CreatedOn != null)
                 {

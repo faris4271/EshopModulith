@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using static Catalog.Features.Products.Commands.CreatProduct.CreatProductCommandHandler;
 
 namespace Catalog.Features.Products.Commands.CreatProduct
 {

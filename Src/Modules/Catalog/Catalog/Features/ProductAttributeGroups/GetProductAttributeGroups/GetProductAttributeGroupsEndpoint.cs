@@ -11,7 +11,7 @@ public sealed class GetProductAttributeGroupsEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/product-attribut-group", async (ISender sender, CancellationToken ct) =>
+        endpoints.MapGet("/api/attribute-group", async (ISender sender, CancellationToken ct) =>
             {
                 var result = await sender.Send(new GetProductAttributeGroupsQuery(), ct);
 

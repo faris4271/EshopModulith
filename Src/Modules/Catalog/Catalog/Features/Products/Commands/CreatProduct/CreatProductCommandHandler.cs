@@ -2,13 +2,15 @@
 using Catalog.Products.Models;
 using CatalogContract.Dtos;
 using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
+using EShop.Module.Core.Contract.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Shared.Abstraction;
+using Shared.Constants;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
-using static Catalog.Features.Products.Commands.CreatProduct.CreatProductCommandHandler;
+
 
 namespace Catalog.Features.Products.Commands.CreatProduct
 {
@@ -18,14 +20,26 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
         private readonly ISender _sender;
 
+        private readonly CatalogDbContext _context;
 
-        public record CreatProductCommand(ProductForm ProductForm) : ICommand<Guid>;
+        private readonly IGenericeRepository<ProductLink, CatalogDbContext> _productLinkRepository;
+        private readonly IEntityService _entityService;
 
 
-        public CreatProductCommandHandler(IGenericeRepository<Product, CatalogDbContext> productRepository, ISender sender)
+
+
+
+        public CreatProductCommandHandler(
+            IGenericeRepository<Product, CatalogDbContext> productRepository,
+            ISender sender, CatalogDbContext context,
+            IGenericeRepository<ProductLink, CatalogDbContext> productLinkRepository,
+            IEntityService entityService)
         {
             _productRepository = productRepository;
             _sender = sender;
+            _context = context;
+            _productLinkRepository = productLinkRepository;
+            _entityService = entityService;
         }
 
         async Task<Result<Guid>> IRequestHandler<CreatProductCommand, Result<Guid>>.Handle(CreatProductCommand request, CancellationToken cancellationToken)
@@ -62,10 +76,10 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                     Value = JsonConvert.SerializeObject(option.Values)
                 });
 
+            // Inside CreatProductCommandHandler.cs
             foreach (var attribute in productreq.Attributes)
             {
                 var att = new ProductAttributeValue(attribute.Id, attribute.Value);
-
                 product.AddAttributeValue(att);
             }
 
@@ -90,10 +104,11 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
             MapProductLinkDtoToProduct(request.ProductForm, product);
 
-            product.CreatedById = "Faris";
-            _productRepository.Add(product);
-            var result = await _productRepository.SaveChangesAsync();
-            Console.WriteLine($"Rows affected: {result}");
+
+            await _productRepository.AddAsync(product);
+            await _entityService.Add(product.Name.name, product.Slug, product.Id, EntityTypeConstants.Product);
+
+            await _productRepository.SaveChangesAsync();
 
             return Result.Create(product.Id);
         }
@@ -121,8 +136,8 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
                 });
             }
-        }
 
+        }
 
 
         private async Task MapProductVariationDtoToProduct(ProductForm productForm, Product product)
@@ -137,7 +152,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                     LinkedProduct = product.Clone()
                 };
 
-                productLink.LinkedProduct.Name = new Shared.DDD.Name(variant.Name);
+                productLink.LinkedProduct.Name = new Shared.DDD.Name(productForm.Product.Name + " " + variant.Name);
                 productLink.LinkedProduct.Slug = variant.Sku;
                 productLink.LinkedProduct.Gtin = variant.Gtin;
                 productLink.LinkedProduct.HasOptions = false;
@@ -145,8 +160,13 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                 productLink.LinkedProduct.OldPrice = variant.OldPrice;
                 productLink.LinkedProduct.NormalizedName = variant.NormalizedName;
                 productLink.LinkedProduct.IsVisibleIndividually = false;
+                if (product.MainImageId != null)
+                {
+                    productLink.LinkedProduct.MainImageId = product.MainImageId;
+                }
 
-                await MapProductVariantImageFromDto(variant, product);
+
+                await MapProductVariantImageFromDto(variant, productLink.LinkedProduct);
 
                 foreach (var combination in variant.OptionCombinations)
                 {
@@ -175,8 +195,6 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             }
 
 
-            await _productRepository.SaveChangesAsync();
-
         }
         private static ProductPriceHistory CreatePriceHistory(Product product)
         {
@@ -194,7 +212,7 @@ namespace Catalog.Features.Products.Commands.CreatProduct
 
         private async Task MapProductVariantImageFromDto(ProductVariationDto productVariation, Product product)
         {
-            if (productVariation.ThumbnailImage == null)
+            if (productVariation.ThumbnailImage != null)
             {
                 var thumbnailImage = await _sender.Send(new CreatMediaCommand(productVariation.ThumbnailImage));
 
@@ -213,11 +231,14 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             if (!filesName.IsSuccess)
                 throw new Exception(filesName.Error.ToString());
 
-            var productMedia = new ProductMedia
+            foreach (var file in filesName.Value)
             {
-                MediaId = filesName.Value.FirstOrDefault().id,
-            };
-            product.AddMedia(productMedia);
+                var productMedia = new ProductMedia
+                {
+                    MediaId = file.id
+                };
+                product.AddMedia(productMedia);
+            }
         }
 
         private async Task SaveProductMedias(ProductForm model, Product product)

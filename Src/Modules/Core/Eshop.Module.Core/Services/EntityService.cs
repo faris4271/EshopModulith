@@ -4,7 +4,6 @@ using EShop.Module.Core.Contract.Dtos;
 using EShop.Module.Core.Contract.Services;
 using Mapster;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Shared.Abstraction;
 
 
@@ -26,7 +25,7 @@ namespace Eshop.Module.Core.Services
             var i = 2;
             while (true)
             {
-                var query =await _repository.GetAllAsQuerable();
+                var query = await _repository.GetAllAsQuerable();
                 var entity = query.FirstOrDefault(x => x.Slug == slug);
 
 
@@ -62,15 +61,15 @@ namespace Eshop.Module.Core.Services
 
         public async Task Update(string newName, string newSlug, Guid entityId, string entityTypeId)
         {
-            var query =await _repository.GetAllAsQuerable() ;
+            var query = await _repository.GetAllAsQuerable();
             var entity = query.FirstOrDefault(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
 
-            if(entity is null)
+            if (entity is null)
                 throw new InvalidOperationException("can not find entity");
 
             entity.Update(newName, newSlug, entityId, entityTypeId);
 
-              _repository.Update(entity);
+            _repository.Update(entity);
 
             await _repository.SaveChangesAsync();
 
@@ -78,17 +77,22 @@ namespace Eshop.Module.Core.Services
 
         public async Task Remove(Guid entityId, string entityTypeId)
         {
-            var query =await _repository.GetAllAsQuerable();
+            var query = await _repository.GetAllAsQuerable();
             var entity = query.FirstOrDefault(x => x.EntityId == entityId && x.EntityTypeId == entityTypeId);
-            _repository.Delete(entity);
+
+            if (entity is not null)
+            {
+                _repository.Delete(entity);
+                await _repository.SaveChangesAsync();
+            }
             //if (entity != null)
             //{
             //    await _mediator.Publish(new EntityDeleting { EntityId = entity.Id });
             //    _entityRepository.Remove(entity);
             //}
-            await _repository.SaveChangesAsync();
+
         }
 
-        
+
     }
 }

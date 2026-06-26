@@ -21,11 +21,11 @@ namespace Shared.Abstraction
         }
 
 
-        public async Task AddAsync(T entity,CancellationToken cancellationToken=default)
+        public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
-          await  _context.Set<T>().AddAsync(entity,cancellationToken);
+            await _context.Set<T>().AddAsync(entity, cancellationToken);
 
 
         }
@@ -91,14 +91,14 @@ namespace Shared.Abstraction
         {
             var entity = _context.Set<T>().FindAsync(id);
             return await entity;
-            await _context.SaveChangesAsync();
+
         }
 
         public void Update(T entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Set<T>().Update(entity);
 
 
         }
@@ -119,12 +119,12 @@ namespace Shared.Abstraction
 
         public async Task AddRangeAsync(IEnumerable<T> entities)
         {
-          await  _context.Set<T>().AddRangeAsync(entities);
+            await _context.Set<T>().AddRangeAsync(entities);
         }
 
         public async Task<IQueryable<T>> Query()
         {
-          return  _context.Set<T>();
+            return _context.Set<T>();
 
         }
 
@@ -158,6 +158,6 @@ namespace Shared.Abstraction
             return await _context.Set<T>().FirstOrDefaultAsync(e => EF.Property<TId>(e, "Id")!.Equals(id), cancellationToken);
         }
 
-   
+
     }
 }

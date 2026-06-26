@@ -10,7 +10,7 @@ namespace Catalog.Data.Configurations
         {
             builder.HasKey(x => x.Id);
 
-            builder.HasOne(x => x.ProductOption)
+            builder.HasOne(x => x.Option)
                    .WithMany(x => x.Values)
                    .HasForeignKey(x => x.OptionId);
         }

@@ -24,9 +24,9 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
 
         public async Task<Result<ProductDetail>> Handle(GetProductDetailsQuery request, CancellationToken cancellationToken)
         {
-            var query =await _repository.GetAllAsQuerable();
+            var query = await _repository.GetAllAsQuerable();
 
-            var product =await query.FirstOrDefaultAsync(p => p.Id == request.Id);
+            var product = await query.FirstOrDefaultAsync(p => p.Id == request.Id);
 
             var model = new ProductDetail
             {
@@ -42,7 +42,7 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
                 IsAllowToOrder = product.IsAllowToOrder,
                 StockTrackingIsEnabled = product.StockTrackingIsEnabled,
                 StockQuantity = product.StockQuantity,
-                Categories= product.Categories.Select(c => new ProductDetailCategory
+                Categories = product.Categories.Select(c => new ProductDetailCategory
                 {
                     Id = c.CategoryId,
                     Name = c.Category.Name.name,
@@ -56,7 +56,7 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
                     Value = a.Value
                 }).ToList(),
 
-                 };
+            };
 
             await MapProductVariantToProductDetailsVariant(product, model);
             await MapRelatedProductToProductDetails(product, model);
@@ -73,9 +73,9 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
         private async Task MapProductImagesToProductVm(Product product, ProductDetail model)
         {
 
-            var medias =await _sender.Send(new GetListOfMediasQuery(product.Medias.Select(m => m.Id).ToList()));
+            var medias = await _sender.Send(new GetListOfMediasQuery(product.Medias.Select(m => m.Id).ToList()));
 
-           
+
 
             model.Images = medias.IsSuccess ? medias.Value.Select(m => new MediaDto
             (
@@ -86,19 +86,19 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
 
         private async Task MapProductVariantToProductDetailsVariant(Product product, ProductDetail model)
         {
-            if(!product.ProductLinks.Any(x=>x.LinkType==ProductLinkType.Super))
+            if (!product.ProductLinks.Any(x => x.LinkType == ProductLinkType.Super))
                 return;
 
-            var query =await _repository.Query();
+            var query = await _repository.Query();
 
-            var variants =await query.Include(x => x.OptionCombinations).ThenInclude(x => x.Option).
-                Include(x => x.Medias).Where(x=>x.ProductLinks.
-                Any(link=>link.LinkType==ProductLinkType.Super && link.ProductId==product.Id)).
-                Where(x=>x.IsPublished).ToListAsync();
+            var variants = await query.Include(x => x.OptionCombinations).ThenInclude(x => x.Option).
+                Include(x => x.Medias).Where(x => x.ProductLinks.
+                Any(link => link.LinkType == ProductLinkType.Super && link.ProductId == product.Id)).
+                Where(x => x.IsPublished).ToListAsync();
 
             foreach (var variation in variants)
             {
-                var medias = await _sender.Send(new GetMediaByIdQuery (variation.Id));
+                var medias = await _sender.Send(new GetMediaByIdQuery(variation.Id));
 
                 var variantDetails = new ProductDetailVariation
                 {
@@ -113,7 +113,7 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
                     CalculateProductPrice(
                         variation.Price, variation.OldPrice, variation.SpecialPrice,
                         variation.SpecialPriceStart, variation.SpecialPriceEnd),
-                    Images =medias.IsSuccess ? medias.Value.Select(m => new MediaDto
+                    Images = medias.IsSuccess ? medias.Value.Select(m => new MediaDto
                     (
                       m.id,
                       m.FileName
@@ -124,9 +124,9 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
                 {
                     variantDetails.Options.Add(new ProductDetailVariationOption
                     {
-                       OptionId= optionCombination.OptionId,
-                       OptionName= optionCombination.Option.Name,
-                       Value= optionCombination.Value,
+                        OptionId = optionCombination.OptionId,
+                        OptionName = optionCombination.Option.Name,
+                        Value = optionCombination.Value,
 
                     });
 
@@ -134,7 +134,7 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
                 model.Variations.Add(variantDetails);
             }
 
-           
+
 
 
         }
@@ -142,34 +142,34 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
         private async Task MapRelatedProductToProductDetails(Product product, ProductDetail model)
         {
             var publishedProductLinks = product.ProductLinks.Where(
-                x=>x.LinkedProduct.IsPublished && 
-                (x.LinkType == ProductLinkType.Related 
+                x => x.LinkedProduct.IsPublished &&
+                (x.LinkType == ProductLinkType.Related
                 || x.LinkType == ProductLinkType.CrossSell)).ToList();
 
             foreach (var productLink in publishedProductLinks)
             {
                 var linkedProduct = productLink.LinkedProduct;
 
-                var productThumbnail =ProductThumbnail.FromProduct(
+                var productThumbnail = ProductThumbnail.FromProduct(
                     linkedProduct.Id, linkedProduct.Name.name, linkedProduct.Slug,
                     linkedProduct.Price, linkedProduct.OldPrice, linkedProduct.SpecialPrice,
                     linkedProduct.SpecialPriceStart, linkedProduct.SpecialPriceEnd,
-                    linkedProduct.StockQuantity,linkedProduct.IsAllowToOrder, linkedProduct.IsCallForPricing, null);
-                 var mediaResult = await _sender.Send(new GetMediaByIdQuery(linkedProduct.Id));
+                    linkedProduct.StockQuantity, linkedProduct.IsAllowToOrder, linkedProduct.IsCallForPricing, null);
+                var mediaResult = await _sender.Send(new GetMediaByIdQuery(linkedProduct.Id));
                 productThumbnail.ThumbnailUrl = mediaResult.IsSuccess ? mediaResult.Value.FirstOrDefault()?.FileName : null;
 
                 productThumbnail.CalculatedProductPrice = _productPricingService.CalculateProductPrice(
                     linkedProduct.Price, linkedProduct.OldPrice, linkedProduct.SpecialPrice,
                     linkedProduct.SpecialPriceStart, linkedProduct.SpecialPriceEnd);
 
-                if(productLink.LinkType == ProductLinkType.Related)
+                if (productLink.LinkType == ProductLinkType.Related)
                     model.RelatedProducts.Add(productThumbnail);
 
-                else if(productLink.LinkType == ProductLinkType.CrossSell)
+                else if (productLink.LinkType == ProductLinkType.CrossSell)
                     model.CrossSellProducts.Add(productThumbnail);
             }
 
-           
+
         }
         private void MapProductOptionToProductDetails(Product product, ProductDetail model)
         {
@@ -178,9 +178,9 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
                 var optionValues = JsonConvert.DeserializeObject<IList<ProductOptionValueDto>>(item.Value);
                 foreach (var value in optionValues)
                 {
-                    if (!model.OptionDisplayValues.ContainsKey(value.Key))
+                    if (!model.OptionDisplayValues.ContainsKey(value.Name))
                     {
-                        model.OptionDisplayValues.Add(value.Key, new ProductOptionDisplay { DisplayType = item.DisplayType, Value = value.Display });
+                        model.OptionDisplayValues.Add(value.Name, new ProductOptionDisplay { DisplayType = item.DisplayType, Value = value.DisplayType });
                     }
                 }
             }

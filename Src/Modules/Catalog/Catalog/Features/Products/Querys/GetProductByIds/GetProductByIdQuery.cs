@@ -1,6 +1,8 @@
-﻿namespace Catalog.Features.Products.Querys.GetProductByIds
+﻿using CatalogContract.Dtos;
+using Shared.Contract.CQRS;
+
+namespace Catalog.Features.Products.Querys.GetProductByIds
 {
-    internal class GetProductByIdQuery
-    {
-    }
+    public record GetProductByIdQuery(Guid id) : IQuery<ProductDto>;
+
 }

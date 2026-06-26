@@ -19,7 +19,7 @@ namespace Catalog.Features.Categorys.GetCategory
                   Results.Ok,
                   Results.NotFound
                 );
-            }).WithTags("Category").AllowAnonymous();
+            }).WithTags("Category");
         }
     }
 }

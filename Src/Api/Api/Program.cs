@@ -90,7 +90,7 @@ app.UseCatalog().UseCore().UseBasket().UseIdentity();
 app.UseRouting();
 
 app.UseCors("AllowAngularApp");
-
+app.UseStaticFiles();
 app.MapCarter();
 app.UseAuthentication();
 app.UseAuthorization();

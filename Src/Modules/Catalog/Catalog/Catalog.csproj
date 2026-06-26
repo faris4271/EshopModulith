@@ -22,7 +22,6 @@
 
 	<ItemGroup>
 		<Folder Include="Category\Events\" />
-		<Folder Include="Features\ProductTemplet\" />
 	</ItemGroup>
 
 	<ItemGroup>

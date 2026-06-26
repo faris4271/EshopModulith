@@ -112,6 +112,7 @@ namespace Catalog.Products.Models
 
         public void AddOptionValue(ProductOptionValue optionValue)
         {
+            optionValue.Product = this;
             this.OptionValues.Add(optionValue);
         }
 
@@ -167,7 +168,10 @@ namespace Catalog.Products.Models
 
             foreach (var attribute in AttributeValues)
             {
-                product.AddAttributeValue(new ProductAttributeValue(attribute.Id, attribute.Value));
+                var att = new ProductAttributeValue(attribute.AttributeId, attribute.Value);
+
+                product.AddAttributeValue(att);
+
             }
 
             foreach (var category in Categories)

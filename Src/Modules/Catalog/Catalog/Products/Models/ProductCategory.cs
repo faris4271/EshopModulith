@@ -4,6 +4,7 @@ namespace Catalog.Products.Models
 {
     public class ProductCategory : EntityBase<Guid>
     {
+
         public bool IsFeaturedProduct { get; set; }
 
         public int DisplayOrder { get; set; }

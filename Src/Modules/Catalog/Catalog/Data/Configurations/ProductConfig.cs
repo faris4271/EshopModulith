@@ -13,8 +13,12 @@ namespace Catalog.Data.Configurations
             builder.Property(c => c.Name).HasConversion(a => a.name, name => new(name));
             builder.Property(d => d.Description)
                 .HasConversion(d => d.description, v => new Shared.DDD.Description(v));
+            builder.Property(d => d.ShortDescription)
+               .HasConversion(d => d.description, v => new Shared.DDD.Description(v));
 
             builder.HasOne(x => x.Brand).WithMany(x => x.Products).HasForeignKey(x => x.BrandId);
+
+            builder.HasMany(x => x.OptionCombinations).WithOne(x => x.Product).HasForeignKey(x => x.ProductId);
 
 
 

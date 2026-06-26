@@ -2,8 +2,8 @@
 {
     public class ProductOptionValueDto
     {
-        public string Key { get; set; }
+        public string Name { get; set; }
 
-        public string Display { get; set; }
+        public string DisplayType { get; set; }
     }
 }

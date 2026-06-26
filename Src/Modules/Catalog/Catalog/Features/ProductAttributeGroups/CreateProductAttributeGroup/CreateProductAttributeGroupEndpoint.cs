@@ -10,7 +10,7 @@ public sealed class CreateProductAttributeGroupEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/product-attribut-groub", async (CreateProductAttributeGroupCommand cmd, ISender sender, CancellationToken ct) =>
+        app.MapPost("api/attribute-group", async (CreateProductAttributeGroupCommand cmd, ISender sender, CancellationToken ct) =>
             {
                 var result = await sender.Send(cmd, ct);
                 return result.Match(Results.Created, Results.BadRequest);

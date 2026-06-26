@@ -18,10 +18,9 @@ namespace Catalog.Products.Models
         [StringLength(450)]
         public string DisplayType { get; set; }
 
-        public ProductOption Option { get; set; }
+        public ProductOption? Option { get; set; }
         public Product Product { get; set; }
 
-        public ProductOption ProductOption { get; set; }
 
         public Guid? ProductId { get; set; }
     }

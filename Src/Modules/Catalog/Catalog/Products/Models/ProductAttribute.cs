@@ -11,6 +11,8 @@ namespace Catalog.Products.Models
 
         public ProductAttributeGroup Group { get; set; }
 
+        public IList<ProductAttributeValue> AttributeValues { get; protected set; } = new List<ProductAttributeValue>();
+
         public IList<ProductTemplateProductAttribute> ProductTemplates { get; protected set; } = new List<ProductTemplateProductAttribute>();
     }
 }

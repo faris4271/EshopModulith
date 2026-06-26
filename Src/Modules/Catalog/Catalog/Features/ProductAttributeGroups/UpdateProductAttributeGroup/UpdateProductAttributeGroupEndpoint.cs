@@ -3,8 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Shared.Contract;
-using Shared.Contract.ResultPattern;
 
 namespace Catalog.Features.ProductAttributeGroups.UpdateProductAttributeGroup;
 
@@ -12,7 +10,7 @@ public sealed class UpdateProductAttributeGroupEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPut("/{id:guid}", async (Guid id, UpdateProductAttributeGroupCommand cmd, ISender sender, CancellationToken ct) =>
+        endpoints.MapPut("api/attribute-group/{id:guid}", async (Guid id, UpdateProductAttributeGroupCommand cmd, ISender sender, CancellationToken ct) =>
             {
                 var updateCmd = cmd with { Id = id };
                 var result = await sender.Send(updateCmd, ct);

@@ -18,5 +18,15 @@ namespace Catalog.Products.Models
             };
             ProductAttributes.Add(productTempateProductAttribute);
         }
+
+        public static ProductTemplate Create(string name)
+        {
+            var productTemplate = new ProductTemplate();
+            productTemplate.Name = new Name(name);
+            productTemplate.Id = Guid.NewGuid();
+            return productTemplate;
+        }
+
+
     }
 }

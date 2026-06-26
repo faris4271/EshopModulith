@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Newtonsoft.Json;
 
 namespace CatalogContract.Dtos
 {
     public class ProductVariationDto
     {
-        public long Id { get; set; }
+        [JsonIgnore]
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 
@@ -19,9 +21,7 @@ namespace CatalogContract.Dtos
 
         public decimal? OldPrice { get; set; }
 
-        // File input doesn't get bound on nested models
-        // https://github.com/aspnet/Mvc/issues/4485
-        // Workaround by moving file input to the top
+
         [BindNever]
         public IFormFileCollection ThumbnailImage { get; set; }
 
