@@ -1,6 +1,6 @@
 ﻿using Eshop.Module.Core.Data;
 using Eshop.Module.Core.Models;
-using EShop.Module.Core.Contract.Feature.Widgets.CreatWidget;
+using EShop.Module.Core.Contract.Feature.Widgets.CreatWidgetInstance;
 using Newtonsoft.Json;
 using Shared.Abstraction;
 using Shared.Contract.CQRS;

@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Eventing.Contract\Shared.Eventing.Contract.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
   </ItemGroup>
 

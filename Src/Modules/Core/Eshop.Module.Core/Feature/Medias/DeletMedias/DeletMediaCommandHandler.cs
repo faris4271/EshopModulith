@@ -1,5 +1,6 @@
 ﻿using Eshop.Module.Core.Data;
 using Eshop.Module.Core.Models;
+using EShop.Module.Core.Contract.Feature.Medias.DeletMedias;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstraction;
 using Shared.Contract.CQRS;

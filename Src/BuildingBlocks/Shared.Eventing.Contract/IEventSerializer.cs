@@ -1,5 +1,3 @@
-using Shared.Message.Events;
-
 namespace Shared.Eventing.Contract;
 
 /// <summary>
@@ -7,7 +5,7 @@ namespace Shared.Eventing.Contract;
 /// </summary>
 public interface IEventSerializer
 {
-    string Serialize(IntegrationEvent @event);
+    string Serialize(IIntegrationEvent @event);
 
-    IntegrationEvent? Deserialize(string payload, string eventTypeName);
+    IIntegrationEvent? Deserialize(string payload, string eventTypeName);
 }

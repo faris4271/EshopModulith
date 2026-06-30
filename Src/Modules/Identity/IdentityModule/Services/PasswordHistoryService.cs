@@ -1,13 +1,9 @@
 ﻿using IdentityModule.Data;
 using IdentityModule.Domain;
-using MassTransit.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Module.Identity.Contract.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IdentityModule.Services
 {
@@ -18,8 +14,8 @@ namespace IdentityModule.Services
         private readonly UserManager<AppUser> _userManager;
 
         private readonly PasswordPolicyOptions _passwordPolicyOptions;
-        public PasswordHistoryService(IdentityDbContext identityDb, 
-            UserManager<AppUser> userManager,IOptions<PasswordPolicyOptions> passwordPolicyOptions)
+        public PasswordHistoryService(IdentityDbContext identityDb,
+            UserManager<AppUser> userManager, IOptions<PasswordPolicyOptions> passwordPolicyOptions)
         {
             _identityDb = identityDb;
             _userManager = userManager;
@@ -32,19 +28,19 @@ namespace IdentityModule.Services
 
             var count = _passwordPolicyOptions.PasswordHistoryCount;
 
-            if(count<=0)
+            if (count <= 0)
             {
                 return;
             }
 
-            var oldPasswordHistory=await _identityDb.PasswordHistories.
-                Where(x=>x.UserId==userId).
-                OrderByDescending(x=>x.CreatedAt).
+            var oldPasswordHistory = await _identityDb.PasswordHistories.
+                Where(x => x.UserId == userId).
+                OrderByDescending(x => x.CreatedAt).
                 ToListAsync(cancellationToken);
 
             if (oldPasswordHistory != null)
             {
-                var passwordHistoryToRemove=oldPasswordHistory.Skip(count).ToList();
+                var passwordHistoryToRemove = oldPasswordHistory.Skip(count).ToList();
                 if (passwordHistoryToRemove.Any())
                 {
                     _identityDb.PasswordHistories.RemoveRange(passwordHistoryToRemove);
@@ -58,33 +54,33 @@ namespace IdentityModule.Services
             ArgumentException.ThrowIfNullOrEmpty(userId, nameof(userId));
             ArgumentException.ThrowIfNullOrEmpty(newPassword, nameof(newPassword));
 
-            var count=_passwordPolicyOptions.PasswordHistoryCount;
+            var count = _passwordPolicyOptions.PasswordHistoryCount;
 
             if (count == 0)
             {
                 return false;
             }
 
-            var user =await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user is null)
             {
                 return false;
             }
 
-            var passwordhistory=_identityDb.Set<PasswordHistory>().
-                Where(x=>x.UserId==userId).
-                OrderByDescending(x=>x.CreatedAt).
-                Select(x=>x.PasswordHash).
+            var passwordhistory = _identityDb.Set<PasswordHistory>().
+                Where(x => x.UserId == userId).
+                OrderByDescending(x => x.CreatedAt).
+                Select(x => x.PasswordHash).
                 Take(count).ToList();
 
-            foreach(var passwordHash in passwordhistory)
+            foreach (var passwordHash in passwordhistory)
             {
                 var passwordHasher = _userManager.PasswordHasher;
 
                 var result = passwordHasher.VerifyHashedPassword(user, passwordHash, newPassword);
 
-                if(result==PasswordVerificationResult.Success || result== PasswordVerificationResult.SuccessRehashNeeded)
+                if (result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded)
                 {
                     return true;
                 }
@@ -99,7 +95,7 @@ namespace IdentityModule.Services
 
             var user = await _userManager.FindByIdAsync(userId);
 
-            if (user is null||  string.IsNullOrEmpty(user.PasswordHash))
+            if (user is null || string.IsNullOrEmpty(user.PasswordHash))
             {
                 return;
             }

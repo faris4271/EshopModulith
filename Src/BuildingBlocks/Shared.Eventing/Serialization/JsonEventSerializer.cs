@@ -1,5 +1,4 @@
 ﻿using Shared.Eventing.Contract;
-using Shared.Message.Events;
 using System.Text.Json;
 
 namespace Shared.Eventing.Serialization
@@ -9,16 +8,17 @@ namespace Shared.Eventing.Serialization
         private static readonly JsonSerializerOptions Options = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            PropertyNameCaseInsensitive = true,
         };
 
-        public string Serialize(IntegrationEvent @event)
+        public string Serialize(IIntegrationEvent @event)
         {
             ArgumentNullException.ThrowIfNull(@event);
 
             return JsonSerializer.Serialize(@event, @event.GetType(), Options);
         }
-        public IntegrationEvent? Deserialize(string payload, string eventTypeName)
+
+        public IIntegrationEvent? Deserialize(string payload, string eventTypeName)
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(payload);
             ArgumentNullException.ThrowIfNullOrWhiteSpace(eventTypeName);
@@ -27,11 +27,9 @@ namespace Shared.Eventing.Serialization
             if (type == null)
                 return null;
 
-            var result = JsonSerializer.Deserialize(payload, type);
+            var result = JsonSerializer.Deserialize(payload, type, Options);
 
-            return result as IntegrationEvent;
+            return result as IIntegrationEvent;
         }
-
-
     }
 }

@@ -11,11 +11,9 @@ namespace Module.Inventory.Models
 
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(450)]
-        public string Name { get; set; }
+        public Name Name { get; set; }
 
-        public long AddressId { get; set; }
-
-        public long? VendorId { get; set; }
+        public Guid? VendorId { get; set; }
 
         public Address Address { get; set; }
     }

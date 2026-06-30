@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimplCommerce.Module.Catalog.Areas.Catalog.Controllers
+namespace CatalogContract.Dtos
 {
     public record GetProductTempletsDto
     {

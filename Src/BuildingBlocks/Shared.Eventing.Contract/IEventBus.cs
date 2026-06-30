@@ -1,5 +1,3 @@
-using Shared.Message.Events;
-
 namespace Shared.Eventing.Contract;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace Shared.Eventing.Contract;
 /// </summary>
 public interface IEventBus
 {
-    Task PublishAsync(IntegrationEvent @event, CancellationToken ct = default);
+    Task PublishAsync(IIntegrationEvent @event, CancellationToken ct = default);
 
-    Task PublishAsync(IEnumerable<IntegrationEvent> events, CancellationToken ct = default);
+    Task PublishAsync(IEnumerable<IIntegrationEvent> events, CancellationToken ct = default);
 }

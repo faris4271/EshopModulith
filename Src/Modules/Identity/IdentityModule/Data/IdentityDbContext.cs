@@ -14,8 +14,8 @@ namespace IdentityModule.Data
 
         public DbSet<PasswordHistory> PasswordHistories => Set<PasswordHistory>();
 
-        public DbSet<OutboxMessage> outboxMessages => Set<OutboxMessage>();
 
+        public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
         public DbSet<UserSession> UserSessions => Set<UserSession>();
 
         public DbSet<Group> Groups => Set<Group>();
@@ -29,22 +29,21 @@ namespace IdentityModule.Data
         {
 
             base.OnModelCreating(modelBuilder);
-            // وحد الاسم هنا (مثلاً اجعله كله lowercase)
+
             const string schema = "identity";
             modelBuilder.HasDefaultSchema(schema);
 
-            // تأكد من تمرير نفس الاسم للـ OutboxConfiguration
-            modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration(schema));
 
-            // تأكد من الـ Identity Entities أنها تتبع نفس الـ Schema
+
+
             modelBuilder.Entity<AppUser>().ToTable("AspNetUsers", schema);
             modelBuilder.Entity<Role>().ToTable("AspNetRoles", schema);
 
-            // إزالة الـ Unique عن UserName كما طلبت سابقاً
             modelBuilder.Entity<AppUser>(entity =>
             {
                 entity.HasIndex(u => u.NormalizedUserName).IsUnique(false);
             });
+
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
 

@@ -6,6 +6,8 @@ using IdentityModule;
 using IdentityModule.Data;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi;
+using Module.Inventory;
+using Module.Inventory.EventHandler;
 using Shared.Caching;
 using Shared.Eventing;
 using Shared.Extensions;
@@ -24,6 +26,8 @@ builder.Services.Configure<FormOptions>(options =>
 var catalogAssembly = typeof(CatalogModule).Assembly;
 var identityAssembly = typeof(IdentityDbContext).Assembly;
 var basketAssembly = typeof(BasketModule).Assembly;
+var inventoryAssembly = typeof(ProductCreatedEventHandler).Assembly;
+
 
 builder.Services.AddCarter(configurator: config =>
 {
@@ -42,7 +46,7 @@ builder.Services.AddCarter(configurator: config =>
     config.WithModules(basketModuleTypes);
 });
 
-
+builder.Services.AddEventingCore(builder.Configuration);
 builder.Services
     .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, identityAssembly);
 #region Cqrs
@@ -66,8 +70,15 @@ builder.Services.AddCatalog(builder.Configuration)
     .AddMailing()
     .AddCaching(builder.Configuration)
     .AddHeroJobs()
-    .AddEventingCore(builder.Configuration)
-    .AddIntegrationEventHandlers(catalogAssembly, basketAssembly, identityAssembly);
+    .AddInventory(builder.Configuration);
+
+//builder.Services.AddModularMassTransit(builder.Configuration, config =>
+//{
+//    config.AddModuleMassTransit<CatalogDbContext>(typeof(CatalogModule).Assembly);
+
+//    //config.AddModuleMassTransit<IdentityDbContext>(typeof(IdentityDbContext).Assembly);
+//    //config.AddModuleMassTransit<InventoryDbContext>(typeof(ProductCreatedConsumer).Assembly);
+//});
 //builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 //builder.Services.AddProblemDetails();
 builder.Services.AddScoped<CurrentUserMiddleware>();
@@ -86,7 +97,7 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 //app.UseExceptionHandler();
-app.UseCatalog().UseCore().UseBasket().UseIdentity();
+app.UseCatalog().UseCore().UseBasket().UseIdentity().UseInventory();
 app.UseRouting();
 
 app.UseCors("AllowAngularApp");

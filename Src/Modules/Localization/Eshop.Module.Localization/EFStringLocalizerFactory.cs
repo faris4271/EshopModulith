@@ -1,10 +1,9 @@
 ﻿using System;
-using Eshop.Module.Localization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 using Shared.Caching;
 
-namespace SimplCommerce.Module.Localization
+namespace Eshop.Module.Localization
 {
     public class EfStringLocalizerFactory : IStringLocalizerFactory
     {

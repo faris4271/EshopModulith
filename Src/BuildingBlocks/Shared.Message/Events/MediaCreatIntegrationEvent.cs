@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Text;
 
-namespace Shared.Message.Events
-{
-    public record MediaCreatIntegrationEvent
-        (
+//namespace Shared.Message.Events
+//{
+//    public record MediaCreatIntegrationEvent
+//        (
 
-        ) : IntegrationEvent;
+//        ) : IntegrationEvent;
 
-}
+//}

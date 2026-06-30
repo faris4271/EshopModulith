@@ -25,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\BuildingBlocks\Shared.Eventing\Shared.Eventing.csproj" />
 		<ProjectReference Include="..\..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
 		<ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />
 		<ProjectReference Include="..\..\Basket\Eshop.Module.Basket.Contract\Eshop.Module.Basket.Contract.csproj" />

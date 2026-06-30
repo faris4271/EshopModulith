@@ -1,4 +1,4 @@
-﻿using Catalog.Features.Products.Querys.GetCartRuleProduct;
+﻿using CatalogContract.Features.GetCartRuleProduct;
 using Eshop.Module.Basket.Contract.Dtos;
 using Eshop.Module.Basket.Data;
 using Eshop.Module.Basket.Models;

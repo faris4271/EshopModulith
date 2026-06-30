@@ -39,7 +39,10 @@
     <Project Path="Src/Modules/Localization/Eshop.Module.Localization.Contract/Eshop.Module.Localization.Contract.csproj" Id="9b41644d-b046-40c9-9fde-9e48d1132346" />
     <Project Path="Src/Modules/Localization/Eshop.Module.Localization/Eshop.Module.Localization.csproj" Id="c096687b-be52-48c2-b788-4cef76e0da15" />
   </Folder>
-  <Folder Name="/Src/Playground/" />
+  <Folder Name="/Src/Playground/">
+    <Project Path="Src/Playground/AppHost/AppHost.csproj" Id="9a6ce50f-593a-4182-9f55-e4ed95132b13" />
+    <Project Path="Src/Playground/ServiceDefaults/ServiceDefaults.csproj" Id="c9f94ab2-682c-432d-b552-656d6f71d68d" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>

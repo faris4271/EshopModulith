@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Abstraction;
 using Shared.Data;
 using Shared.Data.interceptores;
-using Shared.Message.Extensions;
+using Shared.Eventing;
 using System.Reflection;
 
 namespace Catalog
@@ -25,9 +25,10 @@ namespace Catalog
 
             service.AddScoped<ISaveChangesInterceptor, DispachDomainEventInterceptor>();
             service.AddScoped(typeof(IGenericeRepository<,>), typeof(GenericeRepository<,>));
+            //eventing 
+            service.AddEventingForDbContext<CatalogDbContext>();
+            service.AddIntegrationEventHandlers(typeof(CatalogDbContext).Assembly);
 
-
-            service.AddMassTransitWithAssemblies<CatalogDbContext>(configuration, typeof(CatalogDbContext).Assembly);
             service.AddScoped<DispachDomainEventInterceptor>();
             service.AddScoped<AuditableEntityInterceptor>();
             service.AddScoped<IProductPricingService, ProductPricingService>();
@@ -40,6 +41,8 @@ namespace Catalog
 
                 option.UseNpgsql(configuration.GetConnectionString("defualt"));
             });
+
+
             return service;
         }
 

@@ -5,7 +5,8 @@ using Module.Identity.Contract.Feature.Tokens.TokenGeneration;
 using Module.Identity.Contract.Services;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
-using Shared.Message.OutBox;
+using Shared.Eventing.Contract;
+
 
 namespace IdentityModule.Feature.Tokens.AccessToken
 {
@@ -16,19 +17,19 @@ namespace IdentityModule.Feature.Tokens.AccessToken
         private readonly ISessionService _sessionService;
         private readonly IRequestContextService _requestService;
         private readonly ILogger<GenerateTokenCommandHandler> _logger;
-        private readonly IOutBoxStore _outBoxStore;
+        private readonly IEventBus _eventBus;
 
         public GenerateTokenCommandHandler(IIdentityService identityService,
             ITokenServic tokenService, ISessionService sessionService,
             IRequestContextService requestService,
-            ILogger<GenerateTokenCommandHandler> logger, IOutBoxStore outBoxStore)
+            ILogger<GenerateTokenCommandHandler> logger, IEventBus eventBus)
         {
             _identityService = identityService;
             _tokenService = tokenService;
             _sessionService = sessionService;
             _requestService = requestService;
             _logger = logger;
-            _outBoxStore = outBoxStore;
+            _eventBus = eventBus;
         }
 
         public async Task<Result<TokenResponse>> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
@@ -81,7 +82,7 @@ namespace IdentityModule.Feature.Tokens.AccessToken
                 TokenFingerprint: fingerprint,
                 AccessTokenExpiresAtUtc: token.AccessTokenExpiresAt);
 
-            await _outBoxStore.AddAsync(integrationEvent);
+            await _eventBus.PublishAsync(integrationEvent);
 
             return Result.Success(token);
 

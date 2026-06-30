@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Shared.Eventing;
 using Shared.Eventing.Contract;
-using Shared.Eventing.Serialization;
-using Shared.Message.Events;
 
-namespace Shared.Message.OutBox
+namespace Shared.Eventing.OutBox
 {
     internal class EfCoreOutboxStore<TDbContext>(
         TDbContext _dbContext, IEventSerializer _eventSerializer,
@@ -13,22 +10,22 @@ namespace Shared.Message.OutBox
 
         ) : IOutBoxStore where TDbContext : DbContext
     {
-        public async Task AddAsync(IntegrationEvent @event, CancellationToken ct = default)
+        public async Task AddAsync(IIntegrationEvent @event, CancellationToken ct = default)
         {
             var payload = _eventSerializer.Serialize(@event);
 
-            var outBox = new OutboxMessage
+            var message = new OutboxMessage
             {
                 Id = @event.Id,
-                Type = @event.EventType,
+                CreatedOnUtc = @event.OccurredOnUtc,
+                Type = @event.GetType().AssemblyQualifiedName ?? @event.GetType().FullName!,
                 Payload = payload,
-                CreatedOnUtc = @event.OcurredOn,
-                IsDead = false,
-                RetryCount = 0
-
+                CorrelationId = @event.CorrelationId,
+                RetryCount = 0,
+                IsDead = false
             };
 
-            await _dbContext.Set<OutboxMessage>().AddAsync(outBox, ct);
+            await _dbContext.Set<OutboxMessage>().AddAsync(message, ct);
             await _dbContext.SaveChangesAsync(ct).ConfigureAwait(false);
         }
 

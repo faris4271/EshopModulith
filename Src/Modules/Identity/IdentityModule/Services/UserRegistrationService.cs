@@ -1,6 +1,5 @@
 ﻿using IdentityModule.Data;
 using IdentityModule.Domain;
-using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +7,7 @@ using Module.Identity.Contract.Events;
 using Module.Identity.Contract.Services;
 using Shared.Abstraction;
 using Shared.Contract.Exeption;
+using Shared.Eventing.Contract;
 using Shared.Identity;
 using Shared.Mailing;
 using Shared.Mailing.Services;
@@ -23,7 +23,7 @@ namespace IdentityModule.Services
         IGenericeRepository<Group, IdentityDbContext> _gruopRepository,
         IGenericeRepository<UserGroup, IdentityDbContext> _userGroupRepository,
         IMailService _mailService,
-        IPublishEndpoint _publish
+        IEventBus _eventBus
 
         ) : IUserRegistrationService
     {
@@ -184,6 +184,8 @@ namespace IdentityModule.Services
             var integrationevent = new UserRegisteredIntegrationEvent
             (
                 Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid().ToString(),
                 sourse,
                 user.Id,
                user.Email ?? string.Empty,
@@ -191,7 +193,7 @@ namespace IdentityModule.Services
                user.LastName ?? string.Empty
             );
 
-            await _publish.Publish(integrationevent);
+            await _eventBus.PublishAsync(integrationevent);
 
         }
 

@@ -1,4 +1,4 @@
-﻿using Catalog.Brands.Dtos;
+﻿using CatalogContract.Dtos;
 using Shared.Contract.CQRS;
 
 namespace Catalog.Features.Brands.UpdateBrands

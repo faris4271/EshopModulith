@@ -1,5 +1,4 @@
-﻿using FSH.Framework.Storage;
-using IdentityModule.Authorization.Jwt;
+﻿using IdentityModule.Authorization.Jwt;
 using IdentityModule.Data;
 using IdentityModule.Domain;
 using IdentityModule.Services;
@@ -14,6 +13,7 @@ using Shared.Contract.Context;
 using Shared.Data;
 using Shared.Eventing;
 using Shared.Persistence;
+using Shared.Storage;
 using UAParser;
 
 namespace IdentityModule;
@@ -45,8 +45,8 @@ public static class IdentityModule
         services.AddTransient<IUserStatusService, UserStatusService>();
         services.AddTransient<ISessionService, SessionService>();
         services.AddScoped<IRoleService, RoleService>();
-        services.AddEventingForDbContext<IdentityDbContext>();
         // Facade for backward compatibility
+
 
         services.AddScoped<IDbInitializer, IdentityDbInitializer>();
 
@@ -63,6 +63,9 @@ public static class IdentityModule
         // Register password expiry service
         services.AddScoped<IPasswordExpiryService, PasswordExpiryService>();
 
+
+        services.AddEventingForDbContext<IdentityDbContext>();
+        services.AddIntegrationEventHandlers(typeof(IdentityModule).Assembly);
 
         // Register group role service for group-derived permissions
         services.AddScoped<IGroupRoleService, GroupRoleService>();
@@ -92,7 +95,7 @@ public static class IdentityModule
 
 
     }
-    public static async Task<IApplicationBuilder> UseIdentity(this IApplicationBuilder app)
+    public static IApplicationBuilder UseIdentity(this IApplicationBuilder app)
     {
 
         app.UseMigration<IdentityDbContext>();

@@ -1,5 +1,5 @@
-﻿using Shared.Contract.CQRS;
-using SimplCommerce.Module.Catalog.Areas.Catalog.Controllers;
+﻿using CatalogContract.Dtos;
+using Shared.Contract.CQRS;
 
 namespace Catalog.Features.ProductTemplet.GetProductTemplets
 {

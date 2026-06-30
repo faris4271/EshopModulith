@@ -1,4 +1,4 @@
-﻿namespace Shared.Eventing.RabbitMq;
+namespace Shared.Eventing.RabbitMq;
 
 /// <summary>
 /// Configuration options for RabbitMQ event bus.
@@ -8,7 +8,7 @@ public sealed class RabbitMqOptions
     /// <summary>
     /// RabbitMQ host name or connection string.
     /// </summary>
-    public string Host { get; set; } = "localhost";
+    public string Host { get; set; } = "ecommerce-mq";
 
     /// <summary>
     /// RabbitMQ port. Default is 5672.

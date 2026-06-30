@@ -1,11 +1,10 @@
 ﻿using Catalog.Products.Events;
-using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Catalog.Products.EventHandlers
 {
-    public class ProducPriceChangeEventHandler(ILogger<ProductPriceChangeEvent> logger, IBus bus) : INotificationHandler<ProductPriceChangeEvent>
+    public class ProducPriceChangeEventHandler(ILogger<ProductPriceChangeEvent> logger) : INotificationHandler<ProductPriceChangeEvent>
     {
         public async Task Handle(ProductPriceChangeEvent notification, CancellationToken cancellationToken)
         {

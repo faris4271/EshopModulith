@@ -1,11 +1,10 @@
-﻿using Shared.Eventing;
-using Shared.Message.Events;
+﻿using Shared.Eventing.Contract;
 
-namespace Shared.Message.OutBox
+namespace Shared.Eventing.OutBox
 {
     public interface IOutBoxStore
     {
-        Task AddAsync(IntegrationEvent @event, CancellationToken ct = default);
+        Task AddAsync(IIntegrationEvent @event, CancellationToken ct = default);
 
         Task<IReadOnlyList<OutboxMessage>> GetPendingBatchAsync(int batchSize, CancellationToken ct = default);
 

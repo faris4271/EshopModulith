@@ -3,64 +3,70 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Shared.Eventing.OutBox
+namespace Shared.Eventing.OutBox;
+
+/// <summary>
+/// Background service that periodically dispatches outbox messages.
+/// Alternative to Hangfire-based scheduling for simpler deployments.
+/// </summary>
+public sealed class OutboxDispatcherHostedService : BackgroundService
 {
-    public class OutboxDispatcherHostedService : BackgroundService
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<OutboxDispatcherHostedService> _logger;
+    private readonly TimeSpan _interval;
+
+    public OutboxDispatcherHostedService(
+        IServiceScopeFactory scopeFactory,
+        IOptions<EventingOptions> options,
+        ILogger<OutboxDispatcherHostedService> logger)
     {
-        private IServiceScopeFactory _scopeFactory;
-        private ILogger<OutboxDispatcherHostedService> _logger;
-        private TimeSpan _interval;
+        ArgumentNullException.ThrowIfNull(options);
+        _scopeFactory = scopeFactory;
+        _logger = logger;
+        _interval = TimeSpan.FromSeconds(options.Value.OutboxDispatchIntervalSeconds > 0
+            ? options.Value.OutboxDispatchIntervalSeconds
+            : 10);
+    }
 
-        public OutboxDispatcherHostedService(IServiceScopeFactory scopeFactory,
-            ILogger<OutboxDispatcherHostedService> logger, IOptions<EventingOptions> options)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation(
+            "Outbox dispatcher hosted service started. Dispatch interval: {Interval}s",
+            _interval.TotalSeconds);
+
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _scopeFactory = scopeFactory;
-            _logger = logger;
-            _interval = TimeSpan.FromSeconds(
-                options.Value.OutboxDispatchIntervalSeconds > 0
-                ? options.Value.OutboxDispatchIntervalSeconds : 10);
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation(
-                "Outbox dispatcher hosted service started. Dispatch interval: {Interval}s",
-                _interval.TotalSeconds);
-
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                try
-                {
-                    await DispatchOutboxAsync(stoppingToken).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error dispatching outbox messages");
-                }
-
-                try
-                {
-                    await Task.Delay(_interval, stoppingToken).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-                {
-                    break;
-                }
+                await DispatchOutboxAsync(stoppingToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                // Graceful shutdown
+                break;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error dispatching outbox messages");
             }
 
-            _logger.LogInformation("Outbox dispatcher hosted service stopped");
+            try
+            {
+                await Task.Delay(_interval, stoppingToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
         }
 
-        private async Task DispatchOutboxAsync(CancellationToken ct)
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var dispatcher = scope.ServiceProvider.GetRequiredService<OutboxDispatcher>();
-            await dispatcher.DispatchAsync(ct).ConfigureAwait(false);
-        }
+        _logger.LogInformation("Outbox dispatcher hosted service stopped");
+    }
+
+    private async Task DispatchOutboxAsync(CancellationToken ct)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dispatcher = scope.ServiceProvider.GetRequiredService<OutboxDispatcher>();
+        await dispatcher.DispatchAsync(ct).ConfigureAwait(false);
     }
 }

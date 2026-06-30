@@ -1,6 +1,7 @@
 ﻿using Catalog.Data;
 using Catalog.Products.Models;
 using CatalogContract.Dtos;
+using CatalogContract.IntegrationEvents;
 using EShop.Module.Core.Contract.Feature.Medias.CreatMedia;
 using EShop.Module.Core.Contract.Services;
 using MediatR;
@@ -10,6 +11,7 @@ using Shared.Abstraction;
 using Shared.Constants;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
+using Shared.Eventing.OutBox;
 
 
 namespace Catalog.Features.Products.Commands.CreatProduct
@@ -25,6 +27,8 @@ namespace Catalog.Features.Products.Commands.CreatProduct
         private readonly IGenericeRepository<ProductLink, CatalogDbContext> _productLinkRepository;
         private readonly IEntityService _entityService;
 
+        private readonly IOutBoxStore _outBoxStore;
+
 
 
 
@@ -33,21 +37,22 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             IGenericeRepository<Product, CatalogDbContext> productRepository,
             ISender sender, CatalogDbContext context,
             IGenericeRepository<ProductLink, CatalogDbContext> productLinkRepository,
-            IEntityService entityService)
+            IEntityService entityService, IOutBoxStore outBoxStore)
         {
             _productRepository = productRepository;
             _sender = sender;
             _context = context;
             _productLinkRepository = productLinkRepository;
             _entityService = entityService;
+            _outBoxStore = outBoxStore;
         }
 
         async Task<Result<Guid>> IRequestHandler<CreatProductCommand, Result<Guid>>.Handle(CreatProductCommand request, CancellationToken cancellationToken)
         {
-
+            using var transaction = _productLinkRepository.BeginTransaction();
 
             var productreq = request.ProductForm.Product;
-            var strockQuantity = 10;
+
 
             var product = Product.Create(
                 productreq.Name,
@@ -60,7 +65,6 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                 productreq.Slug,
                 productreq.Sku,
                 productreq.Gtin,
-                strockQuantity,
                 productreq.SpecialPrice,
                 productreq.Price,
                 productreq.MetaTitle,
@@ -109,6 +113,16 @@ namespace Catalog.Features.Products.Commands.CreatProduct
             await _entityService.Add(product.Name.name, product.Slug, product.Id, EntityTypeConstants.Product);
 
             await _productRepository.SaveChangesAsync();
+            await _outBoxStore.AddAsync(new ProductCreatedIntegrationEvent(
+               Id: Guid.NewGuid(),
+               OccurredOnUtc: DateTime.UtcNow,
+               CorrelationId: Guid.NewGuid().ToString(),
+               Source: "Catalog",
+               ProductId: product.Id,
+               Sku: product.Sku
+           ));
+            await transaction.CommitAsync();
+
 
             return Result.Create(product.Id);
         }

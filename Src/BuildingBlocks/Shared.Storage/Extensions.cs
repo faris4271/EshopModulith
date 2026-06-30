@@ -1,10 +1,9 @@
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Storage.Local;
 using Shared.Storage.Services;
 
-namespace FSH.Framework.Storage;
+namespace Shared.Storage;
 
 public static class Extensions
 {

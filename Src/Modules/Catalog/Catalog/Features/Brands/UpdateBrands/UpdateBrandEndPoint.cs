@@ -1,5 +1,5 @@
 ﻿using Carter;
-using Catalog.Brands.Dtos;
+using CatalogContract.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

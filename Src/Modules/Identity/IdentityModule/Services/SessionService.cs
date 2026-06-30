@@ -1,6 +1,5 @@
 ﻿using IdentityModule.Data;
 using IdentityModule.Domain;
-using MassTransit.Initializers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Module.Identity.Contract.Dtos;

@@ -8,7 +8,7 @@ public sealed class EventingOptions
     /// <summary>
     /// Provider for the event bus implementation. Supported: "InMemory", "RabbitMQ".
     /// </summary>
-    public string Provider { get; set; } = "InMemory";
+    public string Provider { get; set; } = "RabbitMQ";
 
     /// <summary>
     /// Batch size for outbox dispatching.

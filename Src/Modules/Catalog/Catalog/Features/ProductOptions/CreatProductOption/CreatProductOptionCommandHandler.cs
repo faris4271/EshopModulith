@@ -1,5 +1,4 @@
 ﻿using Catalog.Data;
-using Catalog.Features.ProductOptions.CreateProductOption;
 using Catalog.Products.Models;
 using Shared.Abstraction;
 using Shared.Contract.CQRS;

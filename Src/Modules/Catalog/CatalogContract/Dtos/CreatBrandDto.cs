@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Catalog.Brands.Dtos
+namespace CatalogContract.Dtos
 {
     public class CreatBrandDto
     {

@@ -1,4 +1,4 @@
-using Shared.Message.Events;
+using Shared.Eventing.Contract;
 
 namespace Module.Identity.Contract.Events;
 
@@ -9,7 +9,7 @@ namespace Module.Identity.Contract.Events;
 public sealed record TokenGeneratedIntegrationEvent(
     Guid Id,
     DateTime OccurredOnUtc,
- 
+
     string CorrelationId,
     string Source,
     string UserId,
@@ -19,5 +19,5 @@ public sealed record TokenGeneratedIntegrationEvent(
     string UserAgent,
     string TokenFingerprint,
     DateTime AccessTokenExpiresAtUtc)
-    : IntegrationEvent;
+    : IIntegrationEvent;
 

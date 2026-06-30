@@ -198,7 +198,6 @@ namespace Catalog.Products.Models
             string slug,
             string sku,
             string gtin,
-            int stockQuantity,
             decimal? specialPrice,
             decimal price,
             string metaTitle,
@@ -217,7 +216,6 @@ namespace Catalog.Products.Models
 
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(oldPrice);
             if (specialPrice.HasValue) ArgumentOutOfRangeException.ThrowIfNegativeOrZero(specialPrice.Value);
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stockQuantity);
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
 
             var product = new Product()
@@ -241,7 +239,7 @@ namespace Catalog.Products.Models
                 IsCallForPricing = isCallForPricing,
                 IsAllowToOrder = isAllowToOrder,
                 StockTrackingIsEnabled = stockTrackingIsEnabled,
-                StockQuantity = stockQuantity,
+                StockQuantity = 0,
                 MetaTitle = metaTitle,
                 MetaDescription = metaDescription,
                 MetaKeywords = metaKeyword

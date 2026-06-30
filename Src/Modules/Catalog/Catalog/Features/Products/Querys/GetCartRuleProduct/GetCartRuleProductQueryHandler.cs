@@ -1,6 +1,7 @@
 ﻿using Catalog.Data;
 using Catalog.Products.Models;
 using CatalogContract.Dtos;
+using CatalogContract.Features.GetCartRuleProduct;
 using Shared.Abstraction;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;

@@ -14,7 +14,7 @@ public class OutboxMessage
 
     public string Payload { get; set; } = default!;
 
-
+    public string CorrelationId { get; set; }
 
     public DateTime? ProcessedOnUtc { get; set; }
 
