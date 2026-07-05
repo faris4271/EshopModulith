@@ -16,7 +16,7 @@ public class GetUserProfileEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/profile", async (ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
+        app.MapGet("api/identity/profile", async (ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
         {
             if (user.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
             {

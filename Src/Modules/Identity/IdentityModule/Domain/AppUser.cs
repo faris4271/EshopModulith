@@ -8,13 +8,24 @@ namespace IdentityModule.Domain
     public class AppUser : IdentityUser, IHasDomainEvents, IAuditableEntity
     {
         private readonly List<IDomainEvent> _domainEvent;
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
+        public Name? FirstName { get; set; }
+        public Name? LastName { get; set; }
         public Uri? ImageUrl { get; set; }
         public bool IsActive { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
 
+
+        public Guid? VendorId { get; set; }
+        public IList<UserAddress> UserAddresses { get; set; } = new List<UserAddress>();
+
+        public UserAddress DefaultShippingAddress { get; set; }
+
+        public Guid? DefaultShippingAddressId { get; set; }
+
+        public UserAddress DefaultBillingAddress { get; set; }
+
+        public Guid? DefaultBillingAddressId { get; set; }
         public string? ObjectId { get; set; }
 
         /// <summary>Timestamp when the user last changed their password</summary>
@@ -22,6 +33,10 @@ namespace IdentityModule.Domain
 
         // Navigation property for password history
         public virtual ICollection<PasswordHistory> PasswordHistories { get; set; } = new List<PasswordHistory>();
+
+        public virtual ICollection<UserRoles> Roles { get; set; } = new List<UserRoles>();
+
+        public virtual ICollection<UserGroup> GroupUsers { get; set; } = new List<UserGroup>();
 
         public IReadOnlyList<IDomainEvent> Events => _domainEvent.AsReadOnly();
 
@@ -55,8 +70,8 @@ namespace IdentityModule.Domain
             AddDomainEvent(UserRegisteredEvent.Create(
                 userId: Id,
                 email: Email ?? string.Empty,
-                firstName: FirstName,
-                lastName: LastName,
+                firstName: FirstName.name,
+                lastName: LastName.name,
                 tenantId: tenantId));
         }
 

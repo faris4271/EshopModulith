@@ -34,6 +34,7 @@
   </Folder>
   <Folder Name="/Src/Modules/Inventory/">
     <Project Path="Src/Modules/Inventory/Module.Inventory/Module.Inventory.csproj" Id="7b0f7d92-8eb1-496f-97b5-500de5d7939c" />
+    <Project Path="Src/Modules/Inventory/Module.Inventory.Contract/Module.Inventory.Contract.csproj" />
   </Folder>
   <Folder Name="/Src/Modules/Localization/">
     <Project Path="Src/Modules/Localization/Eshop.Module.Localization.Contract/Eshop.Module.Localization.Contract.csproj" Id="9b41644d-b046-40c9-9fde-9e48d1132346" />

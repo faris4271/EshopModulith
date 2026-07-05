@@ -5,7 +5,7 @@ using Shared.Eventing;
 
 namespace IdentityModule.Data
 {
-    public class IdentityDbContext : IdentityDbContext<AppUser, Role, string>
+    public class IdentityDbContext : IdentityDbContext<AppUser, AppRole, string>
     {
         public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
         {
@@ -37,7 +37,7 @@ namespace IdentityModule.Data
 
 
             modelBuilder.Entity<AppUser>().ToTable("AspNetUsers", schema);
-            modelBuilder.Entity<Role>().ToTable("AspNetRoles", schema);
+            modelBuilder.Entity<AppRole>().ToTable("AspNetRoles", schema);
 
             modelBuilder.Entity<AppUser>(entity =>
             {

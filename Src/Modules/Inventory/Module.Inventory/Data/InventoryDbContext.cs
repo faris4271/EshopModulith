@@ -13,6 +13,7 @@ namespace Module.Inventory.Data
         public DbSet<OutboxMessage> OutboxMessages { get; set; }
         public DbSet<InboxMessage> InboxMessages { get; set; }
         public DbSet<ProductBackInStockSubscription> ProductBackInStockSubscriptions { get; set; }
+        public DbSet<StockHistory> StockHistories { get; set; }
         public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options)
         {
         }

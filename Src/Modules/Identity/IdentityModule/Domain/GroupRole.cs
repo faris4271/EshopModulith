@@ -7,7 +7,7 @@
 
         // Navigation properties (init for EF Core materialization)
         public virtual Group? Group { get; init; }
-        public virtual Role? Role { get; init; }
+        public virtual AppRole? Role { get; init; }
 
         private GroupRole() { } // EF Core
 

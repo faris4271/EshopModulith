@@ -23,6 +23,36 @@ namespace IdentityModule.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("IdentityModule.Domain.AppRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", "identity");
+                });
+
             modelBuilder.Entity("IdentityModule.Domain.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -44,6 +74,12 @@ namespace IdentityModule.Data.Migrations
                     b.Property<string>("Culture")
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)");
+
+                    b.Property<Guid?>("DefaultBillingAddressId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("DefaultShippingAddressId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -115,13 +151,22 @@ namespace IdentityModule.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<Guid?>("VendorId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DefaultBillingAddressId");
+
+                    b.HasIndex("DefaultShippingAddressId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("AspNetUsers", "identity");
                 });
@@ -233,34 +278,30 @@ namespace IdentityModule.Data.Migrations
                     b.ToTable("PasswordHistory", "identity");
                 });
 
-            modelBuilder.Entity("IdentityModule.Domain.Role", b =>
+            modelBuilder.Entity("IdentityModule.Domain.UserAddress", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("Description")
+                    b.Property<int>("AddressType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("LastUsedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("AspNetRoles", "identity");
+                    b.ToTable("UserAddress", "identity");
                 });
 
             modelBuilder.Entity("IdentityModule.Domain.UserGroup", b =>
@@ -281,7 +322,12 @@ namespace IdentityModule.Data.Migrations
                         .HasMaxLength(450)
                         .HasColumnType("character varying(450)");
 
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("text");
+
                     b.HasKey("UserId", "GroupId");
+
+                    b.HasIndex("AppUserId");
 
                     b.HasIndex("GroupId");
 
@@ -372,6 +418,51 @@ namespace IdentityModule.Data.Migrations
                     b.ToTable("UserSessions", "identity");
                 });
 
+            modelBuilder.Entity("IdentityModule.Domain.Vendor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LatestUpdatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("LatestUpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Vendor", "identity");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -452,11 +543,18 @@ namespace IdentityModule.Data.Migrations
                     b.Property<string>("RoleId")
                         .HasColumnType("text");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)");
+
                     b.HasKey("UserId", "RoleId");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("AspNetUserRoles", "identity");
+
+                    b.HasDiscriminator().HasValue("IdentityUserRole<string>");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -516,6 +614,37 @@ namespace IdentityModule.Data.Migrations
                     b.ToTable("OutboxMessages", "identity");
                 });
 
+            modelBuilder.Entity("IdentityModule.Domain.UserRoles", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUserRole<string>");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasDiscriminator().HasValue("UserRoles");
+                });
+
+            modelBuilder.Entity("IdentityModule.Domain.AppUser", b =>
+                {
+                    b.HasOne("IdentityModule.Domain.UserAddress", "DefaultBillingAddress")
+                        .WithMany()
+                        .HasForeignKey("DefaultBillingAddressId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("IdentityModule.Domain.UserAddress", "DefaultShippingAddress")
+                        .WithMany()
+                        .HasForeignKey("DefaultShippingAddressId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("IdentityModule.Domain.Vendor", null)
+                        .WithMany("Users")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("DefaultBillingAddress");
+
+                    b.Navigation("DefaultShippingAddress");
+                });
+
             modelBuilder.Entity("IdentityModule.Domain.GroupRole", b =>
                 {
                     b.HasOne("IdentityModule.Domain.Group", "Group")
@@ -524,7 +653,7 @@ namespace IdentityModule.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("IdentityModule.Domain.Role", "Role")
+                    b.HasOne("IdentityModule.Domain.AppRole", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -546,8 +675,74 @@ namespace IdentityModule.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("IdentityModule.Domain.UserAddress", b =>
+                {
+                    b.HasOne("IdentityModule.Domain.AppUser", "User")
+                        .WithMany("UserAddresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Shared.Identity.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("UserAddressId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.Property<string>("Phone")
+                                .IsRequired()
+                                .HasMaxLength(30)
+                                .HasColumnType("character varying(30)");
+
+                            b1.Property<string>("PostalCode")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
+
+                            b1.Property<string>("State")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasMaxLength(250)
+                                .HasColumnType("character varying(250)");
+
+                            b1.Property<string>("ZipCode")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
+
+                            b1.HasKey("UserAddressId");
+
+                            b1.ToTable("UserAddress", "identity");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserAddressId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("IdentityModule.Domain.UserGroup", b =>
                 {
+                    b.HasOne("IdentityModule.Domain.AppUser", null)
+                        .WithMany("GroupUsers")
+                        .HasForeignKey("AppUserId");
+
                     b.HasOne("IdentityModule.Domain.Group", "Group")
                         .WithMany("UserGroups")
                         .HasForeignKey("GroupId")
@@ -578,7 +773,7 @@ namespace IdentityModule.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("IdentityModule.Domain.Role", null)
+                    b.HasOne("IdentityModule.Domain.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -603,21 +798,6 @@ namespace IdentityModule.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("IdentityModule.Domain.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IdentityModule.Domain.AppUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.HasOne("IdentityModule.Domain.AppUser", null)
@@ -627,9 +807,39 @@ namespace IdentityModule.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("IdentityModule.Domain.UserRoles", b =>
+                {
+                    b.HasOne("IdentityModule.Domain.AppRole", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IdentityModule.Domain.AppUser", "User")
+                        .WithMany("Roles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IdentityModule.Domain.AppRole", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("IdentityModule.Domain.AppUser", b =>
                 {
+                    b.Navigation("GroupUsers");
+
                     b.Navigation("PasswordHistories");
+
+                    b.Navigation("Roles");
+
+                    b.Navigation("UserAddresses");
                 });
 
             modelBuilder.Entity("IdentityModule.Domain.Group", b =>
@@ -637,6 +847,11 @@ namespace IdentityModule.Data.Migrations
                     b.Navigation("GroupRoles");
 
                     b.Navigation("UserGroups");
+                });
+
+            modelBuilder.Entity("IdentityModule.Domain.Vendor", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

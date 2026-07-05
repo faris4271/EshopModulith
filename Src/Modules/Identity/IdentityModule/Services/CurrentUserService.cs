@@ -7,6 +7,7 @@ using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
 using Shared.Contract.Exeption;
 using Shared.Contract.Identity;
+using Shared.DDD;
 using Shared.GlobalConfig;
 using System.Security.Claims;
 
@@ -71,10 +72,11 @@ internal sealed class CurrentUserService : ICurrentUserService
         }
 
         UserGuid = Guid.NewGuid();
-        var dummyEmail = string.Format("{0}@guest.simplcommerce.com", UserGuid);
+        var dummyEmail = string.Format("{0}@guest.Eshop.com", UserGuid);
         user = new AppUser
         {
-            FirstName = "Guest",
+            FirstName = new Name("Guest"),
+            LastName = new Name("User"),
             Id = UserGuid.Value.ToString(),
             Email = dummyEmail,
             UserName = dummyEmail,

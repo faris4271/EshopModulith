@@ -12,7 +12,7 @@ public class RegisterUserEndpointL : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/register", async (RegisterUserCommand command,
+        app.MapPost("api/identity/register", async (RegisterUserCommand command,
            HttpContext context,
            ISender sender,
            CancellationToken cancellationToken) =>

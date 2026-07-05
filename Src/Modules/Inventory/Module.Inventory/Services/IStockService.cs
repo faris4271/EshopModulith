@@ -1,11 +1,9 @@
-﻿using Module.Inventory.Models;
+﻿using Shared.Contract.ResultPattern;
 
 namespace Module.Inventory.Services
 {
-    public interface IStockService
+    internal interface IStockService
     {
-        Task AddAllProduct(Warehouse warehouse);
-
-        Task UpdateStock(StockUpdateRequest stockUpdateRequest);
+        Task<Error> UpdateStockAsync(Guid stockId, int adjustedQuantity, string note, CancellationToken cancellationToken);
     }
 }

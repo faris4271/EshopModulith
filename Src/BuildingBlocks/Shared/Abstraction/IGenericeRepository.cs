@@ -13,7 +13,7 @@ namespace Shared.Abstraction
         Task<T> GetByIdAsync<TId>(TId id,
            bool trackChanges = false,
            params Expression<Func<T, object>>[] includes);
-        Task AddAsync(T entity,CancellationToken cancellationToken=default);
+        Task AddAsync(T entity, CancellationToken cancellationToken = default);
         Task AddRangeAsync(IEnumerable<T> entities);
 
         Task<IQueryable<T>> GetAllAsQuerable();
@@ -27,7 +27,9 @@ namespace Shared.Abstraction
         void Delete(T entity);
         void DeleteRange(IEnumerable<T> entities);
         Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         IDbContextTransaction BeginTransaction();
 
+        Task UpdateAsync(T entity, CancellationToken cancellationToken);
     }
 }

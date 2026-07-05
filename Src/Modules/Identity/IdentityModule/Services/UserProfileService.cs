@@ -7,6 +7,7 @@ using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
 using SendGrid.Helpers.Errors.Model;
 using Shared.Contract.Exeption;
+using Shared.DDD;
 using Shared.Storage;
 using Shared.Storage.Services;
 using Shared.Web.Origin;
@@ -52,8 +53,8 @@ namespace IdentityModule.Services
                 Id = user.Id,
                 Email = user.Email,
                 UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = user.FirstName.name,
+                LastName = user.LastName.name,
                 ImageUrl = ResolveImageUrl(user.ImageUrl),
                 IsActive = user.IsActive
 
@@ -110,8 +111,8 @@ namespace IdentityModule.Services
                     Id = user.Id,
                     Email = user.Email,
                     UserName = user.UserName,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
+                    FirstName = user.FirstName.name,
+                    LastName = user.LastName.name,
                     ImageUrl = ResolveImageUrl(user.ImageUrl),
                     IsActive = user.IsActive
 
@@ -142,8 +143,8 @@ namespace IdentityModule.Services
 
             }
 
-            user.FirstName = firstName;
-            user.LastName = lastName;
+            user.FirstName = new Name(firstName);
+            user.LastName = new Name(lastName);
 
             var curentPhoneNumber = await _userManager.GetPhoneNumberAsync(user);
 

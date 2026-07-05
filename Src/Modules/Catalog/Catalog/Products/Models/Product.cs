@@ -251,7 +251,7 @@ namespace Catalog.Products.Models
         }
 
         public void Update(
-    string name,
+            string name,
             string description,
             string shortDescription,
             decimal? oldPrice,
@@ -308,6 +308,12 @@ namespace Catalog.Products.Models
             {
                 AddDomainEvent(ProductPriceChangeEvent.Create(this));
             }
+        }
+
+        public void UpdateStock(int quantity)
+        {
+            if (quantity < 0) throw new ArgumentOutOfRangeException(nameof(quantity), "Stock quantity cannot be negative.");
+            StockQuantity = quantity;
         }
     }
 }

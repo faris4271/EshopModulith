@@ -11,17 +11,17 @@ using Shared.Identity;
 
 namespace IdentityModule.Services;
 
-public class RoleService(RoleManager<Role> roleManager,
+public class RoleService(RoleManager<AppRole> roleManager,
     IdentityDbContext context,
     ICurrentUser currentUser) : IRoleService
 {
     public async Task<IEnumerable<RoleDto>> GetRolesAsync(CancellationToken cancellationToken = default)
     {
         if (roleManager is null)
-            throw new NotFoundException("RoleManager<FshRole> not resolved. Check Identity registration.");
+            throw new NotFoundException("RoleManager<AppRole> not resolved. Check Identity registration.");
 
         if (roleManager.Roles is null)
-            throw new NotFoundException("Role store not configured. Ensure .AddRoles<FshRole>() and EF stores.");
+            throw new NotFoundException("Role store not configured. Ensure .AddRoles<AppRole>() and EF stores.");
 
 
         var roles = await roleManager.Roles
@@ -33,7 +33,7 @@ public class RoleService(RoleManager<Role> roleManager,
 
     public async Task<RoleDto?> GetRoleAsync(string id, CancellationToken cancellationToken = default)
     {
-        Role? role = await roleManager.FindByIdAsync(id);
+        AppRole? role = await roleManager.FindByIdAsync(id);
 
         _ = role ?? throw new NotFoundException("role not found");
 
@@ -42,7 +42,7 @@ public class RoleService(RoleManager<Role> roleManager,
 
     public async Task<RoleDto> CreateOrUpdateRoleAsync(string roleId, string name, string description, CancellationToken cancellationToken = default)
     {
-        Role? role = await roleManager.FindByIdAsync(roleId);
+        AppRole? role = await roleManager.FindByIdAsync(roleId);
 
         if (role != null)
         {
@@ -52,7 +52,7 @@ public class RoleService(RoleManager<Role> roleManager,
         }
         else
         {
-            role = new Role(name, description);
+            role = new AppRole(name, description);
             await roleManager.CreateAsync(role);
         }
 
@@ -61,7 +61,7 @@ public class RoleService(RoleManager<Role> roleManager,
 
     public async Task DeleteRoleAsync(string id, CancellationToken cancellationToken = default)
     {
-        Role? role = await roleManager.FindByIdAsync(id);
+        AppRole? role = await roleManager.FindByIdAsync(id);
 
         _ = role ?? throw new NotFoundException("role not found");
 
@@ -98,7 +98,7 @@ public class RoleService(RoleManager<Role> roleManager,
         return "permissions updated";
     }
 
-    private static void ValidateRoleCanBeModified(Role role)
+    private static void ValidateRoleCanBeModified(AppRole role)
     {
         if (role.Name == RoleConstants.Admin)
         {
@@ -108,7 +108,7 @@ public class RoleService(RoleManager<Role> roleManager,
 
 
 
-    private async Task RemoveRevokedPermissionsAsync(Role role, IList<System.Security.Claims.Claim> currentClaims, List<string> permissions, CancellationToken cancellationToken = default)
+    private async Task RemoveRevokedPermissionsAsync(AppRole role, IList<System.Security.Claims.Claim> currentClaims, List<string> permissions, CancellationToken cancellationToken = default)
     {
         var claimsToRemove = currentClaims.Where(c => !permissions.Exists(p => p == c.Value));
 
@@ -124,7 +124,7 @@ public class RoleService(RoleManager<Role> roleManager,
         }
     }
 
-    private async Task AddNewPermissionsAsync(Role role, IList<System.Security.Claims.Claim> currentClaims, List<string> permissions, CancellationToken cancellationToken = default)
+    private async Task AddNewPermissionsAsync(AppRole role, IList<System.Security.Claims.Claim> currentClaims, List<string> permissions, CancellationToken cancellationToken = default)
     {
         var newPermissions = permissions
             .Where(p => !string.IsNullOrEmpty(p) && !currentClaims.Any(c => c.Value == p))

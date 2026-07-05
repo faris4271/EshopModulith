@@ -12,7 +12,7 @@ namespace IdentityModule.Data;
 internal sealed class IdentityDbInitializer(
     ILogger<IdentityDbInitializer> logger,
     IdentityDbContext context,
-    RoleManager<Role> roleManager,
+    RoleManager<AppRole> roleManager,
     UserManager<AppUser> userManager,
     TimeProvider timeProvider,
 
@@ -39,10 +39,10 @@ internal sealed class IdentityDbInitializer(
         foreach (string roleName in RoleConstants.DefaultRoles)
         {
             if (await roleManager.Roles.SingleOrDefaultAsync(r => r.Name == roleName, cancellationToken)
-                is not Role role)
+                is not AppRole role)
             {
                 // create role
-                role = new Role(roleName, $"{roleName} Role for Tenant");
+                role = new AppRole(roleName, $"{roleName} Role for Tenant");
                 await roleManager.CreateAsync(role);
             }
 
@@ -63,7 +63,7 @@ internal sealed class IdentityDbInitializer(
         }
     }
 
-    private async Task AssignPermissionsToRoleAsync(IdentityDbContext dbContext, IReadOnlyList<AppPermission> permissions, Role role, CancellationToken cancellationToken = default)
+    private async Task AssignPermissionsToRoleAsync(IdentityDbContext dbContext, IReadOnlyList<AppPermission> permissions, AppRole role, CancellationToken cancellationToken = default)
     {
         var currentClaims = await roleManager.GetClaimsAsync(role);
         var newClaims = permissions

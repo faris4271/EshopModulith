@@ -20,9 +20,9 @@ namespace Shared.Data
             using var scope = service.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<TContext>();
             var seeder = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-
-            await context.Database.MigrateAsync();
             await seeder.SeedAsync();
+            await context.Database.MigrateAsync();
+
         }
     }
 }

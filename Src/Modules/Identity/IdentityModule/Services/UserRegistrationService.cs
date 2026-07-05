@@ -7,6 +7,7 @@ using Module.Identity.Contract.Events;
 using Module.Identity.Contract.Services;
 using Shared.Abstraction;
 using Shared.Contract.Exeption;
+using Shared.DDD;
 using Shared.Eventing.Contract;
 using Shared.Identity;
 using Shared.Mailing;
@@ -50,7 +51,7 @@ namespace IdentityModule.Services
 
             var emailVerficationUrl = await GetEmailVerificationUriAsync(user, origin);
 
-            var emailBody = BuildConfirmationEmailHtml(user.FirstName ?? user.UserName ?? "user", emailVerficationUrl);
+            var emailBody = BuildConfirmationEmailHtml(user.FirstName.name ?? user.UserName ?? "user", emailVerficationUrl);
 
 
             var mailRequest = new MailRequest(new Collection<string> { user.Email }, "confirm email", emailBody);
@@ -103,8 +104,8 @@ namespace IdentityModule.Services
 
             var user = new AppUser
             {
-                FirstName = firstName,
-                LastName = lastName,
+                FirstName = new Name(firstName),
+                LastName = new Name(lastName),
                 Email = email,
                 UserName = userName,
 
@@ -189,8 +190,8 @@ namespace IdentityModule.Services
                 sourse,
                 user.Id,
                user.Email ?? string.Empty,
-               user.FirstName ?? string.Empty,
-               user.LastName ?? string.Empty
+               user.FirstName?.name ?? string.Empty,
+               user.LastName?.name ?? string.Empty
             );
 
             await _eventBus.PublishAsync(integrationevent);
@@ -216,8 +217,8 @@ namespace IdentityModule.Services
             var user = new AppUser
             {
                 Email = email,
-                FirstName = firstName,
-                LastName = lastName,
+                FirstName = new Name(firstName),
+                LastName = new Name(lastName),
                 UserName = userName,
                 IsActive = true,
                 EmailConfirmed = true,

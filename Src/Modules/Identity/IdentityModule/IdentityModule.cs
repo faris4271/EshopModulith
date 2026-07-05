@@ -70,7 +70,7 @@ public static class IdentityModule
         // Register group role service for group-derived permissions
         services.AddScoped<IGroupRoleService, GroupRoleService>();
 
-        services.AddIdentity<AppUser, Role>(options =>
+        services.AddIdentity<AppUser, AppRole>(options =>
         {
             options.Password.RequiredLength = IdentityModuleConstants.PasswordLength;
             options.Password.RequireDigit = false;

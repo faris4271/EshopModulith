@@ -8,4 +8,9 @@
     <UserSecretsId>c45fb22a-55fc-495d-9aff-4fc926b7f42b</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MessagePack" Version="3.1.7" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.6" />
+  </ItemGroup>
+
 </Project>

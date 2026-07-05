@@ -6,6 +6,7 @@ public static class RoleConstants
 {
     public const string Admin = nameof(Admin);
     public const string Basic = nameof(Basic);
+    public const string Guest = nameof(Guest);
 
     /// <summary>
     /// The base roles provided by the framework.
@@ -13,7 +14,8 @@ public static class RoleConstants
     public static IReadOnlyList<string> DefaultRoles { get; } = new ReadOnlyCollection<string>(new[]
     {
         Admin,
-        Basic
+        Basic,
+        Guest
     });
 
     /// <summary>

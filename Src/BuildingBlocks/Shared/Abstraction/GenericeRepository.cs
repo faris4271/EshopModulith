@@ -158,6 +158,30 @@ namespace Shared.Abstraction
             return await _context.Set<T>().FirstOrDefaultAsync(e => EF.Property<TId>(e, "Id")!.Equals(id), cancellationToken);
         }
 
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
 
+        public async Task UpdateAsync(T entity, CancellationToken cancellationToken = default)
+        {
+
+            var id = _context.Model.FindEntityType(typeof(T))
+                .FindPrimaryKey().Properties.Select(x => x.PropertyInfo.GetValue(entity)).FirstOrDefault();
+
+            if (id == null) throw new ArgumentException("Entity identity could not be determined.");
+
+
+            var existingEntity = await _context.Set<T>().FindAsync(new[] { id }, cancellationToken);
+
+            if (existingEntity == null)
+            {
+                throw new ArgumentException("Entity not found in database.");
+            }
+
+            _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

@@ -66,10 +66,10 @@ namespace IdentityModule.Services
         new(ClaimTypes.NameIdentifier, user.Id),
         new(JwtRegisteredClaimNames.Sub, user.Id),
         new(ClaimTypes.Email, user.Email!),
-        new(ClaimTypes.Name, user.FirstName ?? string.Empty),
+        new(ClaimTypes.Name, user.FirstName.name ?? string.Empty),
         new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
         new(ClaimConstants.Fullname, $"{user.FirstName} {user.LastName}"),
-        new(ClaimTypes.Surname, user.LastName ?? string.Empty),
+        new(ClaimTypes.Surname, user.LastName.name ?? string.Empty),
         new(ClaimConstants.ImageUrl, user.ImageUrl?.ToString() ?? string.Empty)
            };
 
@@ -145,7 +145,7 @@ namespace IdentityModule.Services
         {
             if (!user.IsActive)
                 throw new InvalidOperationException();
-            if (user.EmailConfirmed)
+            if (!user.EmailConfirmed)
                 throw new InvalidOperationException();
 
         }

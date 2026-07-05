@@ -12,12 +12,12 @@ namespace IdentityModule.Services
     {
         private readonly UserManager<AppUser> _userManager;
 
-        private readonly RoleManager<Role> _roleManager;
+        private readonly RoleManager<AppRole> _roleManager;
 
         private readonly IdentityDbContext _identityDb;
 
         public UserRoleService(UserManager<AppUser> userManager,
-            RoleManager<Role> roleManager, IdentityDbContext identityDb)
+            RoleManager<AppRole> roleManager, IdentityDbContext identityDb)
         {
             _userManager = userManager;
             _roleManager = roleManager;

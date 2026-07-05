@@ -7,7 +7,6 @@ using IdentityModule.Data;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi;
 using Module.Inventory;
-using Module.Inventory.EventHandler;
 using Shared.Caching;
 using Shared.Eventing;
 using Shared.Extensions;
@@ -23,10 +22,15 @@ builder.Services.Configure<FormOptions>(options =>
     options.ValueCountLimit = int.MaxValue; // default is 1024
 });
 
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.AllowTrailingCommas = true;
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+});
 var catalogAssembly = typeof(CatalogModule).Assembly;
 var identityAssembly = typeof(IdentityDbContext).Assembly;
 var basketAssembly = typeof(BasketModule).Assembly;
-var inventoryAssembly = typeof(ProductCreatedEventHandler).Assembly;
+var inventoryAssembly = typeof(InventoryModule).Assembly;
 
 
 builder.Services.AddCarter(configurator: config =>
@@ -39,17 +43,20 @@ builder.Services.AddCarter(configurator: config =>
 
     var basketModuleTypes = typeof(BasketModule).Assembly.GetTypes()
         .Where(x => x.IsAssignableTo(typeof(ICarterModule))).ToArray();
+    var inventoryModuleTypes = typeof(InventoryModule).Assembly.GetTypes()
+        .Where(x => x.IsAssignableTo(typeof(ICarterModule))).ToArray();
 
 
     config.WithModules(catalogModule);
     config.WithModules(identityModuleTypes);
     config.WithModules(basketModuleTypes);
+    config.WithModules(inventoryModuleTypes);
 });
 
 builder.Services.AddEventingCore(builder.Configuration);
 builder.Services
     .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, identityAssembly);
-#region Cqrs
+#region Cross-Origin Resource Sharing (CORS) Configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",

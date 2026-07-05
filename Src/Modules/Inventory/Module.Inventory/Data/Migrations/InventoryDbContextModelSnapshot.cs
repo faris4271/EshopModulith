@@ -59,6 +59,10 @@ namespace Module.Inventory.Data.Migrations
                     b.Property<Guid>("WarehouseId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("sku")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId")
@@ -67,6 +71,45 @@ namespace Module.Inventory.Data.Migrations
                     b.HasIndex("WarehouseId");
 
                     b.ToTable("Stocks", "inventory");
+                });
+
+            modelBuilder.Entity("Module.Inventory.Models.StockHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("AdjustedQuantity")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LatestUpdatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("LatestUpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("StockHistories", "inventory");
                 });
 
             modelBuilder.Entity("Module.Inventory.Models.Warehouse", b =>
@@ -154,6 +197,17 @@ namespace Module.Inventory.Data.Migrations
                         .WithMany()
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("Module.Inventory.Models.StockHistory", b =>
+                {
+                    b.HasOne("Module.Inventory.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Warehouse");

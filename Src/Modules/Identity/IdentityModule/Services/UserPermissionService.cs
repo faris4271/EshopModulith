@@ -10,7 +10,7 @@ namespace IdentityModule.Services
 {
     internal class UserPermissionService(
     UserManager<AppUser> _userManager,
-    RoleManager<Role> _roleManager,
+    RoleManager<AppRole> _roleManager,
     IdentityDbContext _db,
     ICacheService cache) : IUserPermissionService
     {

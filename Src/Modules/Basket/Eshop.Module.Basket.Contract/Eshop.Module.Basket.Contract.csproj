@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Catalog\CatalogContract\CatalogContract.csproj" />
     <ProjectReference Include="..\..\Core\EShop.Module.Core.Contract\EShop.Module.Core.Contract.csproj" />
   </ItemGroup>

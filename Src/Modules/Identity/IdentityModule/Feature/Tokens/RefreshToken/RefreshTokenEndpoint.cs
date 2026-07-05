@@ -12,7 +12,7 @@ public class RefreshTokenEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/token/refresh", async (HttpContext context,
+        app.MapGet("api/identity/refresh-token", async (HttpContext context,
            [FromServices] ISender sender,
            CancellationToken ct) =>
            {

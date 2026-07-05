@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.1" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.6" />
     <PackageReference Include="NuGet.CommandLine" Version="7.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +27,7 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Storage\Shared.Storage.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Web\Shared.Web.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />
+    <ProjectReference Include="..\..\Core\EShop.Module.Core.Contract\EShop.Module.Core.Contract.csproj" />
     <ProjectReference Include="..\Module.Identity.Contract\Module.Identity.Contract.csproj" />
   </ItemGroup>
 
