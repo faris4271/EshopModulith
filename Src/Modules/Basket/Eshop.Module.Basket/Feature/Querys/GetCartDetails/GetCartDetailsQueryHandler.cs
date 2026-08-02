@@ -1,5 +1,5 @@
 ﻿using Eshop.Module.Basket.Contract.Dtos;
-using Eshop.Module.Basket.Contract.Services;
+using Eshop.Module.Basket.Services;
 using Module.Identity.Contract.Services;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
@@ -15,7 +15,7 @@ namespace Eshop.Module.Basket.Feature.Querys.GetCartDetails
         {
 
 
-            var cartDetails = await _cartService.GetCartDetails(request.CustomerId);
+            var cartDetails = await _cartService.GetCartDetails(request.CustomerId, cancellationToken);
 
             if (cartDetails == null)
                 return Result.Failure<CartDto>(new Error("CartNotFound", "Cart not found", ErrorType.NotFound));

@@ -12,11 +12,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Eventing.Contract\Shared.Eventing.Contract.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
+    <ProjectReference Include="..\..\Core\EShop.Module.Core.Contract\EShop.Module.Core.Contract.csproj" />
   </ItemGroup>
 
 </Project>

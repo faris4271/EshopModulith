@@ -1,4 +1,4 @@
-﻿using IdentityModule.Domain;
+using IdentityModule.Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shared.Eventing;
@@ -24,6 +24,8 @@ namespace IdentityModule.Data
 
         public DbSet<UserGroup> UserGroups => Set<UserGroup>();
 
+        public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,7 +34,6 @@ namespace IdentityModule.Data
 
             const string schema = "identity";
             modelBuilder.HasDefaultSchema(schema);
-
 
 
 

@@ -1,5 +1,4 @@
-﻿using Eshop.Module.Basket.Contract.Services;
-using Eshop.Module.Basket.Data;
+﻿using Eshop.Module.Basket.Data;
 using Eshop.Module.Basket.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +18,6 @@ namespace Eshop.Module.Basket
             });
 
             services.AddScoped<ICartService, CartService>();
-
-            services.AddScoped<ICouponService, CouponService>();
 
 
             return services;

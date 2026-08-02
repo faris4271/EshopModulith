@@ -18,16 +18,11 @@ internal class UpdateWarehouseCommandHandler(IGenericeRepository<Warehouse, Inve
         }
 
         warehouse.Update(
-            request.dto.Name,
-            request.dto.VendorId,
-            request.dto.Street,
-            request.dto.City,
-            request.dto.State,
-            request.dto.ZipCode,
-            request.dto.Country,
-            request.dto.Phone,
-            request.dto.PostalCode
-        );
+        request.dto.Name,
+        request.dto.VendorId,
+        request.dto.AddressId
+
+    );
 
         await _repository.UpdateAsync(warehouse, cancellationToken);
         await _repository.SaveChangesAsync(cancellationToken);

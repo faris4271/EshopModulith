@@ -11,6 +11,7 @@ using Shared.Abstraction;
 using Shared.Constants;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
+using Shared.DDD;
 using Shared.Eventing.OutBox;
 
 
@@ -58,15 +59,15 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                 productreq.Name,
                 productreq.Description,
                 productreq.ShortDescription,
-                productreq.OldPrice ?? 0m,
+                new Money(productreq.OldPrice ?? 0m, productreq.Currency),
                 productreq.Specification,
                 productreq.SpecialPriceStart,
                 productreq.SpecialPriceEnd,
                 productreq.Slug,
                 productreq.Sku,
                 productreq.Gtin,
-                productreq.SpecialPrice,
-                productreq.Price,
+                new Money(productreq.SpecialPrice ?? 0m, productreq.Currency),
+                new Money(productreq.Price, productreq.Currency),
                 productreq.MetaTitle,
                 productreq.MetaDescription,
                 productreq.MetaKeywords);
@@ -170,8 +171,8 @@ namespace Catalog.Features.Products.Commands.CreatProduct
                 productLink.LinkedProduct.Slug = variant.Sku;
                 productLink.LinkedProduct.Gtin = variant.Gtin;
                 productLink.LinkedProduct.HasOptions = false;
-                productLink.LinkedProduct.Price = variant.Price;
-                productLink.LinkedProduct.OldPrice = variant.OldPrice;
+                productLink.LinkedProduct.Price = new Money(variant.Price, variant.Currency);
+                productLink.LinkedProduct.OldPrice = new Money(variant.OldPrice ?? 0, variant.Currency);
                 productLink.LinkedProduct.NormalizedName = variant.NormalizedName;
                 productLink.LinkedProduct.IsVisibleIndividually = false;
                 if (product.MainImageId != null)

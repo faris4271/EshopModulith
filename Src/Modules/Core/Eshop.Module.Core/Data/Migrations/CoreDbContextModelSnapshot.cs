@@ -23,6 +23,154 @@ namespace Eshop.Module.Core.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Eshop.Module.Core.Models.Address", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AddressLine1")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("AddressLine2")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("CityName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("CountryId")
+                        .HasMaxLength(10)
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CreatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DistrictId")
+                        .HasMaxLength(10)
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("LatestUpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<DateTimeOffset?>("LatestUpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("StateOrProvinceId")
+                        .HasMaxLength(10)
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityName");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("StateOrProvinceId");
+
+                    b.HasIndex("ZipCode");
+
+                    b.ToTable("Addresses", "Core");
+                });
+
+            modelBuilder.Entity("Eshop.Module.Core.Models.Country", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code3")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsBillingEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsCityEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDistrictEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsShippingEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsZipCodeEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries", "Core");
+                });
+
+            modelBuilder.Entity("Eshop.Module.Core.Models.District", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasMaxLength(10)
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LatestUpdatedById")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("LatestUpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("StateOrProvinceId")
+                        .HasMaxLength(10)
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StateOrProvinceId");
+
+                    b.ToTable("Districts", "Core");
+                });
+
             modelBuilder.Entity("Eshop.Module.Core.Models.Entity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -132,6 +280,15 @@ namespace Eshop.Module.Core.Data.Migrations
                             IsMenuable = false,
                             RoutingAction = "ProductDetail",
                             RoutingController = "Product"
+                        },
+                        new
+                        {
+                            Id = "Vendor",
+                            AreaName = "Catalog",
+                            CreatedOn = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            IsMenuable = false,
+                            RoutingAction = "VendorDetail",
+                            RoutingController = "Vendor"
                         });
                 });
 
@@ -163,6 +320,71 @@ namespace Eshop.Module.Core.Data.Migrations
                     b.ToTable("media", "Core");
                 });
 
+            modelBuilder.Entity("Eshop.Module.Core.Models.StateOrProvince", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CountryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("StatesOrProvinces", "Core");
+                });
+
+            modelBuilder.Entity("Eshop.Module.Core.Models.Address", b =>
+                {
+                    b.HasOne("Eshop.Module.Core.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Eshop.Module.Core.Models.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Eshop.Module.Core.Models.StateOrProvince", "StateOrProvince")
+                        .WithMany()
+                        .HasForeignKey("StateOrProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+
+                    b.Navigation("District");
+
+                    b.Navigation("StateOrProvince");
+                });
+
+            modelBuilder.Entity("Eshop.Module.Core.Models.District", b =>
+                {
+                    b.HasOne("Eshop.Module.Core.Models.StateOrProvince", "StateOrProvince")
+                        .WithMany()
+                        .HasForeignKey("StateOrProvinceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("StateOrProvince");
+                });
+
             modelBuilder.Entity("Eshop.Module.Core.Models.Entity", b =>
                 {
                     b.HasOne("Eshop.Module.Core.Models.EntityType", "EntityType")
@@ -172,6 +394,22 @@ namespace Eshop.Module.Core.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("EntityType");
+                });
+
+            modelBuilder.Entity("Eshop.Module.Core.Models.StateOrProvince", b =>
+                {
+                    b.HasOne("Eshop.Module.Core.Models.Country", "Country")
+                        .WithMany("StatesOrProvinces")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Eshop.Module.Core.Models.Country", b =>
+                {
+                    b.Navigation("StatesOrProvinces");
                 });
 #pragma warning restore 612, 618
         }

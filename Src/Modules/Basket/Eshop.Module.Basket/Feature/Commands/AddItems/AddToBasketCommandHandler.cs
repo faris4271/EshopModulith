@@ -1,5 +1,5 @@
 ﻿using Eshop.Module.Basket.Contract.Dtos;
-using Eshop.Module.Basket.Contract.Services;
+using Eshop.Module.Basket.Services;
 using Module.Identity.Contract.Services;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
@@ -22,7 +22,7 @@ namespace Eshop.Module.Basket.Feature.Commands.AddItems
                 return Result.Failure<CartDto>(Error.Failure(result.ErrorCode, result.ErrorMessage.ToString()));
 
 
-            var cartDetails = await _cartService.GetCartDetails(currentUserId);
+            var cartDetails = await _cartService.GetCartDetails(currentUserId, cancellationToken);
 
             return Result.Success(cartDetails);
         }

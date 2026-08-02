@@ -152,7 +152,7 @@ namespace Catalog.Features.Products.Querys.GetProductDetails
 
                 var productThumbnail = ProductThumbnail.FromProduct(
                     linkedProduct.Id, linkedProduct.Name.name, linkedProduct.Slug,
-                    linkedProduct.Price, linkedProduct.OldPrice, linkedProduct.SpecialPrice,
+                    linkedProduct.Price.Amount, linkedProduct.OldPrice?.Amount, linkedProduct.SpecialPrice.Amount,
                     linkedProduct.SpecialPriceStart, linkedProduct.SpecialPriceEnd,
                     linkedProduct.StockQuantity, linkedProduct.IsAllowToOrder, linkedProduct.IsCallForPricing, null);
                 var mediaResult = await _sender.Send(new GetMediaByIdQuery(linkedProduct.Id));

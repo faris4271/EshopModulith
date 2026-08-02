@@ -1,7 +1,6 @@
-﻿using Eshop.Module.Pricing.Models;
-using Shared.DDD;
+﻿using Shared.DDD;
 
-namespace SimplCommerce.Module.Pricing.Models
+namespace Eshop.Module.Pricing.Models
 {
     public class CatalogRuleCustomerGroup:EntityBase<Guid>
     {

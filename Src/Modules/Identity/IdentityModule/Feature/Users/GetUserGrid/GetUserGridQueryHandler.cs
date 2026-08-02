@@ -16,6 +16,31 @@ namespace IdentityModule.Feature.Users.GetUserGrid
             var user = userManager.Users.AsNoTracking().AsQueryable();
 
 
+            if (request.SmartTableParam.Search.PredicateObject != null)
+            {
+                dynamic search = request.SmartTableParam.Search.PredicateObject;
+
+                if (search.Email != null)
+                {
+                    string email = search.Email;
+                    user = user.Where(x => x.Email.Contains(email));
+                }
+
+                if (search.CreatedOn != null)
+                {
+                    if (search.CreatedOn.before != null)
+                    {
+                        DateTimeOffset before = search.CreatedOn.before;
+                        user = user.Where(x => x.CreatedOn <= before);
+                    }
+
+                    if (search.CreatedOn.after != null)
+                    {
+                        DateTimeOffset after = search.CreatedOn.after;
+                        user = user.Where(x => x.CreatedOn >= after);
+                    }
+                }
+            }
 
             var result = user.ToSmartTableResult(
              request.SmartTableParam,

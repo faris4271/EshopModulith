@@ -1,5 +1,4 @@
 ﻿using Eshop.Module.Core.Data;
-using Eshop.Module.Core.Models;
 using Eshop.Module.Core.Services;
 using EShop.Module.Core.Contract.Services;
 using Microsoft.AspNetCore.Builder;
@@ -8,10 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Abstraction;
 using Shared.Data;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace Eshop.Module.Core
 {
@@ -30,7 +26,8 @@ namespace Eshop.Module.Core
                 op.UseNpgsql(configuration.GetConnectionString("defualt"));
             });
 
-            services.AddMediatR(cfg => {
+            services.AddMediatR(cfg =>
+            {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
 
             });
@@ -39,10 +36,10 @@ namespace Eshop.Module.Core
 
         public static IApplicationBuilder UseCore(this IApplicationBuilder app)
         {
-            
-                app.UseMigration<CoreDbContext>();
 
-                return app;
+            app.UseMigration<CoreDbContext>();
+
+            return app;
         }
     }
 }

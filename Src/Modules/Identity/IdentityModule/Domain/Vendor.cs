@@ -48,5 +48,15 @@ namespace IdentityModule.Domain
         {
             Slug = slug;
         }
+
+        public void Update(string name, string description, string email, bool isActive, string slug)
+        {
+            Name = new Name(name);
+            Description = new Description(description);
+            Email = new Email(email);
+            IsActive = isActive;
+            Slug = slug;
+            LatestUpdatedOn = DateTimeOffset.UtcNow;
+        }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Shared.DDD;
-using Shared.Identity;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -9,29 +8,29 @@ namespace Module.Inventory.Models
     {
         public Warehouse() { }
 
-        public Warehouse(Guid id, Name name, Guid? vendorId, Address address)
+        public Warehouse(Guid id, Name name, Guid? vendorId, Guid addressId)
         {
             Id = id;
             Name = name;
             VendorId = vendorId;
-            Address = address;
+            AddressId = addressId;
         }
 
-        public static Warehouse Create(string name, Guid? vendorId, string street, string city, string state, string zipCode, string country, string phone, string postalCode)
+        public static Warehouse Create(string name, Guid? vendorId, Guid addressId)
         {
             return new Warehouse(
                 Guid.NewGuid(),
                 new Name(name),
                 vendorId,
-                new Address(street, city, postalCode, country, phone, state, zipCode)
+                Guid.NewGuid()
             );
         }
 
-        public void Update(string name, Guid? vendorId, string street, string city, string state, string zipCode, string country, string phone, string postalCode)
+        public void Update(string name, Guid? vendorId, Guid addressId)
         {
             Name = new Name(name);
             VendorId = vendorId;
-            Address = new Address(street, city, postalCode, country, phone, state, zipCode);
+            AddressId = addressId;
         }
 
         [Required(ErrorMessage = "The {0} field is required.")]
@@ -40,6 +39,6 @@ namespace Module.Inventory.Models
 
         public Guid? VendorId { get; set; }
 
-        public Address Address { get; set; }
+        public Guid AddressId { get; set; }
     }
 }

@@ -18,13 +18,13 @@ internal class GetWarehousesQueryHandler(IGenericeRepository<Warehouse, Inventor
             x.Id,
             x.Name.name,
             x.VendorId,
-            x.Address.Street,
-            x.Address.City,
-            x.Address.State,
-            x.Address.ZipCode,
-            x.Address.Country,
-            x.Address.Phone,
-            x.Address.PostalCode
+            x.AddressId.ToString(),
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
         )).ToList();
         return Result.Success(dtos);
     }

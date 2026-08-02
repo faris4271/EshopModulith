@@ -1,4 +1,4 @@
-﻿using Eshop.Module.Basket.Contract.Services;
+﻿using Eshop.Module.Basket.Services;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 

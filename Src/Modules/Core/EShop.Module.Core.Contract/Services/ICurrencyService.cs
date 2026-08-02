@@ -1,11 +1,12 @@
-﻿using System.Globalization;
+﻿namespace EShop.Module.Core.Contract.Services;
 
-namespace EShop.Module.Core.Contract.Services
+using Shared.DDD;
+using System.Globalization;
+
+public interface ICurrencyService
 {
-    public interface ICurrencyService
-    {
-        CultureInfo CurrencyCulture { get; }
 
-        string FormatCurrency(decimal value);
-    }
+    string FormatCurrency(Money money, CultureInfo? targetCulture = null);
+
+    int GetDecimalPlaces(string currencyCode);
 }

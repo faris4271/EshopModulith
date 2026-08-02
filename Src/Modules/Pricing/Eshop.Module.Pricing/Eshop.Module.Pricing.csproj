@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Caching\Shared.Caching.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />
+    <ProjectReference Include="..\..\Catalog\CatalogContract\CatalogContract.csproj" />
+    <ProjectReference Include="..\..\Identity\Module.Identity.Contract\Module.Identity.Contract.csproj" />
+    <ProjectReference Include="..\Eshop.Module.Pricing.Contract\Eshop.Module.Pricing.Contract.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,6 +12,7 @@ using Shared.Abstraction;
 using Shared.Constants;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
+using Shared.DDD;
 
 namespace Catalog.Features.Products.Commands.UpdateProduct
 {
@@ -49,6 +50,7 @@ namespace Catalog.Features.Products.Commands.UpdateProduct
                productreq.Description,
                productreq.ShortDescription,
                productreq.OldPrice ?? 0m,
+               productreq.Currency,
                productreq.Specification,
                productreq.SpecialPriceStart,
                productreq.SpecialPriceEnd,
@@ -205,12 +207,12 @@ namespace Catalog.Features.Products.Commands.UpdateProduct
                         LinkedProduct = product.Clone()
                     };
 
-                    productLink.LinkedProduct.Name = new Shared.DDD.Name(productVariationVm.Name);
+                    productLink.LinkedProduct.Name = new Name(productVariationVm.Name);
                     productLink.LinkedProduct.Slug = productVariationVm.Name;
                     productLink.LinkedProduct.Sku = productVariationVm.Sku;
                     productLink.LinkedProduct.Gtin = productVariationVm.Gtin;
-                    productLink.LinkedProduct.Price = productVariationVm.Price;
-                    productLink.LinkedProduct.OldPrice = productVariationVm.OldPrice;
+                    productLink.LinkedProduct.Price = new Money(productVariationVm.Price, productVariationVm.Currency);
+                    productLink.LinkedProduct.OldPrice = new Money(productVariationVm.OldPrice ?? 0, productVariationVm.Currency);
                     productLink.LinkedProduct.NormalizedName = productVariationVm.NormalizedName;
                     productLink.LinkedProduct.HasOptions = false;
                     productLink.LinkedProduct.IsVisibleIndividually = false;
@@ -239,8 +241,8 @@ namespace Catalog.Features.Products.Commands.UpdateProduct
                 else
                 {
                     var isPriceChanged = false;
-                    if (productLink.LinkedProduct.Price != productVariationVm.Price ||
-                        productLink.LinkedProduct.OldPrice != productVariationVm.OldPrice)
+                    if (productLink.LinkedProduct.Price.Amount != productVariationVm.Price ||
+                        productLink.LinkedProduct.OldPrice.Amount != productVariationVm.OldPrice)
                     {
                         isPriceChanged = true;
                     }
@@ -249,8 +251,8 @@ namespace Catalog.Features.Products.Commands.UpdateProduct
                     productLink.LinkedProduct.LatestUpdatedOn = DateTimeOffset.Now;
                     productLink.LinkedProduct.Sku = productVariationVm.Sku;
                     productLink.LinkedProduct.Gtin = productVariationVm.Gtin;
-                    productLink.LinkedProduct.Price = productVariationVm.Price;
-                    productLink.LinkedProduct.OldPrice = productVariationVm.OldPrice;
+                    productLink.LinkedProduct.Price = new Money(productVariationVm.Price, productVariationVm.Currency);
+                    productLink.LinkedProduct.OldPrice = new Money(productVariationVm.OldPrice ?? 0, productVariationVm.Currency);
                     productLink.LinkedProduct.IsDeleted = false;
                     productLink.LinkedProduct.StockTrackingIsEnabled = product.StockTrackingIsEnabled;
 

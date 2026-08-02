@@ -1,19 +1,10 @@
 ﻿using CatalogContract.Dtos;
-using EShop.Module.Core.Contract.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Eshop.Module.Basket.Contract.Dtos
 {
     public class CartItemDto
     {
-        private readonly ICurrencyService _currencyService;
 
-        public CartItemDto(ICurrencyService currencyService)
-        {
-            _currencyService = currencyService;
-        }
 
         public Guid Id { get; set; }
 
@@ -27,7 +18,7 @@ namespace Eshop.Module.Basket.Contract.Dtos
 
         public decimal ProductPrice { get; set; }
 
-        public string ProductPriceString => _currencyService.FormatCurrency(ProductPrice);
+        public string ProductPriceString { get; set; }
 
         public int ProductStockQuantity { get; set; }
 
@@ -39,10 +30,10 @@ namespace Eshop.Module.Basket.Contract.Dtos
 
         public decimal Total => Quantity * ProductPrice;
 
-        public string TotalString => _currencyService.FormatCurrency(Total);
+        public string TotalString { get; set; }
 
         public IEnumerable<ProductVariationOptionDto> VariationOptions { get; set; } = new List<ProductVariationOptionDto>();
 
-   
+
     }
 }

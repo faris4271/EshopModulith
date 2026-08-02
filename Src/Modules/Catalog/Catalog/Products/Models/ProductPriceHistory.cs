@@ -18,11 +18,11 @@ namespace Catalog.Products.Models
 
         public DateTimeOffset CreatedOn { get; set; }
 
-        public decimal? Price { get; set; }
+        public Money? Price { get; set; }
 
-        public decimal? OldPrice { get; set; }
+        public Money? OldPrice { get; set; }
 
-        public decimal? SpecialPrice { get; set; }
+        public Money? SpecialPrice { get; set; }
 
         public DateTimeOffset? SpecialPriceStart { get; set; }
 

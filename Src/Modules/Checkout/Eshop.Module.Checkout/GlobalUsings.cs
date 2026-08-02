@@ -1,0 +1,13 @@
+﻿global using Carter;
+global using FluentValidation;
+global using MediatR;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Routing;
+global using Shared.Abstraction;
+global using Shared.Contract.CQRS;
+global using Shared.Contract.ResultPattern;
+global using System;
+global using System.Collections.Generic;
+global using System.Threading;
+global using System.Threading.Tasks;

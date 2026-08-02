@@ -24,7 +24,7 @@ public class RegisterUserEndpointL : ICarterModule
 
             return result.Match(Results.Ok, Results.BadRequest);
         })
-       .WithName("RegisterUser")
+       .WithName("RegisterUser").WithTags("Identity")
        .WithSummary("Register user").AllowAnonymous()
        //.RequirePermission(IdentityPermissionConstants.Users.Create)
        .WithDescription("Create a new user account.");

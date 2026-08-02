@@ -157,7 +157,7 @@ namespace Eshop.Module.Basket.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("CartRuleId");
 
                     b.ToTable("CartRuleProduct", "basket");
                 });
@@ -168,10 +168,7 @@ namespace Eshop.Module.Basket.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<long>("CartRuleId")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("CartRuleId1")
+                    b.Property<Guid>("CartRuleId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("CouponId")
@@ -188,7 +185,7 @@ namespace Eshop.Module.Basket.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CartRuleId1");
+                    b.HasIndex("CartRuleId");
 
                     b.HasIndex("CouponId");
 
@@ -304,7 +301,7 @@ namespace Eshop.Module.Basket.Data.Migrations
                 {
                     b.HasOne("Eshop.Module.Basket.Models.CartRule", "CartRule")
                         .WithMany("Products")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("CartRuleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -315,7 +312,7 @@ namespace Eshop.Module.Basket.Data.Migrations
                 {
                     b.HasOne("Eshop.Module.Basket.Models.CartRule", "CartRule")
                         .WithMany()
-                        .HasForeignKey("CartRuleId1")
+                        .HasForeignKey("CartRuleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

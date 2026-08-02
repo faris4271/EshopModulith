@@ -26,8 +26,8 @@ namespace Catalog.Features.Products.Querys.GetProducts
                 dynamic search = param.Search.PredicateObject;
                 if (search.Name != null)
                 {
-                    string name = search.Name;
-                    query = query.Where(x => x.Name.name.Contains(name));
+                    string searchName = search.Name;
+                    query = query.Where(x => EF.Functions.ILike((string)(object)x.Name, $"%{searchName}%"));
                 }
 
                 if (search.HasOptions != null)

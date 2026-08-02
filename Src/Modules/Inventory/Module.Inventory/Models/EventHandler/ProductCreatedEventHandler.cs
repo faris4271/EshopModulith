@@ -11,23 +11,18 @@ namespace Module.Inventory.Models.EventHandler
     {
         public async Task HandleAsync(ProductCreatedIntegrationEvent @event, CancellationToken ct = default)
         {
-            try
-            {
-                var queryWarehouse = await _warhouseRepository.Query();
-                var defaultWarehouse = queryWarehouse.FirstOrDefault();
 
-                var stock = Stock.Create(@event.ProductId, defaultWarehouse.Id, @event.Sku);
+            var queryWarehouse = await _warhouseRepository.Query();
+            var defaultWarehouse = queryWarehouse.FirstOrDefault();
 
-                await _stockRepository.AddAsync(stock);
+            var stock = Stock.Create(@event.ProductId, defaultWarehouse.Id, @event.Sku);
 
-                await _stockRepository.SaveChangesAsync();
+            await _stockRepository.AddAsync(stock);
 
-            }
-            catch (Exception ex)
-            {
+            await _stockRepository.SaveChangesAsync();
 
-                Console.WriteLine(ex.Message);
-            }
+
+
         }
     }
 }

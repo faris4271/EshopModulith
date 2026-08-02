@@ -1,5 +1,4 @@
 ﻿using Shared.DDD;
-using Shared.Identity;
 
 namespace IdentityModule.Domain
 {
@@ -10,8 +9,6 @@ namespace IdentityModule.Domain
         public AppUser User { get; set; }
 
         public Guid AddressId { get; set; }
-
-        public Address Address { get; set; }
 
         public AddressType AddressType { get; set; }
 

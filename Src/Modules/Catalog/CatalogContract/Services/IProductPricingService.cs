@@ -1,15 +1,19 @@
-﻿using System;
-using CatalogContract.Dtos;
+﻿using CatalogContract.Dtos;
+using Shared.DDD;
 
 
 namespace CatalogContract.Services
 {
     public interface IProductPricingService
     {
-        CalculatedProductPrice CalculateProductPrice(ProductThumbnail productThumbnail);
 
         CalculatedProductPrice CalculateProductPrice(CartItemsDto product);
 
-        CalculatedProductPrice CalculateProductPrice(decimal price, decimal? oldPrice, decimal? specialPrice, DateTimeOffset? specialPriceStart, DateTimeOffset? specialPriceEnd);
+        public CalculatedProductPrice CalculateProductPrice(
+          Money price,
+          Money? oldPrice,
+          Money? specialPrice,
+          DateTimeOffset? specialPriceStart,
+          DateTimeOffset? specialPriceEnd);
     }
 }

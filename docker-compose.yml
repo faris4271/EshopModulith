@@ -41,3 +41,9 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  eshop-redis:
+     image: redis:latest
+     container_name: eshop-redis
+     restart: always
+     ports:
+     - 6379:6379

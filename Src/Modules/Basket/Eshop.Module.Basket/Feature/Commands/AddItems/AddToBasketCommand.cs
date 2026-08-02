@@ -3,6 +3,6 @@ using Shared.Contract.CQRS;
 
 namespace Eshop.Module.Basket.Feature.Commands.AddItems
 {
-    internal record AddToBasketCommand(Guid productId, int quantity) : ICommand<CartDto>;
+    public record AddToBasketCommand(Guid productId, int quantity) : ICommand<CartDto>;
 
 }

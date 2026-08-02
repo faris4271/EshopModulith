@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Module.Identity.Contract.Feature.Users.ConfirmEmail;
 using Shared.Contract.ResultPattern;
-using System.Net;
 
 namespace IdentityModule.Feature.Users.ConfirmEmail;
 
@@ -20,7 +19,7 @@ public class ConfirmEmailEndpoint : ICarterModule
             result.Match(Results.Ok, Results.BadRequest);
 
         })
-        .WithName("ConfirmEmail")
+        .WithName("ConfirmEmail").WithTags("Users")
         .WithSummary("Confirm user email")
         .WithDescription("Confirm a user's email address.")
         .AllowAnonymous();

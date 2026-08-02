@@ -19,7 +19,7 @@ namespace Eshop.Module.Basket.Feature.Querys.GetCartList
 
                 var result = await sender.Send(new GetCartListQuery(currentUser));
                 return result.Match(Results.Ok, Results.BadRequest);
-            });
+            }).WithTags("Cart");
         }
     }
 }

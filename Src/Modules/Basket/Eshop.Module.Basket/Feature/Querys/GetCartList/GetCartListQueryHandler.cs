@@ -1,5 +1,5 @@
 ﻿using Eshop.Module.Basket.Contract.Dtos;
-using Eshop.Module.Basket.Contract.Services;
+using Eshop.Module.Basket.Services;
 using EShop.Module.Core.Contract.Services;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
@@ -10,10 +10,10 @@ namespace Eshop.Module.Basket.Feature.Querys.GetCartList
     {
         public async Task<Result<CartDto>> Handle(GetCartListQuery request, CancellationToken cancellationToken)
         {
-            var cartItem = await _cartService.GetCartDetails(request.customerId);
+            var cartItem = await _cartService.GetCartDetails(request.customerId, cancellationToken);
 
             if (cartItem == null)
-                cartItem = new CartDto(currencyService);
+                cartItem = new CartDto();
 
             return Result.Success(cartItem);
 

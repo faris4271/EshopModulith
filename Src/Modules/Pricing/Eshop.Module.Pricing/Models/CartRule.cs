@@ -1,41 +1,55 @@
 ﻿using Shared.DDD;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Eshop.Module.Pricing.Models
 {
-    public class CartRule: EntityBase<Guid>
+    public class CartRule : EntityBase<Guid>
     {
+        public CartRule(string name, string description, bool isActive,
+            DateTimeOffset? startOn, DateTimeOffset? endOn,
+            bool isCouponRequired, string ruleToApply, decimal discountAmount,
+            decimal? maxDiscountAmount, int? discountStep,
+            int? usageLimitPerCoupon, int? usageLimitPerCustomer)
+        {
+            Id = Guid.NewGuid();
+            Name = name;
+            Description = description;
+            IsActive = isActive;
+            StartOn = startOn;
+            EndOn = endOn;
+            IsCouponRequired = isCouponRequired;
+            RuleToApply = ruleToApply;
+            DiscountAmount = discountAmount;
+            MaxDiscountAmount = maxDiscountAmount;
+            DiscountStep = discountStep;
+            UsageLimitPerCoupon = usageLimitPerCoupon;
+            UsageLimitPerCustomer = usageLimitPerCustomer;
+        }
 
         [Required(ErrorMessage = "The {0} field is required.")]
         [StringLength(450)]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
-        public string Description { get; set; }
+        public string Description { get; private set; }
 
-        public bool IsActive { get; set; }
+        public bool IsActive { get; private set; }
 
-        public DateTimeOffset? StartOn { get; set; }
+        public DateTimeOffset? StartOn { get; private set; }
+        public DateTimeOffset? EndOn { get; private set; }
 
-        public DateTimeOffset? EndOn { get; set; }
-
-        public bool IsCouponRequired { get; set; }
+        public bool IsCouponRequired { get; private set; }
 
         [StringLength(450)]
-        public string RuleToApply { get; set; }
+        public string RuleToApply { get; private set; }
 
-        public decimal DiscountAmount { get; set; }
+        public decimal DiscountAmount { get; private set; }
 
-        public decimal? MaxDiscountAmount { get; set; }
+        public decimal? MaxDiscountAmount { get; private set; } = 0;
+        public int? DiscountStep { get; private set; }
 
-        public int? DiscountStep { get; set; }
+        public int? UsageLimitPerCoupon { get; private set; }
 
-        public int? UsageLimitPerCoupon { get; set; }
-
-        public int? UsageLimitPerCustomer { get; set; }
-
+        public int? UsageLimitPerCustomer { get; private set; }
         public IList<Coupon> Coupons { get; set; } = new List<Coupon>();
 
         public IList<CartRuleCustomerGroup> CustomerGroups { get; set; } = new List<CartRuleCustomerGroup>();
@@ -43,5 +57,41 @@ namespace Eshop.Module.Pricing.Models
         public IList<CartRuleProduct> Products { get; set; } = new List<CartRuleProduct>();
 
         public IList<CartRuleCategory> Categories { get; set; } = new List<CartRuleCategory>();
+
+        public void AddCoupon(string couponCode)
+        {
+            var coupon = new Coupon(couponCode, this.Id);
+            Coupons.Add(coupon);
+        }
+
+        public void Update(string name, string description, bool isActive,
+            DateTimeOffset? startOn, DateTimeOffset? endOn,
+            bool isCouponRequired, string ruleToApply, decimal discountAmount,
+            decimal? maxDiscountAmount, int? discountStep,
+            int? usageLimitPerCoupon, int? usageLimitPerCustomer)
+        {
+            Name = name;
+            Description = description;
+            IsActive = isActive;
+            StartOn = startOn;
+            EndOn = endOn;
+            IsCouponRequired = isCouponRequired;
+            RuleToApply = ruleToApply;
+            DiscountAmount = discountAmount;
+            MaxDiscountAmount = maxDiscountAmount;
+            DiscountStep = discountStep;
+            UsageLimitPerCoupon = usageLimitPerCoupon;
+            UsageLimitPerCustomer = usageLimitPerCustomer;
+        }
+
+        public void ClearProductRules()
+        {
+            Products.Clear();
+        }
+
+        public void AddProductRule(Guid productId)
+        {
+            Products.Add(new CartRuleProduct(this.Id, productId));
+        }
     }
 }

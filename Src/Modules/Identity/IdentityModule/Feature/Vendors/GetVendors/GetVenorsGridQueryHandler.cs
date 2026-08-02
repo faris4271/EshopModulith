@@ -1,5 +1,6 @@
 ﻿using IdentityModule.Data;
 using IdentityModule.Domain;
+using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Feature.Vendors;
 using Shared.Abstraction;
@@ -20,11 +21,10 @@ namespace IdentityModule.Feature.Vendors.GetVendors
             if (request.SmartTableParam.Search.PredicateObject != null)
             {
                 dynamic search = request.SmartTableParam.Search.PredicateObject;
-
-                if (search.Email != null)
+                if (search.Name != null)
                 {
-                    string email = search.Email;
-                    query = query.Where(x => x.Email.email.Contains(email));
+                    string searchName = search.Name;
+                    query = query.Where(x => EF.Functions.ILike((string)(object)x.Name, $"%{searchName}%"));
                 }
 
                 if (search.CreatedOn != null)

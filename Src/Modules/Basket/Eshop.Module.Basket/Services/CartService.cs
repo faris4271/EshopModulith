@@ -1,14 +1,22 @@
 ﻿using CatalogContract.Services;
-using Eshop.Module.Basket.Contract.Dtos;
 using Eshop.Module.Basket.Contract.Feature.GetProductsByIds;
-using Eshop.Module.Basket.Contract.Services;
 using Eshop.Module.Basket.Data;
 using Eshop.Module.Basket.Models;
+using Eshop.Module.Pricing.Contract.Dtos;
+using Eshop.Module.Pricing.Contract.Services;
 using EShop.Module.Core.Contract.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Services;
 using Shared.Abstraction;
+using Shared.Caching;
+using AddToCartResult = Eshop.Module.Basket.Contract.Dtos.AddToCartResult;
+using CartDto = Eshop.Module.Basket.Contract.Dtos.CartDto;
+using CartInfoForCoupon = Eshop.Module.Pricing.Contract.Dtos.CartInfoForCoupon;
+using CartItemDto = Eshop.Module.Basket.Contract.Dtos.CartItemDto;
+using CartItemForCoupon = Eshop.Module.Pricing.Contract.Dtos.CartItemForCoupon;
+using CartQuantityUpdateDto = Eshop.Module.Basket.Contract.Dtos.CartQuantityUpdateDto;
+using UpdateCartResult = Eshop.Module.Basket.Contract.Dtos.UpdateCartResult;
 
 namespace Eshop.Module.Basket.Services
 {
@@ -18,6 +26,7 @@ namespace Eshop.Module.Basket.Services
         ICouponService _couponService,
         ICurrencyService _currencyService,
         ICurrentUserService _currentUserService,
+        ICacheService _cacheService,
         ISender sender
         ) : ICartService
     {
@@ -63,7 +72,7 @@ namespace Eshop.Module.Basket.Services
             return addToCartResult;
         }
 
-        public async Task<Contract.Dtos.CouponValidationResult> ApplyCoupon(Guid customerId, string couponCode)
+        public async Task<CouponValidationResult> ApplyCoupon(Guid customerId, string couponCode)
         {
             var query = await _repository.GetAllAsQuerable();
 
@@ -82,24 +91,40 @@ namespace Eshop.Module.Basket.Services
             return validation;
         }
 
-        public async Task<CartDto> GetCartDetails(Guid customerId)
+        public async Task<CartDto> GetCartDetails(Guid customerId, CancellationToken cancellationToken)
         {
-
-            var query = await _repository.Query();
-
-            var productIds = query.Where(x => x.CustomerId == customerId.ToString()).Select(x => x.ProductId).ToList();
-
-            var cartDto = new CartDto(_currencyService);
-            var UserId = _currentUserService.GetUserId();
-
-            var SendCartItems = await sender.Send(new GetProductsByIdsQuery(productIds));
+            var cacheKey = GetCartCacheKey(customerId.ToString());
 
 
-            var cartItems = SendCartItems.Value;
+            var cartDto = await _cacheService.GetOrSetAsync(cacheKey, async () =>
+            {
+                var query = await _repository.Query();
 
-            cartDto.Items = cartItems;
+                var productIds = query
+                    .Where(x => x.CustomerId == customerId.ToString())
+                    .Select(x => x.ProductId)
+                    .ToList();
 
-            cartDto.SubTotal = cartItems.Sum(x => x.Quantity * (x.CalculatedProductPrice.OldPrice ?? x.CalculatedProductPrice.Price));
+                var freshCartDto = new CartDto();
+
+                if (!productIds.Any())
+                {
+                    return freshCartDto;
+                }
+
+
+                var productResult = await sender.Send(new GetProductsByIdsQuery(productIds), cancellationToken);
+                var cartItems = productResult.Value ?? new List<CartItemDto>();
+
+                freshCartDto.Items = cartItems;
+
+
+                return freshCartDto;
+            }, cancellationToken: cancellationToken);
+
+            cartDto.SubTotal = cartDto.Items.Sum(x => x.Quantity * (x.CalculatedProductPrice.OldPrice?.Amount ?? x.CalculatedProductPrice.CalculatedPrice.Amount));
+
+            cartDto.Discount = 0;
 
             if (!string.IsNullOrWhiteSpace(cartDto.CouponCode))
             {
@@ -107,7 +132,9 @@ namespace Eshop.Module.Basket.Services
                 {
                     Items = cartDto.Items.Select(x => new CartItemForCoupon { ProductId = x.ProductId, Quantity = x.Quantity }).ToList()
                 };
+
                 var couponValidationResult = await _couponService.Validate(customerId, cartDto.CouponCode, cartInfoForCoupon);
+
                 if (couponValidationResult.Succeeded)
                 {
                     cartDto.Discount = couponValidationResult.DiscountAmount;
@@ -117,13 +144,13 @@ namespace Eshop.Module.Basket.Services
                     cartDto.CouponValidationErrorMessage = couponValidationResult.ErrorMessage;
                 }
             }
+
             cartDto.Discount += cartDto.Items
-                .Where(x => x.CalculatedProductPrice.OldPrice.HasValue)
-                .Sum(x => x.Quantity * (x.CalculatedProductPrice.OldPrice.Value - x.CalculatedProductPrice.Price));
+                .Where(x => x.CalculatedProductPrice.OldPrice.IsPositive)
+                .Sum(x => x.Quantity * (x.CalculatedProductPrice.OldPrice.Amount - x.CalculatedProductPrice.CalculatedPrice.Amount));
 
             return cartDto;
         }
-
         public async Task MigrateCart(Guid fromUserId, Guid toUserId)
         {
             var query = await _repository.Query();
@@ -193,6 +220,12 @@ namespace Eshop.Module.Basket.Services
 
             UpdateResult.Success = true;
             return UpdateResult;
+        }
+
+
+        public static string GetCartCacheKey(string userId)
+        {
+            return $"cart:{userId}";
         }
     }
 }

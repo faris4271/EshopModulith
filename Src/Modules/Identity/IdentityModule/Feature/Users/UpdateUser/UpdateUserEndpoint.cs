@@ -17,22 +17,22 @@ public class UpdateUserEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-         app.MapPut("/profile", async ([FromBody] UpdateUserCommand request, ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
-        {
-            if (user.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
-            {
-                throw new UnauthorizedException();
-            }
+        app.MapPut("/profile", async ([FromBody] UpdateUserCommand request, ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
+       {
+           if (user.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+           {
+               throw new UnauthorizedException();
+           }
 
-            request.Id = userId;
+           request.Id = userId;
 
-            var result= await sender.Send(request, cancellationToken);
+           var result = await sender.Send(request, cancellationToken);
 
-            return result.Match(Results.NoContent, Results.BadRequest);
-        })
-       .WithName("UpdateUserProfile")
-       .WithSummary("Update user profile")
-       //.RequirePermission(IdentityPermissionConstants.Users.Update)
-       .WithDescription("Update profile details for the authenticated user.");
+           return result.Match(Results.NoContent, Results.BadRequest);
+       })
+      .WithName("UpdateUserProfile").WithTags("Users")
+      .WithSummary("Update user profile")
+      //.RequirePermission(IdentityPermissionConstants.Users.Update)
+      .WithDescription("Update profile details for the authenticated user.");
     }
 }

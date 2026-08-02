@@ -15,11 +15,11 @@ namespace Catalog.Products.Models
 
         public string Specification { get; set; }
 
-        public decimal Price { get; set; }
+        public Money Price { get; set; }
 
-        public decimal? OldPrice { get; set; }
+        public Money? OldPrice { get; set; }
 
-        public decimal? SpecialPrice { get; set; }
+        public Money? SpecialPrice { get; set; }
 
         public DateTimeOffset? SpecialPriceStart { get; set; }
 
@@ -191,15 +191,15 @@ namespace Catalog.Products.Models
             string name,
             string description,
             string shortDescription,
-            decimal oldPrice,
+            Money oldPrice,
             string specification,
             DateTimeOffset? specialPriceStart,
             DateTimeOffset? specialPriceEnd,
             string slug,
             string sku,
             string gtin,
-            decimal? specialPrice,
-            decimal price,
+            Money? specialPrice,
+            Money price,
             string metaTitle,
             string metaDescription,
             string metaKeyword,
@@ -213,10 +213,6 @@ namespace Catalog.Products.Models
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(slug)) throw new ArgumentNullException(nameof(slug));
 
-
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(oldPrice);
-            if (specialPrice.HasValue) ArgumentOutOfRangeException.ThrowIfNegativeOrZero(specialPrice.Value);
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
 
             var product = new Product()
             {
@@ -255,6 +251,7 @@ namespace Catalog.Products.Models
             string description,
             string shortDescription,
             decimal? oldPrice,
+            string currency,
             string specification,
             DateTimeOffset? specialPriceStart,
             DateTimeOffset? specialPriceEnd,
@@ -287,14 +284,14 @@ namespace Catalog.Products.Models
             if (description != null) Description = new Shared.DDD.Description(description);
             if (shortDescription != null) ShortDescription = new Shared.DDD.Description(shortDescription);
 
-            if (price.HasValue && Price != price.Value || SpecialPrice != specialPrice || OldPrice != oldPrice)
+            if (price.HasValue && Price.Amount != price.Value || SpecialPrice.Amount != specialPrice || OldPrice.Amount != oldPrice)
             {
-                Price = price.Value;
+                Price = new Money(price.Value, currency);
                 priceChanged = true;
             }
 
-            if (oldPrice.HasValue) OldPrice = oldPrice;
-            if (specialPrice.HasValue) SpecialPrice = specialPrice;
+            if (oldPrice.HasValue) OldPrice = new Money(oldPrice.Value, currency);
+            if (specialPrice.HasValue) SpecialPrice = new Money(specialPrice.Value, currency);
             if (specialPriceStart.HasValue) SpecialPriceStart = specialPriceStart;
             if (specialPriceEnd.HasValue) SpecialPriceEnd = specialPriceEnd;
             if (stockQuantity.HasValue) StockQuantity = stockQuantity.Value;

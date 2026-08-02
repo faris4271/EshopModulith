@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Shared.DDD;
-using SimplCommerce.Module.Pricing.Models;
 
 namespace Eshop.Module.Pricing.Models
 {

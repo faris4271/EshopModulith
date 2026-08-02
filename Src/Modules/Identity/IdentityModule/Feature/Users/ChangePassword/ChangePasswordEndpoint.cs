@@ -10,7 +10,7 @@ using Shared.Contract.ResultPattern;
 
 namespace IdentityModule.Feature.Users.ChangePassword;
 
-public  class ChangePasswordEndpoint : ICarterModule
+public class ChangePasswordEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -22,7 +22,7 @@ public  class ChangePasswordEndpoint : ICarterModule
             var result = await sender.Send(command, cancellationToken);
             return result.Match(Results.Ok, Results.BadRequest);
         })
-           .WithName("ChangePassword")
+           .WithName("ChangePassword").WithTags("Users")
             .WithSummary("Change password")
             .WithDescription("Change the current user's password.")
             .RequireAuthorization();

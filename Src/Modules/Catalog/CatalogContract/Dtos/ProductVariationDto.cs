@@ -21,6 +21,8 @@ namespace CatalogContract.Dtos
 
         public decimal? OldPrice { get; set; }
 
+        public string Currency { get; set; }
+
 
         [BindNever]
         public IFormFileCollection ThumbnailImage { get; set; }

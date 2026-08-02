@@ -15,14 +15,7 @@ namespace Module.Inventory.Data.Configurations
                 v => v.name,
                 v => new Name(v)
             ).HasMaxLength(100).IsRequired();
-            builder.OwnsOne(x => x.Address, a =>
-            {
-                a.Property(p => p.Street).HasMaxLength(200).IsRequired();
-                a.Property(p => p.City).HasMaxLength(100).IsRequired();
-                a.Property(p => p.State).HasMaxLength(100).IsRequired();
-                a.Property(p => p.ZipCode).HasMaxLength(20).IsRequired();
-                a.Property(p => p.Country).HasMaxLength(100).IsRequired();
-            });
+
         }
     }
 }

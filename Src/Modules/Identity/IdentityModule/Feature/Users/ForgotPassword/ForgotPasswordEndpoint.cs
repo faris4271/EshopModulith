@@ -2,15 +2,12 @@ using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Module.Identity.Contract.Feature.Users.ForgotPassword;
-using Shared.Contract.ResultPattern;
-using Shared.DDD;
 
 namespace IdentityModule.Feature.Users.ForgotPassword;
 
-public  class ForgotPasswordEndpoint : ICarterModule
+public class ForgotPasswordEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -18,7 +15,7 @@ public  class ForgotPasswordEndpoint : ICarterModule
         {
             var result = await sender.Send(command);
 
-           return result.Match(Results.NoContent, Results.BadRequest);
-        });
+            return result.Match(Results.NoContent, Results.BadRequest);
+        }).WithTags("Users");
     }
 }

@@ -15,7 +15,7 @@ public class ToggleUserStatusEndpoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPatch("/users/{id:guid}", Handler)
-     .WithName("ToggleUserStatus")
+     .WithName("ToggleUserStatus").WithTags("Users")
      .WithSummary("Toggle user status")
      //.RequirePermission(IdentityPermissionConstants.Users.Update)
      .WithDescription("Activate or deactivate a user account.");

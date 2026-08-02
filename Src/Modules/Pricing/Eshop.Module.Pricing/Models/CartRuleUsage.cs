@@ -1,22 +1,19 @@
 ﻿using Shared.DDD;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Eshop.Module.Pricing.Models
 {
-    internal class CartRuleUsage: EntityBase<Guid>
+    internal class CartRuleUsage : EntityBase<Guid>
     {
         public CartRuleUsage()
         {
             CreatedOn = DateTimeOffset.Now;
         }
 
-        public long CartRuleId { get; set; }
+        public Guid CartRuleId { get; set; }
 
         public CartRule CartRule { get; set; }
 
-        public long? CouponId { get; set; }
+        public Guid? CouponId { get; set; }
 
         public Coupon Coupon { get; set; }
 

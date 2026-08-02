@@ -2,7 +2,7 @@
 
 namespace Eshop.Module.Pricing.Models
 {
-    public class CartRuleCategory:EntityBase<Guid>
+    public class CartRuleCategory : EntityBase<Guid>
     {
         public Guid CategoryId { get; set; }
 

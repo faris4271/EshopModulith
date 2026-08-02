@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Contract\Shared.Contract.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared\Shared.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Web\Shared.Web.csproj" />
+    <ProjectReference Include="..\..\Core\EShop.Module.Core.Contract\EShop.Module.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\Identity\Module.Identity.Contract\Module.Identity.Contract.csproj" />
+    <ProjectReference Include="..\..\Pricing\Eshop.Module.Pricing.Contract\Eshop.Module.Pricing.Contract.csproj" />
+    <ProjectReference Include="..\..\Shipping\Eshop.Module.Shipping.Contract\Eshop.Module.Shipping.Contract.csproj" />
+    <ProjectReference Include="..\..\Tax\Module.Tax.Contract\Module.Tax.Contract.csproj" />
+    <ProjectReference Include="..\Eshop.Module.Checkout.Contract\Eshop.Module.Checkout.Contract.csproj" />
+  </ItemGroup>
+</Project>

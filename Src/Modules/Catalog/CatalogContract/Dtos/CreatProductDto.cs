@@ -1,6 +1,6 @@
 ﻿namespace CatalogContract.Dtos
 {
-    public class CreatProductDto
+    public record CreatProductDto
     {
 
 
@@ -21,6 +21,8 @@
         public string Name { get; set; }
 
         public string Slug { get; set; }
+
+        public string Currency { get; set; }
 
         public string MetaTitle { get; set; }
 

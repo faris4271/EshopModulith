@@ -299,9 +299,11 @@ namespace IdentityModule.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AddressId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserAddress", "identity");
+                    b.ToTable("UserAddresses", "identity");
                 });
 
             modelBuilder.Entity("IdentityModule.Domain.UserGroup", b =>
@@ -681,57 +683,6 @@ namespace IdentityModule.Data.Migrations
                         .WithMany("UserAddresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("Shared.Identity.Address", "Address", b1 =>
-                        {
-                            b1.Property<Guid>("UserAddressId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("City")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)");
-
-                            b1.Property<string>("Country")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)");
-
-                            b1.Property<string>("Phone")
-                                .IsRequired()
-                                .HasMaxLength(30)
-                                .HasColumnType("character varying(30)");
-
-                            b1.Property<string>("PostalCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("character varying(20)");
-
-                            b1.Property<string>("State")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)");
-
-                            b1.Property<string>("Street")
-                                .IsRequired()
-                                .HasMaxLength(250)
-                                .HasColumnType("character varying(250)");
-
-                            b1.Property<string>("ZipCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("character varying(20)");
-
-                            b1.HasKey("UserAddressId");
-
-                            b1.ToTable("UserAddress", "identity");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserAddressId");
-                        });
-
-                    b.Navigation("Address")
                         .IsRequired();
 
                     b.Navigation("User");

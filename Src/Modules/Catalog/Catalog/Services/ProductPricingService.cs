@@ -1,67 +1,73 @@
-﻿using CatalogContract.Dtos;
+﻿namespace Catalog.Services;
+
+using CatalogContract.Dtos;
 using CatalogContract.Services;
 using EShop.Module.Core.Contract.Services;
+using Shared.DDD;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Catalog.Services
+internal class ProductPricingService : IProductPricingService
 {
-    
-    internal class ProductPricingService : IProductPricingService
+    private readonly ICurrencyService _currencyService;
+
+    public ProductPricingService(ICurrencyService currencyService)
     {
-        private readonly ICurrencyService _currencyService;
+        _currencyService = currencyService ?? throw new ArgumentNullException(nameof(currencyService));
+    }
 
-        public ProductPricingService(ICurrencyService currencyService)
+
+    public CalculatedProductPrice CalculateProductPrice(CartItemsDto product)
+    {
+        ArgumentNullException.ThrowIfNull(product);
+
+        return CalculateProductPrice(
+            product.Price,
+            product.OldPrice,
+            product.SpecialPrice,
+            product.SpecialPriceStart,
+            product.SpecialPriceEnd
+        );
+    }
+
+    public CalculatedProductPrice CalculateProductPrice(
+        Money price,
+        Money? oldPrice,
+        Money? specialPrice,
+        DateTimeOffset? specialPriceStart,
+        DateTimeOffset? specialPriceEnd)
+    {
+        ArgumentNullException.ThrowIfNull(price);
+
+        var calculatedPrice = price;
+        var percentOfSaving = 0;
+        var now = DateTimeOffset.UtcNow;
+
+        bool isSpecialActive = specialPrice is not null
+            && (!specialPriceStart.HasValue || specialPriceStart.Value <= now)
+            && (!specialPriceEnd.HasValue || specialPriceEnd.Value >= now);
+
+        if (isSpecialActive)
         {
-            _currencyService = currencyService;
-        }
+            calculatedPrice = specialPrice!;
 
-        public CalculatedProductPrice CalculateProductPrice(ProductThumbnail productThumbnail)
-        {
-            return CalculateProductPrice(productThumbnail.Price, productThumbnail.OldPrice, 
-                productThumbnail.SpecialPrice, productThumbnail.SpecialPriceStart, productThumbnail.SpecialPriceEnd);
-        }
-
-        public CalculatedProductPrice CalculateProductPrice(CartItemsDto product)
-        {
-            return CalculateProductPrice(product.Price,
-                product.OldPrice, product.SpecialPrice,
-                product.SpecialPriceStart, product.SpecialPriceEnd);
-        }
-
-        public CalculatedProductPrice CalculateProductPrice(decimal price, decimal? oldPrice, 
-            decimal? specialPrice, DateTimeOffset? specialPriceStart, DateTimeOffset? specialPriceEnd)
-        {
-            decimal calculatedPrice = price;
-            var percentOfSaving = 0;
-            var now = DateTimeOffset.UtcNow;
-
-            bool specialActive = specialPrice.HasValue
-                && (!specialPriceStart.HasValue || specialPriceStart.Value <= now)
-                && (!specialPriceEnd.HasValue || specialPriceEnd.Value >= now);
-
-            if (specialActive)
+            if (oldPrice is null || oldPrice.Amount < price.Amount)
             {
-                calculatedPrice = specialPrice.Value;
-
-                if (!oldPrice.HasValue || oldPrice.Value < price)
-                {
-                    oldPrice = price;
-                }
+                oldPrice = price;
             }
-
-            if (oldPrice.HasValue && oldPrice.Value > 0 && oldPrice.Value > calculatedPrice)
-            {
-                percentOfSaving = (int)((oldPrice.Value - calculatedPrice) / oldPrice.Value * 100);
-            }
-
-            return new CalculatedProductPrice(_currencyService)
-            {
-                Price = calculatedPrice,
-                OldPrice = oldPrice,
-                PercentOfSaving = percentOfSaving,
-            };
         }
+
+        if (oldPrice is not null && oldPrice.Amount > 0m && oldPrice.Amount > calculatedPrice.Amount)
+        {
+            percentOfSaving = (int)((oldPrice.Amount - calculatedPrice.Amount) / oldPrice.Amount * 100m);
+        }
+
+
+        return new CalculatedProductPrice(
+            CalculatedPrice: calculatedPrice,
+            OldPrice: oldPrice,
+            PercentOfSaving: percentOfSaving,
+            PriceText: _currencyService.FormatCurrency(calculatedPrice),
+            OldPriceText: oldPrice is not null ? _currencyService.FormatCurrency(oldPrice) : null
+        );
     }
 }

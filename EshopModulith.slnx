@@ -24,6 +24,10 @@
     <Project Path="Src/Modules/Catalog/Catalog/Catalog.csproj" />
     <Project Path="Src/Modules/Catalog/CatalogContract/CatalogContract.csproj" Id="942cae5f-008f-49a2-ba62-fbefbebefe6e" />
   </Folder>
+  <Folder Name="/Src/Modules/Checkout/">
+    <Project Path="Src/Modules/Checkout/Eshop.Module.Checkout.Contract/Eshop.Module.Checkout.Contract.csproj" />
+    <Project Path="Src/Modules/Checkout/Eshop.Module.Checkout/Eshop.Module.Checkout.csproj" />
+  </Folder>
   <Folder Name="/Src/Modules/Core/">
     <Project Path="Src/Modules/Core/EShop.Module.Core.Contract/EShop.Module.Core.Contract.csproj" Id="a70742e5-57e3-49ed-9ccb-e8b0e3cfb2f7" />
     <Project Path="Src/Modules/Core/Eshop.Module.Core/Eshop.Module.Core.csproj" Id="6d2c26c4-6e0d-4cba-b003-06bd41654e37" />
@@ -33,12 +37,24 @@
     <Project Path="Src/Modules/Identity/Module.Identity.Contract/Module.Identity.Contract.csproj" Id="493927a5-8fcf-4f37-aa41-53f039a40747" />
   </Folder>
   <Folder Name="/Src/Modules/Inventory/">
-    <Project Path="Src/Modules/Inventory/Module.Inventory/Module.Inventory.csproj" Id="7b0f7d92-8eb1-496f-97b5-500de5d7939c" />
     <Project Path="Src/Modules/Inventory/Module.Inventory.Contract/Module.Inventory.Contract.csproj" />
+    <Project Path="Src/Modules/Inventory/Module.Inventory/Module.Inventory.csproj" Id="7b0f7d92-8eb1-496f-97b5-500de5d7939c" />
   </Folder>
   <Folder Name="/Src/Modules/Localization/">
     <Project Path="Src/Modules/Localization/Eshop.Module.Localization.Contract/Eshop.Module.Localization.Contract.csproj" Id="9b41644d-b046-40c9-9fde-9e48d1132346" />
     <Project Path="Src/Modules/Localization/Eshop.Module.Localization/Eshop.Module.Localization.csproj" Id="c096687b-be52-48c2-b788-4cef76e0da15" />
+  </Folder>
+  <Folder Name="/Src/Modules/Pricing/">
+    <Project Path="Src/Modules/Pricing/Eshop.Module.Pricing.Contract/Eshop.Module.Pricing.Contract.csproj" />
+    <Project Path="Src/Modules/Pricing/Eshop.Module.Pricing/Eshop.Module.Pricing.csproj" />
+  </Folder>
+  <Folder Name="/Src/Modules/Shipping/">
+    <Project Path="Src/Modules/Shipping/Eshop.Module.Shipping.Contract/Eshop.Module.Shipping.Contract.csproj" />
+    <Project Path="Src/Modules/Shipping/Eshop.Module.Shipping/Eshop.Module.Shipping.csproj" />
+  </Folder>
+  <Folder Name="/Src/Modules/Tax/">
+    <Project Path="Src/Modules/Tax/Module.Tax.Contract/Module.Tax.Contract.csproj" Id="41ac018d-f945-4459-bbc4-4480569eb047" />
+    <Project Path="Src/Modules/Tax/Module.Tax/Module.Tax.csproj" Id="99bf9179-1aae-4f67-bc02-203800fc2902" />
   </Folder>
   <Folder Name="/Src/Playground/">
     <Project Path="Src/Playground/AppHost/AppHost.csproj" Id="9a6ce50f-593a-4182-9f55-e4ed95132b13" />
