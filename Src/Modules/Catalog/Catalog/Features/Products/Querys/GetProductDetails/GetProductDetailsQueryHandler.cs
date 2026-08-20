@@ -1,7 +1,7 @@
 ﻿using Catalog.Data;
 using Catalog.Products.Models;
 using CatalogContract.Dtos;
-using CatalogContract.Services;
+using Eshop.Module.Pricing.Contract.Services;
 using EShop.Module.Core.Contract.Dtos;
 using EShop.Module.Core.Contract.Feature.Medias.GetMedia;
 using Mapster;

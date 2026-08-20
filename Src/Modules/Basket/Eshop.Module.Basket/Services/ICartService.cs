@@ -15,5 +15,7 @@ namespace Eshop.Module.Basket.Services
 
         Task<CouponValidationResult> ApplyCoupon(Guid customerId, string couponCode);
         Task MigrateCart(Guid fromUserId, Guid toUserId);
+
+        Task<decimal> CalculateBasketTotal(Guid customerId, CancellationToken cancellationToken = default);
     }
 }

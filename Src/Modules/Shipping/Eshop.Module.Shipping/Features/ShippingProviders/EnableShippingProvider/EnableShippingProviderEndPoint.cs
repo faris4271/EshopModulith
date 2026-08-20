@@ -4,7 +4,6 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Shared.Contract.ResultPattern;
 
 namespace Eshop.Module.Shipping.Features.ShippingProviders.EnableShippingProvider;
 
@@ -15,7 +14,7 @@ internal sealed class EnableShippingProviderEndPoints : ICarterModule
         app.MapPost("/api/v1/shipping-providers/{id}/enable", async (Guid id, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new EnableShippingProviderCommand(id), ct);
-            return result.Match(Results.NoContent, ApiResults.Problem);
+            return result.Match(Results.NoContent, Results.BadRequest);
         })
         .WithName(nameof(EnableShippingProviderCommand))
         .WithSummary("Enable a shipping provider")

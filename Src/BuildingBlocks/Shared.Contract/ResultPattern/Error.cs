@@ -9,7 +9,7 @@ public record Error
         "General.Null",
         "Null value was provided",
         ErrorType.Failure);
-  
+
     public Error(string code, string description, ErrorType type)
     {
         Code = code;
@@ -36,4 +36,7 @@ public record Error
 
     public static Error Conflict(string code, string description) =>
         new(code, description, ErrorType.Conflict);
+
+    public static Error Forbidden(string code, string description) =>
+        new(code, description, ErrorType.Forbidden);
 }

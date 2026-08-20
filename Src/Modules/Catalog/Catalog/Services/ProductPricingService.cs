@@ -1,8 +1,7 @@
 ﻿namespace Catalog.Services;
 
-using CatalogContract.Dtos;
-using CatalogContract.Services;
-using EShop.Module.Core.Contract.Services;
+using Eshop.Module.Pricing.Contract.Dtos;
+using Eshop.Module.Pricing.Contract.Services;
 using Shared.DDD;
 using System;
 
@@ -16,18 +15,7 @@ internal class ProductPricingService : IProductPricingService
     }
 
 
-    public CalculatedProductPrice CalculateProductPrice(CartItemsDto product)
-    {
-        ArgumentNullException.ThrowIfNull(product);
 
-        return CalculateProductPrice(
-            product.Price,
-            product.OldPrice,
-            product.SpecialPrice,
-            product.SpecialPriceStart,
-            product.SpecialPriceEnd
-        );
-    }
 
     public CalculatedProductPrice CalculateProductPrice(
         Money price,
@@ -63,11 +51,13 @@ internal class ProductPricingService : IProductPricingService
 
 
         return new CalculatedProductPrice(
-            CalculatedPrice: calculatedPrice,
-            OldPrice: oldPrice,
+            CalculatedPrice: calculatedPrice.Amount,
+            OldPrice: oldPrice?.Amount,
             PercentOfSaving: percentOfSaving,
             PriceText: _currencyService.FormatCurrency(calculatedPrice),
             OldPriceText: oldPrice is not null ? _currencyService.FormatCurrency(oldPrice) : null
         );
     }
+
+
 }

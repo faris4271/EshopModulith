@@ -1,4 +1,4 @@
-﻿using Eshop.Module.Basket.Contract.Dtos;
+﻿using Eshop.Module.Pricing.Contract.Dtos;
 using Shared.Contract.CQRS;
 using Shared.Web.SmartTable;
 

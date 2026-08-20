@@ -1,7 +1,6 @@
 ﻿namespace CatalogContract.Dtos;
 
 using EShop.Module.Core.Contract.Dtos;
-using Shared.DDD;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,9 +14,10 @@ public class CartItemsDto
     public string Specification { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
 
-    public Money Price { get; set; } = Money.Zero();
-    public Money? OldPrice { get; set; }
-    public Money? SpecialPrice { get; set; }
+    public decimal Price { get; set; }
+
+    public decimal? OldPrice { get; set; }
+    public decimal? SpecialPrice { get; set; }
 
     public DateTimeOffset? SpecialPriceStart { get; set; }
     public DateTimeOffset? SpecialPriceEnd { get; set; }

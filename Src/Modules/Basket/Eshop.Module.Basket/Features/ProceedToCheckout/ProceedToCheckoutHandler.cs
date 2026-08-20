@@ -12,15 +12,18 @@ public sealed class ProceedToCheckoutHandler(
     IGenericeRepository<CartItem, BasketDbContext> basketRepository,
     ICheckoutService checkoutService) : ICommandHandler<ProceedToCheckoutCommand, ProceedToCheckoutResponse>
 {
-
-
     async Task<Result<ProceedToCheckoutResponse>> IRequestHandler<ProceedToCheckoutCommand, Result<ProceedToCheckoutResponse>>.Handle(ProceedToCheckoutCommand request, CancellationToken cancellationToken)
     {
         var query = await basketRepository.GetAllAsQuerable();
         var basketItems = await query
-            .Where(i => i.Id == request.BasketId)
+            .Where(i => i.CustomerId == request.UserId.ToString())
             .Select(i => new CartItemToCheckoutDto(i.ProductId, i.Quantity))
             .ToListAsync(cancellationToken);
+
+        if (!basketItems.Any())
+        {
+            return Result.Failure<ProceedToCheckoutResponse>(Error.NotFound("Basket.NotFound", "Basket was not found."));
+        }
 
         var checkout = await checkoutService.Create(
             request.UserId,

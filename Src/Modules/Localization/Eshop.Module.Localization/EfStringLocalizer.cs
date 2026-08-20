@@ -1,26 +1,31 @@
 ﻿using Eshop.Module.Localization.Data;
 using Eshop.Module.Localization.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
-using Shared.Caching;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace Eshop.Module.Localization
 {
     internal class EfStringLocalizer : IStringLocalizer
     {
-        private readonly ICacheService _cacheService;
+        private static readonly HybridCacheEntryOptions StringLocalizer = new()
+        {
+            Expiration = TimeSpan.FromHours(1),
+            LocalCacheExpiration = TimeSpan.FromMinutes(2),
+        };
+        private readonly HybridCache _cacheService;
 
         private readonly IServiceProvider _serviceProvider;
 
-        public EfStringLocalizer(ICacheService cacheService, IServiceProvider serviceProvider)
+        private readonly LocalizationDbContext _dbContext;
+
+        public EfStringLocalizer(HybridCache cacheService, IServiceProvider serviceProvider, LocalizationDbContext dbContext)
         {
             _cacheService = cacheService;
             _serviceProvider = serviceProvider;
+            _dbContext = dbContext;
         }
 
         public LocalizedString this[string name]
@@ -69,9 +74,9 @@ namespace Eshop.Module.Localization
                     resourceRepository.Add(res);
                     resourceRepository.SaveChanges();
 
-                    var freshResourcesCache =await LoadResources(culture);
+                    var freshResourcesCache = await LoadResources(culture, CancellationToken.None);
                     freshResourcesCache.Add(res);
-                    await _cacheService.SetItemAsync(GetCasheKey(culture), freshResourcesCache);
+                    await _cacheService.SetAsync(GetCasheKey(culture), freshResourcesCache);
                 }
             }
         }
@@ -79,7 +84,7 @@ namespace Eshop.Module.Localization
         private async Task<string> GetString(string name)
         {
             var culture = CultureInfo.CurrentUICulture.Name;
-            var resources = await LoadResources(culture);
+            var resources = await LoadResources(culture, CancellationToken.None);
             var value = resources.SingleOrDefault(r => r.Key == name)?.Value;
 
             if (value == null)
@@ -90,15 +95,19 @@ namespace Eshop.Module.Localization
             return value;
         }
 
-        private async Task<IList<Resource>> LoadResources(string culture)
+        private async Task<IList<Resource>> LoadResources(string culture, CancellationToken ct)
         {
-            var resources =await _cacheService.GetOrSetAsync(GetCasheKey(culture), async () =>
-            {
-                using var scope = _serviceProvider.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<LocalizationDbContext>();
-                var resources = await dbContext.Resources.Where(r => r.CultureId == culture).ToListAsync();
-                return resources;
-            });
+            var state = new LocalizationFactoryState(_dbContext, culture);
+            var tags = new[] { "Culture", "CultureId" };
+            var resources = await _cacheService.GetOrCreateAsync(
+                GetCasheKey(culture),
+                state,
+                LoadResourcesFromDb,
+                StringLocalizer,
+                tags,
+                ct
+            ).AsTask();
+
             return resources;
         }
 
@@ -106,5 +115,16 @@ namespace Eshop.Module.Localization
         {
             return $"LocalizationResources_{culture}";
         }
+        private async ValueTask<List<Resource>> LoadResourcesFromDb(LocalizationFactoryState state, CancellationToken ct)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var resourceRepository = scope.ServiceProvider.GetRequiredService<LocalizationDbContext>();
+                return await resourceRepository.Resources.Where(x => x.CultureId == state.CultureId).ToListAsync();
+            }
+
+        }
+        private readonly record struct LocalizationFactoryState(LocalizationDbContext DbContext, string CultureId);
+
     }
 }

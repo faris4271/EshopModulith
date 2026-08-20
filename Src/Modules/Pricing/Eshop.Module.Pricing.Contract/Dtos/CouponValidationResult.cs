@@ -1,5 +1,4 @@
-﻿using Eshop.Module.Basket.Contract.Dtos;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Eshop.Module.Pricing.Contract.Dtos

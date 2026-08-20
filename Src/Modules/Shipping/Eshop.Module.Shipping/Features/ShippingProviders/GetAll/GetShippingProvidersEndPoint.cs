@@ -15,7 +15,7 @@ internal sealed class GetShippingProvidersEndPoints : ICarterModule
         app.MapGet("/api/v1/shipping-providers", async (ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new GetShippingProvidersQuery(), ct);
-            return result.Match(Results.Ok, ApiResults.Problem);
+            return result.Match(Results.Ok, Results.BadRequest);
         })
         .WithName(nameof(GetShippingProvidersQuery))
         .WithSummary("Get all shipping providers")

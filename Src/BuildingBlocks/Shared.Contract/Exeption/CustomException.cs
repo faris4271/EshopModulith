@@ -92,4 +92,7 @@ public class CustomException : Exception
         : this(message, innerException, Enumerable.Empty<string>(), statusCode)
     {
     }
+
+
+
 }

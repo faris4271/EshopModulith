@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Module.Identity.Contract.Dtos;
 using Module.Identity.Contract.Services;
-using SendGrid.Helpers.Errors.Model;
 using Shared.Contract.Exeption;
 using Shared.DDD;
 using Shared.Storage;

@@ -1,4 +1,4 @@
-﻿using EShop.Module.Core.Contract.Services;
+﻿using Eshop.Module.Pricing.Contract.Services;
 
 namespace Catalog.Products.Models
 {

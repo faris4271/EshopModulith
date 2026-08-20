@@ -1,3 +1,5 @@
+using Eshop.Module.Checkout.Data;
+
 public sealed class CreateCheckoutHandler(
     IGenericeRepository<Checkout, CheckoutDbContext> repository) : ICommandHandler<CreateCheckoutCommand, CreateCheckoutResponse>
 {
@@ -11,4 +13,5 @@ public sealed class CreateCheckoutHandler(
 
         return new CreateCheckoutResponse(checkout.Id);
     }
+
 }

@@ -19,6 +19,11 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Eventing.Contract\Shared.Eventing.Contract.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Shared.Message\Shared.Message.csproj" />
     <ProjectReference Include="..\..\Core\EShop.Module.Core.Contract\EShop.Module.Core.Contract.csproj" />
+    <ProjectReference Include="..\..\Pricing\Eshop.Module.Pricing.Contract\Eshop.Module.Pricing.Contract.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

@@ -9,7 +9,7 @@ public sealed class CheckoutDbContext(DbContextOptions<CheckoutDbContext> option
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("checkout");
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CheckoutDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CheckoutExtensions).Assembly);
     }
 
 

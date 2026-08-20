@@ -1,5 +1,7 @@
 ﻿namespace Shared.DDD;
 
+using System;
+
 public sealed record Money : IComparable<Money>
 {
     public decimal Amount { get; init; }
@@ -11,6 +13,12 @@ public sealed record Money : IComparable<Money>
 
         Amount = amount;
         Currency = currency.Trim().ToUpperInvariant();
+    }
+
+
+    private Money()
+    {
+        Currency = "USD";
     }
 
     public static Money Zero(string currency = "USD") => new(0m, currency);
@@ -45,8 +53,17 @@ public sealed record Money : IComparable<Money>
         return this with { Amount = Amount / divisor };
     }
 
-    public Money Round(int decimals) =>
-        this with { Amount = Math.Round(Amount, decimals, MidpointRounding.AwayFromZero) };
+    public Money ApplyDiscount(decimal percentage)
+    {
+        if (percentage < 0m || percentage > 100m)
+            throw new ArgumentOutOfRangeException(nameof(percentage), "Discount percentage must be between 0 and 100.");
+
+        var discountAmount = Amount * (percentage / 100m);
+        return this with { Amount = Amount - discountAmount };
+    }
+
+    public Money Round(int decimals = 2, MidpointRounding mode = MidpointRounding.AwayFromZero) =>
+        this with { Amount = Math.Round(Amount, decimals, mode) };
 
     public Money Absolute() =>
         this with { Amount = Math.Abs(Amount) };
@@ -78,7 +95,7 @@ public sealed record Money : IComparable<Money>
         return left.Divide(right);
     }
 
-    // Comparisons
+    // Comparisons (Null-Safe)
     public int CompareTo(Money? other)
     {
         if (other is null) return 1;
@@ -86,10 +103,17 @@ public sealed record Money : IComparable<Money>
         return Amount.CompareTo(other.Amount);
     }
 
-    public static bool operator <(Money left, Money right) => left.CompareTo(right) < 0;
-    public static bool operator <=(Money left, Money right) => left.CompareTo(right) <= 0;
-    public static bool operator >(Money left, Money right) => left.CompareTo(right) > 0;
-    public static bool operator >=(Money left, Money right) => left.CompareTo(right) >= 0;
+    public static bool operator <(Money? left, Money? right) =>
+        left is null ? right is not null : left.CompareTo(right) < 0;
+
+    public static bool operator <=(Money? left, Money? right) =>
+        left is null || left.CompareTo(right) <= 0;
+
+    public static bool operator >(Money? left, Money? right) =>
+        left is not null && left.CompareTo(right) > 0;
+
+    public static bool operator >=(Money? left, Money? right) =>
+        left is null ? right is null : left.CompareTo(right) >= 0;
 
     private void EnsureSameCurrency(Money other)
     {
@@ -100,5 +124,5 @@ public sealed record Money : IComparable<Money>
         }
     }
 
-    public override string ToString() => $"{Amount} {Currency}";
+    public override string ToString() => $"{Amount:N2} {Currency}";
 }

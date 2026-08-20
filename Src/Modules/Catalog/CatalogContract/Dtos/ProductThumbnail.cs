@@ -1,5 +1,5 @@
-﻿using EShop.Module.Core.Contract.Dtos;
-using System.Security.Cryptography;
+﻿using Eshop.Module.Pricing.Contract.Dtos;
+using EShop.Module.Core.Contract.Dtos;
 
 namespace CatalogContract.Dtos
 {
@@ -37,7 +37,7 @@ namespace CatalogContract.Dtos
 
         public CalculatedProductPrice CalculatedProductPrice { get; set; }
 
-        public static ProductThumbnail FromProduct(Guid Id , string name,string slug, 
+        public static ProductThumbnail FromProduct(Guid Id, string name, string slug,
             decimal price, decimal? oldPrice, decimal? specialPrice,
             DateTimeOffset? specialPriceStart, DateTimeOffset? specialPriceEnd,
             int? stockQuantity, bool isAllowToOrder, bool isCallForPricing,

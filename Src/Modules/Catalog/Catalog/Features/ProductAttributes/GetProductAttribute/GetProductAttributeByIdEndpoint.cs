@@ -14,7 +14,7 @@ namespace Catalog.Features.ProductAttributes.GetProductAttribute
             app.MapGet("api/product-attributes/{id:guid}", async (Guid id, ISender sender, CancellationToken ct) =>
             {
                 var result = await sender.Send(new GetProductAttributeByIdQuery(id), ct);
-                return result.Match(Results.Ok, error => Results.Problem(error.Error.Description));
+                return result.Match(Results.Ok, error => Results.Problem(error.Description));
             }).WithTags("ProductAttributes");
         }
     }

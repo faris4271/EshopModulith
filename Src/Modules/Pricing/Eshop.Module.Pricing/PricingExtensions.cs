@@ -1,5 +1,7 @@
-using Eshop.Module.Pricing;
+namespace Eshop.Module.Pricing;
+
 using Eshop.Module.Pricing.Contract.Services;
+using Eshop.Module.Pricing.Data;
 using Eshop.Module.Pricing.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,17 +13,20 @@ public static class PricingExtensions
     {
         services.AddDbContext<PricingDbContext>(option =>
         {
-            option.UseNpgsql(configuration["Defualt"]);
+            option.UseNpgsql(configuration.GetConnectionString("defualt"));
         });
-        services.Configure<ExchangeRateApiOptions>(
 
-        configuration.GetSection(ExchangeRateApiOptions.SectionName));
-
-        services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
-
+        services.AddScoped<IPricingService, PricingService>();
         services.AddScoped<ICouponService, CouponService>();
+        services.AddScoped<PricingStrategyFactory>();
+        services.AddScoped<ICurrencyService, CurrencyService>();
 
-        services.AddHostedService<ExchangeRateSyncJob>();
+        // Register all pricing strategies as keyed services for PricingStrategyFactory
+        services.AddKeyedScoped<IPricingStrategy, SimplePricingStrategy>("simple");
+        services.AddKeyedScoped<IPricingStrategy, TieredPricingStrategy>("tiered");
+        services.AddKeyedScoped<IPricingStrategy, DiscountPricingStrategy>("discount");
+        services.AddKeyedScoped<IPricingStrategy, BulkPricingStrategy>("bulk");
+
         return services;
     }
 }

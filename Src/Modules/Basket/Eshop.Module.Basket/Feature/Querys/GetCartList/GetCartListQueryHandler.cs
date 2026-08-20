@@ -1,6 +1,6 @@
 ﻿using Eshop.Module.Basket.Contract.Dtos;
 using Eshop.Module.Basket.Services;
-using EShop.Module.Core.Contract.Services;
+using Eshop.Module.Pricing.Contract.Services;
 using Shared.Contract.CQRS;
 using Shared.Contract.ResultPattern;
 

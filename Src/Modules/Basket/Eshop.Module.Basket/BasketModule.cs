@@ -17,8 +17,8 @@ namespace Eshop.Module.Basket
                 op.UseNpgsql(configuration.GetConnectionString("defualt"));
             });
 
+            services.AddScoped<BasketPricingService>();
             services.AddScoped<ICartService, CartService>();
-
 
             return services;
         }

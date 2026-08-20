@@ -10,7 +10,6 @@ using Eshop.Module.Pricing.Contract.Services;
 using Eshop.Module.Shipping.Contract.Dtos;
 using Eshop.Module.Shipping.Contract.Feature.Shipping.GetApplicablePrices;
 using EShop.Module.Core.Contract.Dtos;
-using EShop.Module.Core.Contract.Services;
 using global::Module.Identity.Contract.Feature.Users.GetUserAddrees;
 using global::Module.Tax.Contract.Features.GetTaxPercents;
 using MediatR;
@@ -96,25 +95,34 @@ internal class CheckoutService : ICheckoutService
         }
 
         var itemsList = checkoutProductItems.Value ?? new List<CheckoutItemDto>();
+        var checkoutItemQuantities = checkoutItems.ToDictionary(x => x.ProductId, x => x.Quantity);
 
+        foreach (var item in itemsList)
+        {
+            if (checkoutItemQuantities.TryGetValue(item.ProductId, out var quantity))
+            {
+                item.Quantity = quantity;
+            }
+        }
 
-        var subTotalAmount = itemsList.Sum(x => x.Quantity * (x.CalculatedProductPrice.OldPrice?.Amount ?? x.ProductPrice));
+        var subTotalAmount = itemsList.Sum(x => x.Quantity * (x.CalculatedProductPrice?.OldPrice ?? x.ProductPrice));
 
         var checkoutDto = new CheckoutDto
         {
             Id = checkoutEntity.Id,
             CouponCode = checkoutEntity.CouponCode,
             IsProductPriceIncludeTax = checkoutEntity.IsProductPriceIncludeTax,
-            TaxAmount = checkoutEntity.TaxAmount.Amount,
-            ShippingAmount = checkoutEntity.ShippingAmount.Amount,
+            TaxAmount = checkoutEntity.TaxAmount?.Amount,
+            ShippingAmount = checkoutEntity.ShippingAmount?.Amount,
             OrderNote = checkoutEntity.OrderNote,
             SubTotal = subTotalAmount,
             Items = itemsList,
-            OrderTotalString = _currencyService.FormatCurrency(checkoutEntity.TotalAmount),
-            TaxAmountString = _currencyService.FormatCurrency(checkoutEntity.TaxAmount),
-            ShippingAmountString = _currencyService.FormatCurrency(checkoutEntity.ShippingAmount)
+            OrderTotalString = string.Empty,
+            TaxAmountString = _currencyService.FormatCurrency(checkoutEntity.TaxAmount ?? new Money(0m, "USD")),
+            ShippingAmountString = _currencyService.FormatCurrency(checkoutEntity.ShippingAmount ?? new Money(0m, "USD"))
         };
 
+        checkoutDto.OrderTotalString = _currencyService.FormatCurrency(new Money(checkoutDto.OrderTotal, "USD"));
 
         if (!string.IsNullOrWhiteSpace(checkoutDto.CouponCode))
         {
@@ -199,7 +207,9 @@ internal class CheckoutService : ICheckoutService
         var applicableShippingPricesResult = await _sender.Send(new GetApplicableShippingPricesQuery(
             shippingAddress,
             shippingAddress,
-            new List<ShippingItemDto>(),
+            orderTaxAndShippingPrice.CheckoutDto.Items
+                .Select(x => new ShippingItemDto(x.ProductId, x.Quantity))
+                .ToList(),
             orderTaxAndShippingPrice.CheckoutDto.OrderTotal
         ));
 

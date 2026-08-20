@@ -4,25 +4,33 @@ using Eshop.Module.Pricing;
 using Eshop.Module.Pricing.Contract.Services;
 using Eshop.Module.Pricing.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Shared.Caching;
 using System.Net.Http.Json;
 
 public class ExchangeRateService : IExchangeRateService
 {
     private readonly PricingDbContext _dbContext;
     private readonly HttpClient _httpClient;
-    private readonly ICacheService _cache;
+    private readonly HybridCache _cache;
     private readonly ILogger<ExchangeRateService> _logger;
     private readonly ExchangeRateApiOptions _options;
 
     private const string CacheKeyPrefix = "exchange_rate_";
 
+    private static readonly HybridCacheEntryOptions ExchangeEntryOptions = new()
+    {
+        Expiration = TimeSpan.FromHours(1),
+        LocalCacheExpiration = TimeSpan.FromMinutes(2),
+    };
+
+    private readonly record struct ExchangeRateState(string from, string to, PricingDbContext dbContext);
+
     public ExchangeRateService(
         PricingDbContext dbContext,
         HttpClient httpClient,
-        ICacheService cache,
+        HybridCache cache,
         ILogger<ExchangeRateService> logger,
         IOptions<ExchangeRateApiOptions> options)
     {
@@ -108,7 +116,7 @@ public class ExchangeRateService : IExchangeRateService
                 }
 
                 // Update Memory Cache instantly
-                UpdateCache(baseCurrency, target, rateValue);
+                await UpdateCacheAsync(baseCurrency, target, rateValue);
             }
 
             await _dbContext.SaveChangesAsync(ct);
@@ -125,26 +133,39 @@ public class ExchangeRateService : IExchangeRateService
     private async Task<decimal?> GetRateAsync(string from, string to, CancellationToken ct)
     {
         var cacheKey = $"{CacheKeyPrefix}{from}_{to}";
+        var state = new ExchangeRateState(from, to, _dbContext);
 
-        var rateFromCache = await _cache.GetOrSetAsync(cacheKey, async () =>
-        {
-            var rateFromDb = await _dbContext.ExchangeRates
-                .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.FromCurrency == from && r.ToCurrency == to, ct);
-            return rateFromDb?.Rate;
-        }, TimeSpan.FromHours(12));
+        var tags = new[] { $"exchange_rate_{from}", $"exchange_rate_{to}" };
 
-
-
+        var rateFromCache = await _cache.GetOrCreateAsync(cacheKey,
+            state,
+            FetchRateFromDbAsync,
+            ExchangeEntryOptions,
+            tags,
+            ct);
 
         return rateFromCache;
     }
 
-    private void UpdateCache(string from, string to, decimal rate)
+    private async ValueTask<decimal?> FetchRateFromDbAsync(ExchangeRateState state, CancellationToken ct)
+    {
+        var rateEntity = await state.dbContext.ExchangeRates
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.FromCurrency == state.from && r.ToCurrency == state.to, ct);
+        if (rateEntity != null)
+        {
+            // Update cache for future requests
+            await UpdateCacheAsync(state.from, state.to, rateEntity.Rate);
+            return rateEntity.Rate;
+        }
+        return null;
+    }
+    private async Task UpdateCacheAsync(string from, string to, decimal rate)
     {
         var cacheKey = $"{CacheKeyPrefix}{from}_{to}";
-        _cache.SetItem(cacheKey, rate, TimeSpan.FromHours(12));
+        await _cache.SetAsync(cacheKey, rate, ExchangeEntryOptions);
     }
 
     #endregion
 }
+

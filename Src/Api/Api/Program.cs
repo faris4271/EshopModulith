@@ -3,6 +3,7 @@ using Catalog;
 using Eshop.Module.Basket;
 using Eshop.Module.Checkout;
 using Eshop.Module.Core;
+using Eshop.Module.Pricing;
 using Eshop.Module.Shipping;
 using IdentityModule;
 using IdentityModule.Data;
@@ -10,6 +11,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.OpenApi;
 using Module.Inventory;
 using Module.Tax;
+using MultiTenancyModule;
+using MultiTenancyModule.Data;
 using Shared.Caching;
 using Shared.Eventing;
 using Shared.Extensions;
@@ -35,6 +38,7 @@ var identityAssembly = typeof(IdentityDbContext).Assembly;
 var basketAssembly = typeof(BasketModule).Assembly;
 var inventoryAssembly = typeof(InventoryModule).Assembly;
 var taxAssembly = typeof(Module.Tax.TaxModule).Assembly;
+var multiTenancyAssembly = typeof(TenantDbContext).Assembly;
 
 
 builder.Services.AddCarter(configurator: config =>
@@ -52,17 +56,21 @@ builder.Services.AddCarter(configurator: config =>
     var TaxModule = typeof(Module.Tax.TaxModule).Assembly.GetTypes()
         .Where(x => x.IsAssignableTo(typeof(ICarterModule))).ToArray();
 
+    var multiTenancyModuleTypes = typeof(TenantDbContext).Assembly.GetTypes()
+        .Where(x => x.IsAssignableTo(typeof(ICarterModule))).ToArray();
+
 
     config.WithModules(catalogModule);
     config.WithModules(identityModuleTypes);
     config.WithModules(basketModuleTypes);
     config.WithModules(inventoryModuleTypes);
     config.WithModules(TaxModule);
+    config.WithModules(multiTenancyModuleTypes);
 });
 
 builder.Services.AddEventingCore(builder.Configuration);
 builder.Services
-    .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, identityAssembly, taxAssembly);
+    .AddMediatRWithAssemblies(catalogAssembly, basketAssembly, identityAssembly, taxAssembly, multiTenancyAssembly);
 #region Cross-Origin Resource Sharing (CORS) Configuration
 builder.Services.AddCors(options =>
 {
@@ -81,6 +89,7 @@ builder.Services.AddCatalog(builder.Configuration)
     .AddCore(builder.Configuration)
     .AddBasket(builder.Configuration)
     .AddIdentityModule(builder.Configuration)
+    .AddMultiTenancyModule(builder.Configuration)
     .AddMailing()
     .AddCaching(builder.Configuration)
     .AddHeroJobs()
@@ -115,7 +124,7 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 //app.UseExceptionHandler();
-app.UseCatalog().UseCore().UseBasket().UseIdentity().UseInventory().UseTax();
+app.UseCatalog().UseCore().UseBasket().UseIdentity().UseInventory().UseTax().UseMultiTenancy();
 app.UseRouting();
 
 app.UseCors("AllowAngularApp");

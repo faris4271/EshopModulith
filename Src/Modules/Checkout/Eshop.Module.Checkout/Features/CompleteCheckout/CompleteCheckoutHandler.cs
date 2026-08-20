@@ -1,7 +1,5 @@
-using Shared.Abstraction;
-using Shared.Contract.CQRS;
+using Eshop.Module.Checkout.Data;
 using Shared.Contract.Exeption;
-using Shared.Contract.ResultPattern;
 
 public sealed class CompleteCheckoutHandler(
     IGenericeRepository<Checkout, CheckoutDbContext> checkoutRepository,

@@ -1,30 +1,33 @@
 ﻿using Eshop.Module.Localization.Contract.Services;
 using Eshop.Module.Localization.Data;
 using Eshop.Module.Localization.Models;
-using Shared.Abstraction;
-using Shared.Caching;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using System.Globalization;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Eshop.Module.Localization.Services
 {
     internal class ContentLocalizationService : IContentLocalizationService
     {
-        private readonly IGenericeRepository<LocalizedContentProperty,LocalizationDbContext> _entityRepository;
+        private readonly LocalizationDbContext _DbContext;
 
         private readonly bool _isLocalizedConentEnable;
 
-        private readonly ICacheService _cacheService;
+        private readonly HybridCache _cacheService;
+
+        private static readonly HybridCacheEntryOptions LocalizationEntryOptions = new()
+        {
+            Expiration = TimeSpan.FromHours(1),
+            LocalCacheExpiration = TimeSpan.FromMinutes(2),
+        };
 
         public ContentLocalizationService(
-            IGenericeRepository<LocalizedContentProperty, 
-            LocalizationDbContext> entityRepository,
-            bool isLocalizedConentEnable, ICacheService cacheService)
+
+            LocalizationDbContext dbContext,
+            bool isLocalizedConentEnable, HybridCache cacheService)
         {
-            _entityRepository = entityRepository;
+            _DbContext = dbContext;
             _isLocalizedConentEnable = isLocalizedConentEnable;
             _cacheService = cacheService;
         }
@@ -36,7 +39,7 @@ namespace Eshop.Module.Localization.Services
 
         public async Task<Func<Guid, string, string, string>> GetLocalizationFunction(string entityType)
         {
-            var localizedContentProperties =await GetLocalizationFromDb(entityType);
+            var localizedContentProperties = await GetLocalizationFromDb(entityType);
 
             Func<Guid, string, string, string> localizationFunction = (entityId, propertyName, defaultValue) =>
             {
@@ -52,47 +55,48 @@ namespace Eshop.Module.Localization.Services
             return localizationFunction;
         }
 
-        public async Task<string> GetLocalizedProperty<TEntity>(TEntity entity, string propertyName, string propertyValue) where TEntity : global::Shared.DDD.EntityBase<Guid>
+        public async Task<string> GetLocalizedProperty<TEntity>(TEntity entity, string propertyName, string propertyValue, CancellationToken ct) where TEntity : global::Shared.DDD.EntityBase<Guid>
         {
-            var culture=CultureInfo.CurrentCulture.Name;
+            var culture = CultureInfo.CurrentCulture.Name;
 
-           return await GetLocalizedProperty(entity, propertyName, propertyValue, culture);
+            return await GetLocalizedProperty(entity, propertyName, propertyValue, culture, ct);
 
         }
 
-        public async Task<string> GetLocalizedProperty<TEntity>(TEntity entity, string propertyName, string propertyValue, string cultureId) where TEntity : global::Shared.DDD.EntityBase<Guid>
+        public async Task<string> GetLocalizedProperty<TEntity>(TEntity entity, string propertyName, string propertyValue, string cultureId, CancellationToken ct) where TEntity : global::Shared.DDD.EntityBase<Guid>
         {
-           
-            if(entity == null) throw new ArgumentNullException(nameof(entity));
 
-          return await GetLocalizedProperty(entity.GetType().Name, entity.Id,propertyName, propertyValue,cultureId);
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            return await GetLocalizedProperty(entity.GetType().Name, entity.Id, propertyName, propertyValue, cultureId, ct);
         }
 
-        public async Task<string> GetLocalizedProperty(string entityType, Guid entityId, string propertyName, string propertyValue)
+        public async Task<string> GetLocalizedProperty(string entityType, Guid entityId, string propertyName, string propertyValue, CancellationToken ct)
         {
             var colure = CultureInfo.CurrentCulture.Name;
 
-           return await  GetLocalizedProperty(entityType, entityId, propertyName, propertyValue, colure);
+            return await GetLocalizedProperty(entityType, entityId, propertyName, propertyValue, colure, ct);
         }
 
-        public async Task<string> GetLocalizedProperty(string entityType, Guid entityId, string propertyName, string propertyValue, string cultureId)
+        public async Task<string> GetLocalizedProperty(string entityType, Guid entityId, string propertyName, string propertyValue, string cultureId, CancellationToken ct)
         {
             if (!_isLocalizedConentEnable)
             {
                 return propertyValue;
             }
 
-            var localizationProperty =await _cacheService.GetOrSetAsync(GetLocalizationCacheKey(entityId.ToString()), async () =>
-            {
+            var state = new LocalizationFactoryState(_DbContext, cultureId, entityId, entityType);
 
-             var localiz= await GetLocalizedPropertiesFromDbAsync(entityType, entityId,cultureId);
-                return localiz;
+            var localizationProperty = await _cacheService.GetOrCreateAsync(GetLocalizationCacheKey(entityId.ToString()),
+                state,
+              GetLocalizedPropertiesFromDbAsync,
 
-            });    
+                LocalizationEntryOptions
+              );
 
-           var localizProperty= localizationProperty.FirstOrDefault(x=>x.ProperyName==propertyName);
+            var localizProperty = localizationProperty.FirstOrDefault(x => x.ProperyName == propertyName);
 
-            if(localizProperty != null) 
+            if (localizProperty != null)
                 return localizProperty.Value;
 
             return propertyValue;
@@ -104,35 +108,56 @@ namespace Eshop.Module.Localization.Services
             return await GetLocalizationFromDb(entityType, CultureInfo.CurrentCulture.Name);
         }
 
-        private async Task<List<LocalizedContentProperty>> GetLocalizationFromDb(string entityType, string cultureId)
+        private async Task<List<LocalizedContentProperty>> GetLocalizationFromDb(
+         string entityType,
+         string cultureId,
+         Guid entityId = default,
+         CancellationToken ct = default)
         {
             if (!_isLocalizedConentEnable)
             {
                 return new List<LocalizedContentProperty>();
             }
 
-            var localizedProperties = await GetLocalizedPropertiesFromDbAsync(entityType, null, cultureId);
+            var state = new LocalizationFactoryState
+            {
+                EntityType = entityType,
+                CultureId = cultureId,
+                EntityId = entityId
+            };
 
-            return  localizedProperties;
-        }
-        private async Task<List<LocalizedContentProperty>> GetLocalizedPropertiesFromDbAsync(string entityType, Guid? entityId, string cultureId)
-        {
-            Expression<Func<LocalizedContentProperty, bool>> expression = localizedContentProperty => entityId == null
-            ? localizedContentProperty.EntityType == entityType
-                && localizedContentProperty.CultureId == cultureId
-            : localizedContentProperty.EntityId == entityId
-                && localizedContentProperty.EntityType == entityType
-                && localizedContentProperty.CultureId == cultureId;
+            // Correctly await the async delegate execution with required state and cancellation token
+            var localizedProperties = await GetLocalizedPropertiesFromDbAsync(state, ct);
 
-            var query = await _entityRepository.Query();
-
-            var localizedProperties = query.Where(expression).ToList();
             return localizedProperties;
         }
 
+        private async ValueTask<List<LocalizedContentProperty>> GetLocalizedPropertiesFromDbAsync(
+            LocalizationFactoryState state,
+            CancellationToken ct)
+        {
+            Expression<Func<LocalizedContentProperty, bool>> expression = localizedContentProperty =>
+                state.EntityId == null
+                    ? localizedContentProperty.EntityType == state.EntityType
+                        && localizedContentProperty.CultureId == state.CultureId
+                    : localizedContentProperty.EntityId == state.EntityId
+                        && localizedContentProperty.EntityType == state.EntityType
+                        && localizedContentProperty.CultureId == state.CultureId;
+
+            // Use ToListAsync to perform a non-blocking database query
+            var localizedProperties = await _DbContext.Set<LocalizedContentProperty>()
+                .Where(expression)
+                .ToListAsync(ct);
+
+            return localizedProperties;
+        }
         public static string GetLocalizationCacheKey(string userId)
         {
             return $"loc:{userId}";
         }
+
+
+
+        private readonly record struct LocalizationFactoryState(LocalizationDbContext DbContext, string CultureId, Guid EntityId, string EntityType);
     }
 }

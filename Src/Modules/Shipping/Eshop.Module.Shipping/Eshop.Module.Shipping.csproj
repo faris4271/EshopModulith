@@ -17,6 +17,9 @@
 
 
 	<ProjectReference Include="..\..\Core\EShop.Module.Core.Contract\EShop.Module.Core.Contract.csproj" />
+
+
+	<ProjectReference Include="..\..\Pricing\Eshop.Module.Pricing.Contract\Eshop.Module.Pricing.Contract.csproj" />
 	<ProjectReference Include="..\Eshop.Module.Shipping.Contract\Eshop.Module.Shipping.Contract.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,6 @@
-﻿namespace Eshop.Module.Basket.Contract.Dtos
+﻿using CatalogContract.Dtos;
+
+namespace Eshop.Module.Basket.Contract.Dtos
 {
     public class CartDto
     {
@@ -27,27 +29,9 @@
 
         public string SubTotalWithDiscountString { get; set; }
 
-        public IList<CartItemDto> Items { get; set; } = new List<CartItemDto>();
+        public IList<CartItemsDto> Items { get; set; } = new List<CartItemsDto>();
 
-        public bool IsValid
-        {
-            get
-            {
-                foreach (var item in Items)
-                {
-                    if (!item.IsProductAvailabeToOrder)
-                    {
-                        return false;
-                    }
+        public bool IsValid { get; set; }
 
-                    if (item.ProductStockTrackingIsEnabled && item.ProductStockQuantity < item.Quantity)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
     }
 }

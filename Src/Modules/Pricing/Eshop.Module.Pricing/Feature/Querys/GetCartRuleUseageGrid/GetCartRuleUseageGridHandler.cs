@@ -1,4 +1,4 @@
-﻿using Eshop.Module.Basket.Contract.Dtos;
+﻿using Eshop.Module.Pricing.Contract.Dtos;
 using Eshop.Module.Pricing.Models;
 using Microsoft.EntityFrameworkCore;
 using Module.Identity.Contract.Services;

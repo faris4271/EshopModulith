@@ -1,10 +1,9 @@
 ﻿using Catalog.Data;
 using Catalog.Products.Models;
-using CatalogContract.Services;
-using Eshop.Module.Basket.Contract.Dtos;
+using CatalogContract.Dtos;
 using Eshop.Module.Basket.Contract.Feature.GetProductsByIds;
+using Eshop.Module.Pricing.Contract.Services;
 using EShop.Module.Core.Contract.Feature.Medias.GetMedia;
-using EShop.Module.Core.Contract.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstraction;
@@ -35,18 +34,15 @@ namespace Catalog.Features.Products.Querys.GetProductsByIds
                 ProductId = x.Id,
                 ProductName = x.Name.name,
                 ProductPrice = x.Price.Amount,
-                CalculatedProductPrice = _productPricingService.
-                 CalculateProductPrice(x.Price, x.OldPrice, x.SpecialPrice
-                 , x.SpecialPriceStart, x.SpecialPriceEnd),
                 ProductStockQuantity = x.StockQuantity,
                 ProductStockTrackingIsEnabled = x.StockTrackingIsEnabled,
                 IsProductAvailabeToOrder = x.IsAllowToOrder && x.IsPublished && !x.IsDeleted,
                 ProductImage = GetProductImage(x.Id).Result,
                 Quantity = x.StockQuantity,
-                VariationOptions = x.OptionCombinations.Select(oc => new ProductVariationOptionDto
+                VariationOptions = x.OptionCombinations.Select(oc => new CatalogContract.Dtos.ProductVariationOptionDto
                 {
                     OptionName = oc.Option.Name,
-                    OptionValue = oc.Value
+                    Value = oc.Value
                 }).ToList()
 
             }).ToList();

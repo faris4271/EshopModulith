@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Module.Identity.Contract.Services
+﻿namespace Module.Identity.Contract.Services
 {
     public interface IUserPermissionService
     {
@@ -16,6 +12,6 @@ namespace Module.Identity.Contract.Services
         /// <summary>
         /// Invalidates the permission cache for a user.
         /// </summary>
-        Task InvalidatePermissionCacheAsync(string userId, CancellationToken cancellationToken);
+        ValueTask InvalidatePermissionCacheAsync(string userId, CancellationToken cancellationToken);
     }
 }

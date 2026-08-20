@@ -1,9 +1,9 @@
-﻿using Catalog.Data;
+using Catalog.Data;
 using Catalog.Products.Models;
 using CatalogContract.Dtos;
 using CatalogContract.Features.GetCheckOutProducts;
+using Eshop.Module.Pricing.Contract.Services;
 using EShop.Module.Core.Contract.Feature.Medias.GetMedia;
-using EShop.Module.Core.Contract.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Shared.Abstraction;
@@ -12,23 +12,28 @@ using Shared.Contract.ResultPattern;
 
 namespace Catalog.Features.Products.Querys.GetCheckOutProducts
 {
-    internal class GetCheckOutProductsHandler(IGenericeRepository<Product, CatalogDbContext> _repository, ISender _sender, ICurrencyService _currencyService) : IQueryHandler<GetCheckOutProductsQuery, List<CheckoutItemDto>>
+    internal class GetCheckOutProductsHandler(
+        IGenericeRepository<Product, CatalogDbContext> repository,
+        IProductPricingService productPricingService,
+        ICurrencyService currencyService,
+        ISender sender) : IQueryHandler<GetCheckOutProductsQuery, List<CheckoutItemDto>>
     {
         public async Task<Result<List<CheckoutItemDto>>> Handle(GetCheckOutProductsQuery request, CancellationToken cancellationToken)
         {
-            var query = await _repository.Query();
+            var query = await repository.Query();
 
-            query = query.Include(x => x.OptionCombinations).Include(x => x.OptionValues).ThenInclude(x => x.Option)
-               .Where(x => request.productIds.Contains(x.Id));
+            query = query.Include(x => x.OptionCombinations)
+                .Include(x => x.OptionValues).ThenInclude(x => x.Option)
+                .Where(x => request.productIds.Contains(x.Id));
 
             var mediaIds = query.Select(x => x.MainImageId).ToList();
 
-            var mediaResults = await _sender.Send(new GetListOfMediasQuery(mediaIds), cancellationToken);
-
+            var mediaResults = await sender.Send(new GetListOfMediasQuery(mediaIds), cancellationToken);
             if (!mediaResults.IsSuccess)
             {
                 return Result.Failure<List<CheckoutItemDto>>(mediaResults.Error);
             }
+
             var mediaDictionary = mediaResults.Value.ToDictionary(x => x.id, x => x.FileName);
 
             var products = await query
@@ -41,13 +46,17 @@ namespace Catalog.Features.Products.Querys.GetCheckOutProducts
                     ProductStockQuantity = x.StockQuantity,
                     ProductStockTrackingIsEnabled = x.StockTrackingIsEnabled,
                     IsProductAvailabeToOrder = x.IsAllowToOrder,
-                    Quantity = 1, // Default quantity for checkout
-                    ProductPriceString = _currencyService.FormatCurrency(x.Price),
-
+                    Quantity = 1,
+                    ProductPriceString = currencyService.FormatCurrency(x.Price),
+                    CalculatedProductPrice = productPricingService.CalculateProductPrice(
+                        x.Price,
+                        x.OldPrice,
+                        x.SpecialPrice,
+                        x.SpecialPriceStart,
+                        x.SpecialPriceEnd),
                     ProductImage = mediaDictionary.ContainsKey(x.MainImageId) ? mediaDictionary[x.MainImageId] : null,
                     VariationOptions = x.OptionCombinations.Select(o => new ProductVariationOptionDto
                     {
-
                         OptionName = o.Option.Name,
                         Value = o.Value
                     }).ToList()

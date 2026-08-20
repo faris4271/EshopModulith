@@ -1,9 +1,9 @@
 ﻿using IdentityModule.Domain;
 using Microsoft.AspNetCore.Identity;
 using Module.Identity.Contract.Services;
-using SendGrid.Helpers.Errors.Model;
 using Shared.Contract.Context;
 using Shared.Contract.Exeption;
+using Shared.Extensions;
 using Shared.Identity;
 
 namespace IdentityModule.Services

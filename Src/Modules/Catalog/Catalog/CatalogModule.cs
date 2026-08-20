@@ -1,6 +1,6 @@
 ﻿using Catalog.Data;
 using Catalog.Services;
-using CatalogContract.Services;
+using Eshop.Module.Pricing.Contract.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

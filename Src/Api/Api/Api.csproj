@@ -43,6 +43,7 @@
     <ProjectReference Include="..\..\Modules\Tax\Module.Tax\Module.Tax.csproj" />
    
     <ProjectReference Include="..\..\Modules\Pricing\Eshop.Module.Pricing\Eshop.Module.Pricing.csproj" />
+    <ProjectReference Include="..\..\Modules\MultiTenancy\MultiTenancyModule\MultiTenancyModule.csproj" />
   </ItemGroup>
 
 </Project>

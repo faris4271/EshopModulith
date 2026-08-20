@@ -14,4 +14,10 @@
     <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Catalog\Catalog\Catalog.csproj" />
+    <ProjectReference Include="..\..\Modules\Checkout\Eshop.Module.Checkout\Eshop.Module.Checkout.csproj" />
+    <ProjectReference Include="..\..\Modules\MultiTenancy\MultiTenancyModule\MultiTenancyModule.csproj" />
+  </ItemGroup>
+
 </Project>

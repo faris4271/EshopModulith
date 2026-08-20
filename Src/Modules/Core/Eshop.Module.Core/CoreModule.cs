@@ -15,7 +15,7 @@ namespace Eshop.Module.Core
     {
         public static IServiceCollection AddCore(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<ICurrencyService, CurrencyService>();
+
 
             services.AddScoped<IEntityService, EntityService>();
 

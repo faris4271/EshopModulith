@@ -1,4 +1,6 @@
-﻿namespace CatalogContract.Dtos
+﻿using Eshop.Module.Pricing.Contract.Dtos;
+
+namespace CatalogContract.Dtos
 {
     public record CheckoutItemDto
     {

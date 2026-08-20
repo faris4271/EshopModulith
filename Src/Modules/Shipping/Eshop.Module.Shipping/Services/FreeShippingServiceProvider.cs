@@ -1,6 +1,6 @@
-﻿using Eshop.Module.Shipping.Contract.Dtos;
+﻿using Eshop.Module.Pricing.Contract.Services;
+using Eshop.Module.Shipping.Contract.Dtos;
 using Eshop.Module.Shipping.Models;
-using EShop.Module.Core.Contract.Services;
 using Newtonsoft.Json;
 
 namespace Eshop.Module.Shipping.Services

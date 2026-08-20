@@ -1,5 +1,6 @@
 ﻿
 
+using Eshop.Module.Pricing.Contract.Dtos;
 using EShop.Module.Core.Contract.Dtos;
 
 namespace CatalogContract.Dtos
